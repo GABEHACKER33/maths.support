@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Maths Support - Educational gaming platform">
+    <title>Maths Support</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600;700&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #9b27ca, #f92121);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 30px;
+        }
+        header {
+            width: 100%;
+            text-align: center;
+            position: relative;
+            top: 0;
+            padding: 20px 0;
+            background: transparent;
+            z-index: 10;
+        }
+        .logo {
+            font-size: 86px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #f12711, #f5af19, #4facfe, #00f2fe);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: colorChange 5s ease infinite;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+            background-size: 400% 400%;
+        }
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 60px;
+            }
+        }
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 40px;
+            }
+        }
+        .main-section {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .search-container {
+            width: 80%;
+            max-width: 600px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        #search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        #search-input:focus {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 80%;
+        }
+        .category-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .category-btn:hover, .category-btn.active {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px);
+        }
+        #game-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            width: 90%;
+            max-width: 1200px;
+            margin-bottom: 20px;
+        }
+        #game-buttons button {
+            padding: 20px;
+            height: 120px;
+            font-size: 18px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        #game-buttons button:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        #game-buttons button .bg-layer {
+            height: 100%;
+            width: 300%;
+            position: absolute;
+            left: -100%;
+            top: 0;
+            background: linear-gradient(135deg, #9b27ca, #d33639, #9b27ca, #d33639);
+            transition: all 0.4s ease;
+            z-index: 1;
+        }
+        #game-buttons button:hover .bg-layer {
+            left: 0;
+        }
+        #game-buttons button span {
+            position: relative;
+            z-index: 2;
+        }
+        #game-buttons button:nth-child(1) { background-color: #f12711; }
+        #game-buttons button:nth-child(2) { background-color: #f5af19; }
+        #game-buttons button:nth-child(3) { background-color: #4facfe; }
+        #game-buttons button:nth-child(4) { background-color: #00f2fe; }
+        #game-buttons button:nth-child(5) { background-color: #9b27ca; }
+        #game-buttons button:nth-child(6) { background-color: #ff8c00; }
+        #game-buttons button:nth-child(7) { background-color: #32cd32; }
+        #game-buttons button:nth-child(8) { background-color: #ff1493; }
+        #game-buttons button:nth-child(9) { background-color: #8a2be2; }
+        #game-buttons button:nth-child(10) { background-color: #ff6347; }
+        #game-buttons button:nth-child(11) { background-color: #20b2aa; }
+        #game-buttons button:nth-child(12) { background-color: #ff69b4; }
+        #game-buttons button:nth-child(13) { background-color: #7fff00; }
+        #game-buttons button:nth-child(14) { background-color: #ff4500; }
+        #game-buttons button:nth-child(15) { background-color: #8b0000; }
+        #game-buttons button:nth-child(16) { background-color: #8a2be2; }
+        #game-buttons button:nth-child(17) { background-color: #f5af19; }
+        #game-buttons button:nth-child(18) { background-color: #ff1493; }
+        #game-buttons button:nth-child(19) { background-color: #8b0000; }
+        #game-buttons button:nth-child(20) { background-color: #ff6347; }
+        #game-buttons button:nth-child(21) { background-color: #f12711; }
+        #game-buttons button:nth-child(22) { background-color: #4facfe; }
+        #game-buttons button:nth-child(23) { background-color: #00f2fe; }
+        #game-buttons button:nth-child(24) { background-color: #A2CAF2; }
+        #game-buttons button:nth-child(25) { background-color: #60ffc8; }
+        #game-buttons button:nth-child(26) { background-color: #ee063e; }
+        #game-buttons button:nth-child(27) { background-color: #eeb206; }
+        #game-buttons button:nth-child(28) { background-color: #32cd32; }
+        #game-buttons button:nth-child(29) { background-color: #20b2aa; }
+        #control-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            width: 100%;
+            justify-content: center;
+        }
+        #control-buttons button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        #control-buttons button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        #control-buttons button span {
+            position: relative;
+            z-index: 2;
+        }
+        #control-buttons button .bg-layer {
+            height: 100%;
+            width: 300%;
+            position: absolute;
+            left: -100%;
+            top: 0;
+            background: linear-gradient(135deg, #9b27ca, #d33639, #9b27ca, #d33639);
+            transition: all 0.4s ease;
+            z-index: 1;
+        }
+        #control-buttons button:hover .bg-layer {
+            left: 0;
+        }
+        #control-buttons button:nth-child(1) { background-color: #f12711; }
+        #control-buttons button:nth-child(2) { background-color: #4facfe; }
+        @keyframes colorChange {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        #logo-container {
+            text-align: center;
+            margin-top: 20px;
+            transition: opacity 0.3s ease;
+        }
+        @keyframes colorChange {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        #game-container {
+            width: 95%;
+            max-width: 1300px;
+            margin: 20px auto;
+            display: none;
+        }
+        #iframeContainer iframe {
+            width: 100%;
+            height: 75vh;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background-color: white;
+        }
+        .loader {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        footer {
+            margin-top: auto;
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+        #backToTop {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        #backToTop.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        #backToTop:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="logo-container">
+            <h1 class="logo">Maths Support</h1>
+        </div>
+    </header>
+    <section class="main-section">
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search games...">
+        </div>
+        <div class="categories">
+            <button class="category-btn active" data-category="all">All Games</button>
+            <button class="category-btn" data-category="action">Action</button>
+            <button class="category-btn" data-category="io">.io Games</button>
+            <button class="category-btn" data-category="casual">Casual</button>
+            <button class="category-btn" data-category="classic">Classic</button>
+        </div>
+        <div class="loader" id="loader"></div>
+        <nav id="game-buttons">
+            <button class="btn red" data-category="io" onclick="showGame('1v1')"><div class="bg-layer"></div><span>1v1.lol</span></button>
+            <button class="btn blue" data-category="io" onclick="showGame('slither')"><div class="bg-layer"></div><span>Slither.io</span></button>
+            <button class="btn green" data-category="action" onclick="showGame('krunker')"><div class="bg-layer"></div><span>Krunker.io</span></button>
+            <button class="btn orange" data-category="action" onclick="showGame('Shell Shockers')"><div class="bg-layer"></div><span>Shell Shockers</span></button>
+            <button class="btn pink" data-category="action" onclick="showGame('Agar.io')"><div class="bg-layer"></div><span>Smash Karts</span></button>
+            <button class="btn cyan" data-category="io" onclick="showGame('ZombsRoyale')"><div class="bg-layer"></div><span>ZombsRoyale.io</span></button>
+            <button class="btn yellow" data-category="io" onclick="showGame('Paper.io')"><div class="bg-layer"></div><span>Openfront</span></button>
+            <button class="btn red" data-category="io" onclick="showGame('SuperHex.io')"><div class="bg-layer"></div><span>SuperHex.io</span></button>
+            <button class="btn blue" data-category="classic" onclick="showGame('Pacman')"><div class="bg-layer"></div><span>Pacman</span></button>
+            <button class="btn green" data-category="action" onclick="showGame('Tetris')"><div class="bg-layer"></div><span>Rocket Bot Royale</span></button>
+            <button class="btn teal" data-category="tools" onclick="showGame('Exam')"><div class="bg-layer"></div><span>QWEN CHAT</span></button>
+            <button class="btn purple" data-category="io" onclick="showGame('Vectaria.io')"><div class="bg-layer"></div><span>Vectaria.io</span></button>
+            <button class="btn orange" data-category="action" onclick="showGame('GTA')"><div class="bg-layer"></div><span>GTA</span></button>
+            <button class="btn pink" data-category="classic" onclick="showGame('Snake')"><div class="bg-layer"></div><span>Snake</span></button>
+            <button class="btn brown" data-category="casual" onclick="showGame('Monkey Mart')"><div class="bg-layer"></div><span>Monkey Mart</span></button>
+            <button class="btn orange" data-category="casual" onclick="showGame('myinstants')"><div class="bg-layer"></div><span>myinstants</span></button>
+            <button class="btn orange" data-category="sports" onclick="showGame('2 Player Games')"><div class="bg-layer"></div><span>Football Legends</span></button>
+            <button class="btn orange" data-category="action" onclick="showGame('Subway Surfers')"><div class="bg-layer"></div><span>Subway Surfers</span></button>
+            <button class="btn teal" data-category="action" onclick="showGame('Granny')"><div class="bg-layer"></div><span>Granny</span></button>
+            <button class="btn teal" data-category="sports" onclick="showGame('SocerRandom')"><div class="bg-layer"></div><span>Soccer Random</span></button>
+            <button class="btn teal" data-category="sports" onclick="showGame('BasketRandom')"><div class="bg-layer"></div><span>Basket Random</span></button>
+            <button class="btn teal" data-category="action" onclick="showGame('GooberDash')"><div class="bg-layer"></div><span>Goober Dash</span></button>
+            <button class="btn teal" data-category="casual" onclick="showGame('Build')"><div class="bg-layer"></div><span>BuildNow.GG</span></button>
+            <button class="btn teal" data-category="casual" onclick="showGame('Dog')"><div class="bg-layer"></div><span>Dog Miner 2</span></button>
+            <button class="btn teal" data-category="io" onclick="showGame('Territorial')"><div class="bg-layer"></div><span>Territorial.io</span></button>
+            <button class="btn teal" data-category="casual" onclick="showGame('Stick')"><div class="bg-layer"></div><span>Stick Man Hook</span></button>
+            <button class="btn teal" data-category="casual" onclick="showGame('Gartic')"><div class="bg-layer"></div><span>Gartic Phone</span></button>
+            <button class="btn teal" data-category="tools" onclick="showGame('Play')"><div class="bg-layer"></div><span>PlaylistSound</span></button>
+            <button class="btn teal" data-category="other" onclick="showGame('Proximos Juegos')"><div class="bg-layer"></div><span>Proximos Juegos</span></button>
+        </nav>
+    </section>
+    <div id="game-container">
+        <div id="iframeContainer"></div>
+        <div id="control-buttons">
+            <button onclick="toggleFullscreen()"><div class="bg-layer"></div><span>Fullscreen</span></button>
+            <button onclick="exitGame()"><div class="bg-layer"></div><span>Exit</span></button>
+        </div>
+    </div>
+    <div id="backToTop">↑</div>
+    <footer>
+        <p>© 2025 Maths Support - Educational Gaming</p>
+    </footer>
+    <script>
+        const gameUrls = {
+            '1v1': 'https://1v1.lol',
+            'slither': 'https://slither.io/',
+            'krunker': 'https://krunker.io/?game=FRA:rjfzp',
+            'Shell Shockers': 'https://kevin.games/shellshock-io',
+            'Agar.io': 'https://smashkarts.io/',
+            'ZombsRoyale': 'https://zombsroyale.io',
+            'Paper.io': 'https://openfront.io',
+            'SuperHex.io': 'https://superhex.io',
+            'Pacman': 'https://freepacman.org/',
+            'Tetris': 'https://rocketbotroyale2.winterpixel.io/',
+            'Vectaria.io': 'https://vectaria.io/',
+            'GTA': 'https://html5.gamedistribution.com/0db7851406a542f1a82d4000d1410d00',
+            'Snake': 'https://littlebigsnake.com',
+            'myinstants': 'https://myinstants.com',
+            '2 Player Games': 'https://html5.gamedistribution.com/ecd138ae69cf4e92b5f5cdd328b6b62e/',
+            'Subway Surfers': 'https://webglmath.online',
+            'Proximos Juegos': 'https://docs.google.com/forms/d/e/1FAIpQLSca0M7eMosYMhJCjllf7rofHe0VK9qKkAV3OaQusgj15wzxGA/viewform?embedded=true',
+            'Monkey Mart': 'https://gameshaxor.github.io/MonkeyMart/',
+            'Granny': 'https://html5.gamedistribution.com/ec2e7f9b7a9f441b92f19100627d94cc/',
+            'SocerRandom': 'https://html5.gamedistribution.com/308d826f20034d7b972f25258c8d0a44/',
+            'BasketRandom': 'https://html5.gamedistribution.com/bf1268dccb5d43e7970bb3edaa54afc8/',
+            'GooberDash': 'https://gooberdash.winterpixel.io/',
+            'Build': 'https://gnhustgames.github.io/buildnowgg/',
+            'Dog': 'https://dogminer2.github.io/',
+            'Territorial': 'https://territorial.io',
+            'Stick': 'https://1games.io/stickman-hook',
+            'Gartic': 'https://garticphone.com',
+            'Play': 'https://playlistsound.com',
+            'Exam': 'https://chat.qwen.ai/',
+        };
+
+        function showGame(gameId) {
+            const gameContainer = document.getElementById('game-container');
+            const iframeContainer = document.getElementById('iframeContainer');
+            const gameButtons = document.getElementById('game-buttons');
+            const logoContainer = document.getElementById('logo-container');
+            const categories = document.querySelector('.categories');
+            const searchContainer = document.querySelector('.search-container');
+            const loader = document.getElementById('loader');
+
+            loader.style.display = 'block';
+
+            const gameUrl = gameUrls[gameId];
+            if (!gameUrl) {
+                console.error(`URL for game "${gameId}" not found`);
+                alert(`Game URL for "${gameId}" is missing.`);
+                loader.style.display = 'none';
+                return;
+            }
+
+            const iframe = document.createElement('iframe');
+            iframe.src = gameUrl;
+            iframe.style.width = '100%';
+            iframe.style.height = '75vh';
+            iframe.style.border = 'none';
+            iframe.style.borderRadius = '12px';
+            iframe.setAttribute('allow', 'fullscreen; autoplay; camera; microphone; clipboard-read; clipboard-write');
+            iframe.setAttribute('allowfullscreen', '');
+            iframe.setAttribute('scrolling', 'no');
+
+            iframeContainer.innerHTML = '';
+            iframeContainer.appendChild(iframe);
+
+            gameContainer.style.display = 'block';
+            gameButtons.style.display = 'none';
+            categories.style.display = 'none';
+            searchContainer.style.display = 'none';
+            logoContainer.style.opacity = '0.3';
+
+            iframe.onload = function() {
+                loader.style.display = 'none';
+            };
+
+            setTimeout(function() {
+                loader.style.display = 'none';
+            }, 5000);
+        }
+
+        function exitGame() {
+            const gameContainer = document.getElementById('game-container');
+            const gameButtons = document.getElementById('game-buttons');
+            const logoContainer = document.getElementById('logo-container');
+            const categories = document.querySelector('.categories');
+            const searchContainer = document.querySelector('.search-container');
+
+            gameContainer.style.display = 'none';
+            gameButtons.style.display = 'grid';
+            categories.style.display = 'flex';
+            searchContainer.style.display = 'block';
+            logoContainer.style.opacity = '1';
+
+            document.getElementById('iframeContainer').innerHTML = '';
+        }
+
+        function toggleFullscreen() {
+            const iframe = document.querySelector('#iframeContainer iframe');
+            if (!iframe) return;
+
+            try {
+                if (iframe.requestFullscreen) {
+                    iframe.requestFullscreen();
+                } else if (iframe.mozRequestFullScreen) {
+                    iframe.mozRequestFullScreen();
+                } else if (iframe.webkitRequestFullscreen) {
+                    iframe.webkitRequestFullscreen();
+                } else if (iframe.msRequestFullscreen) {
+                    iframe.msRequestFullscreen();
+                }
+            } catch (e) {
+                console.error("Fullscreen error:", e);
+                alert("Fullscreen may not be available for this game");
+            }
+        }
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const buttons = document.querySelectorAll('#game-buttons button');
+           
+            buttons.forEach(button => {
+                const gameName = button.textContent.toLowerCase();
+                if (gameName.includes(searchTerm)) {
+                    button.style.display = 'flex';
+                } else {
+                    button.style.display = 'none';
+                }
+            });
+        });
+
+        // Category filtering
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+               
+                const category = this.getAttribute('data-category');
+                const buttons = document.querySelectorAll('#game-buttons button');
+               
+                buttons.forEach(button => {
+                    if (category === 'all' || button.getAttribute('data-category') === category) {
+                        button.style.display = 'flex';
+                    } else {
+                        button.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Back to top functionality
+        const backToTopButton = document.getElementById('backToTop');
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+
+        backToTopButton.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Voiceflow chat widget
+        (function(d, t) {
+            var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+            v.onload = function() {
+                window.voiceflow.chat.load({
+                    verify: { projectID: '679e6a10b581cc269ec450eb' },
+                    url: 'https://general-runtime.voiceflow.com',
+                    versionID: 'production'
+                });
+            }
+            v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs";  
+            v.type = "text/javascript";
+            s.parentNode.insertBefore(v, s);
+        })(document, 'script');
+    </script>
+</body>
+</html>
