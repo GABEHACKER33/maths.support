@@ -1,41 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maths Support - Unblocked Games</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Maths Support — Play Games</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>🎮 Maths Support</h1>
-    <p>Your hub for fun, learning, and unblocked games.</p>
+  <header class="top">
+    <h1>Maths Support 🎮➕</h1>
+    <p>Fun games with a maths twist — click a game to launch</p>
   </header>
 
-  <main>
-    <section class="game-list">
-      <h2>Available Games</h2>
-      <div class="games">
-        <div class="game-card">
-          <h3>Paper.io</h3>
-          <button onclick="openGame('https://gameforge.com/en-US/littlegames/snowball-io/')">Play</button>
+  <main class="container">
+    <div class="game-grid">
+      <!-- Example card: replace href with the game's canonical page or your own hosted file -->
+      <article class="card">
+        <h3>Paper.io (Example)</h3>
+        <div class="actions">
+          <button class="play-btn" data-src="https://gameforge.com/en-US/littlegames/snowball-io/">Play in player</button>
+          <a class="open-tab" href="https://gameforge.com/en-US/littlegames/snowball-io/" target="_blank" rel="noopener noreferrer">Open in new tab</a>
         </div>
-        <div class="game-card">
-          <h3>1v1.LOL</h3>
-          <button onclick="openGame('https://1v1.lol')">Play</button>
+      </article>
+
+      <article class="card">
+        <h3>Snake (Example)</h3>
+        <div class="actions">
+          <button class="play-btn" data-src="https://playsnake.org/">Play in player</button>
+          <a class="open-tab" href="https://playsnake.org/" target="_blank" rel="noopener noreferrer">Open in new tab</a>
         </div>
-        <div class="game-card">
-          <h3>Snake</h3>
-          <button onclick="openGame('https://playsnake.org/')">Play</button>
-        </div>
-      </div>
-    </section>
+      </article>
+
+      <!-- Add more cards here -->
+    </div>
   </main>
 
+  <!-- Modal player -->
+  <div id="playerModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-head">
+        <button id="closeModal" class="close">✕</button>
+        <a id="openNewTab" class="open-tab-modal" target="_blank" rel="noopener noreferrer">Open in new tab</a>
+      </div>
+      <!-- sandbox attribute restricts iframe capabilities (safe). Adjust 'allow' only as needed. -->
+      <iframe id="gameFrame" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"
+              allow="fullscreen; autoplay; encrypted-media"
+              referrerpolicy="no-referrer"
+              src=""
+              title="Game player"></iframe>
+    </div>
+  </div>
+
   <script>
-    function openGame(url) {
-      window.open(url, "_blank");
-    }
+    const modal = document.getElementById('playerModal');
+    const frame = document.getElementById('gameFrame');
+    const openNewTab = document.getElementById('openNewTab');
+    const closeModal = document.getElementById('closeModal');
+
+    document.querySelectorAll('.play-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.getAttribute('data-src');
+        frame.src = url;
+        openNewTab.href = url;
+        modal.setAttribute('aria-hidden', 'false');
+        modal.style.display = 'flex';
+      });
+    });
+
+    closeModal.addEventListener('click', () => {
+      frame.src = '';
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+    });
+
+    // close on ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.style.display === 'flex') {
+        closeModal.click();
+      }
+    });
   </script>
 </body>
 </html>
