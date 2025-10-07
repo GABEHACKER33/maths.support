@@ -1,84 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Maths Support — Play Games</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fullscreen Game Launcher</title>
+  <style>
+    body {
+      background-color: #0d0d0d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    button {
+      padding: 15px 30px;
+      background: #00bcd4;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #008ba3;
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 <body>
-  <header class="top">
-    <h1>Maths Support 🎮➕</h1>
-    <p>Fun games with a maths twist — click a game to launch</p>
-  </header>
-
-  <main class="container">
-    <div class="game-grid">
-      <!-- Example card: replace href with the game's canonical page or your own hosted file -->
-      <article class="card">
-        <h3>Paper.io (Example)</h3>
-        <div class="actions">
-          <button class="play-btn" data-src="https://gameforge.com/en-US/littlegames/snowball-io/">Play in player</button>
-          <a class="open-tab" href="https://gameforge.com/en-US/littlegames/snowball-io/" target="_blank" rel="noopener noreferrer">Open in new tab</a>
-        </div>
-      </article>
-
-      <article class="card">
-        <h3>Snake (Example)</h3>
-        <div class="actions">
-          <button class="play-btn" data-src="https://playsnake.org/">Play in player</button>
-          <a class="open-tab" href="https://playsnake.org/" target="_blank" rel="noopener noreferrer">Open in new tab</a>
-        </div>
-      </article>
-
-      <!-- Add more cards here -->
-    </div>
-  </main>
-
-  <!-- Modal player -->
-  <div id="playerModal" class="modal" aria-hidden="true">
-    <div class="modal-content">
-      <div class="modal-head">
-        <button id="closeModal" class="close">✕</button>
-        <a id="openNewTab" class="open-tab-modal" target="_blank" rel="noopener noreferrer">Open in new tab</a>
-      </div>
-      <!-- sandbox attribute restricts iframe capabilities (safe). Adjust 'allow' only as needed. -->
-      <iframe id="gameFrame" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"
-              allow="fullscreen; autoplay; encrypted-media"
-              referrerpolicy="no-referrer"
-              src=""
-              title="Game player"></iframe>
-    </div>
-  </div>
+  <button onclick="openGame()">🎮 Open Game in Fullscreen</button>
 
   <script>
-    const modal = document.getElementById('playerModal');
-    const frame = document.getElementById('gameFrame');
-    const openNewTab = document.getElementById('openNewTab');
-    const closeModal = document.getElementById('closeModal');
-
-    document.querySelectorAll('.play-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const url = btn.getAttribute('data-src');
-        frame.src = url;
-        openNewTab.href = url;
-        modal.setAttribute('aria-hidden', 'false');
-        modal.style.display = 'flex';
-      });
-    });
-
-    closeModal.addEventListener('click', () => {
-      frame.src = '';
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-    });
-
-    // close on ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.style.display === 'flex') {
-        closeModal.click();
-      }
-    });
+    function openGame() {
+      const gameHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Grand Shift Auto</title>
+          <style>
+            html, body {
+              margin: 0;
+              height: 100%;
+              overflow: hidden;
+              background: black;
+            }
+            iframe {
+              width: 100vw;
+              height: 100vh;
+              border: none;
+            }
+          </style>
+        </head>
+        <body>
+          <iframe src="https://venge.io" allowfullscreen></iframe>
+        </body>
+        </html>
+      `;
+      const newTab = window.open('about:blank', '_blank');
+      newTab.document.write(gameHTML);
+      newTab.document.close();
+    }
   </script>
 </body>
 </html>
