@@ -1,1 +1,575 @@
- <iframe src="https://venge.io" allowfullscreen></iframe>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maths Support - Educational Games</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-cyan: #00fff9;
+            --neon-pink: #ff006e;
+            --neon-purple: #8b00ff;
+            --neon-yellow: #ffea00;
+            --dark-bg: #0a0a0f;
+            --dark-panel: #12121a;
+            --grid-color: rgba(0, 255, 249, 0.1);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridScroll 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridScroll {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+
+        /* Glowing orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 1;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .orb1 {
+            width: 400px;
+            height: 400px;
+            background: var(--neon-cyan);
+            top: -200px;
+            left: -200px;
+        }
+
+        .orb2 {
+            width: 500px;
+            height: 500px;
+            background: var(--neon-pink);
+            bottom: -250px;
+            right: -250px;
+            animation-delay: -5s;
+        }
+
+        .orb3 {
+            width: 350px;
+            height: 350px;
+            background: var(--neon-purple);
+            top: 50%;
+            left: 50%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header */
+        header {
+            padding: 30px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 249, 0.5);
+            letter-spacing: 4px;
+            animation: glowPulse 3s ease-in-out infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(0, 255, 249, 0.7)); }
+            50% { filter: drop-shadow(0 0 40px rgba(255, 0, 110, 0.9)); }
+        }
+
+        .tagline {
+            color: var(--neon-cyan);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+
+        /* Search and filters */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px;
+            background: var(--dark-panel);
+            border: 2px solid rgba(0, 255, 249, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 255, 249, 0.3);
+        }
+
+        .filter-btn {
+            padding: 15px 25px;
+            background: var(--dark-panel);
+            border: 2px solid rgba(139, 0, 255, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(139, 0, 255, 0.2);
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 20px rgba(139, 0, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Games grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: var(--dark-panel);
+            border: 2px solid rgba(0, 255, 249, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s;
+            position: relative;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 249, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .game-card:hover::before {
+            left: 100%;
+        }
+
+        .game-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 30px rgba(0, 255, 249, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .game-thumbnail {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(0, 255, 249, 0.1), rgba(139, 0, 255, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-thumbnail::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.1) 50%, transparent 60%);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .game-info {
+            padding: 20px;
+        }
+
+        .game-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--neon-cyan);
+        }
+
+        .game-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(139, 0, 255, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--neon-purple);
+            border: 1px solid var(--neon-purple);
+        }
+
+        /* Game modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 1200px;
+            height: 90%;
+            background: var(--dark-panel);
+            border: 3px solid var(--neon-cyan);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 255, 249, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(0, 255, 249, 0.3);
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+        }
+
+        .close-btn {
+            background: rgba(255, 0, 110, 0.2);
+            border: 2px solid var(--neon-pink);
+            color: var(--neon-pink);
+            font-size: 1.5rem;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 0, 110, 0.4);
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.6);
+            transform: rotate(90deg);
+        }
+
+        .game-frame {
+            flex: 1;
+            border: 2px solid rgba(0, 255, 249, 0.3);
+            border-radius: 10px;
+            background: #000;
+        }
+
+        /* Fullscreen button */
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(139, 0, 255, 0.3);
+            border: 2px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(139, 0, 255, 0.5);
+            box-shadow: 0 0 20px rgba(139, 0, 255, 0.6);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 2px solid rgba(0, 255, 249, 0.2);
+            margin-top: 60px;
+        }
+
+        footer p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 15px;
+            }
+
+            .modal-content {
+                width: 95%;
+                height: 85%;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background orbs -->
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+
+    <div class="container">
+        <header>
+            <h1 class="logo">MATHS SUPPORT</h1>
+            <p class="tagline">// EDUCATIONAL GAME NEXUS //</p>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search games...">
+            </div>
+            <button class="filter-btn active" data-category="all">All Games</button>
+            <button class="filter-btn" data-category="puzzle">Puzzle</button>
+            <button class="filter-btn" data-category="action">Action</button>
+            <button class="filter-btn" data-category="strategy">Strategy</button>
+            <button class="filter-btn" data-category="casual">Casual</button>
+        </div>
+
+        <div class="games-grid" id="gamesGrid"></div>
+
+        <footer>
+            <p>© 2024 Maths Support - Educational Gaming Platform | All games are for educational purposes</p>
+        </footer>
+    </div>
+
+    <!-- Game Modal -->
+    <div class="modal" id="gameModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Game Title</h2>
+                <button class="close-btn" id="closeBtn">×</button>
+            </div>
+            <iframe class="game-frame" id="gameFrame" frameborder="0" allowfullscreen></iframe>
+            <button class="fullscreen-btn" id="fullscreenBtn">⛶ Fullscreen</button>
+        </div>
+    </div>
+
+    <script>
+        // Game database
+        const games = [
+            { title: '2048', category: 'puzzle', url: 'https://play2048.co/', emoji: '🎯' },
+            { title: 'Tetris', category: 'puzzle', url: 'https://tetris.com/play-tetris', emoji: '🧱' },
+            { title: 'Snake', category: 'casual', url: 'https://playsnake.org/', emoji: '🐍' },
+            { title: 'Pac-Man', category: 'action', url: 'https://www.google.com/logos/2010/pacman10-i.html', emoji: '👾' },
+            { title: 'Chess', category: 'strategy', url: 'https://www.chess.com/play/computer', emoji: '♟️' },
+            { title: 'Sudoku', category: 'puzzle', url: 'https://sudoku.com/', emoji: '🔢' },
+            { title: 'Minesweeper', category: 'puzzle', url: 'https://minesweeperonline.com/', emoji: '💣' },
+            { title: 'Solitaire', category: 'casual', url: 'https://solitaire.org/', emoji: '🃏' },
+            { title: 'Checkers', category: 'strategy', url: 'https://www.247checkers.com/', emoji: '⚫' },
+            { title: 'Bubble Shooter', category: 'casual', url: 'https://www.bubbleshooter.net/', emoji: '🫧' },
+            { title: 'Mahjong', category: 'puzzle', url: 'https://mahjong.org/', emoji: '🀄' },
+            { title: 'Connect 4', category: 'strategy', url: 'https://www.mathsisfun.com/games/connect4.html', emoji: '🔴' },
+            { title: 'Crossword', category: 'puzzle', url: 'https://www.dictionary.com/e/crossword/', emoji: '📝' },
+            { title: 'Word Search', category: 'puzzle', url: 'https://thewordsearch.com/', emoji: '🔤' },
+            { title: 'Quiz Master', category: 'casual', url: 'https://www.sporcle.com/', emoji: '❓' },
+            { title: 'Memory Game', category: 'puzzle', url: 'https://www.memozor.com/', emoji: '🧠' }
+        ];
+
+        let currentCategory = 'all';
+        let searchQuery = '';
+
+        // Render games
+        function renderGames() {
+            const gamesGrid = document.getElementById('gamesGrid');
+            const filteredGames = games.filter(game => {
+                const matchesCategory = currentCategory === 'all' || game.category === currentCategory;
+                const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            gamesGrid.innerHTML = filteredGames.map(game => `
+                <div class="game-card" onclick="openGame('${game.title}', '${game.url}')">
+                    <div class="game-thumbnail">${game.emoji}</div>
+                    <div class="game-info">
+                        <div class="game-title">${game.title}</div>
+                        <span class="game-category">${game.category.toUpperCase()}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // Animate cards
+            document.querySelectorAll('.game-card').forEach((card, index) => {
+                card.style.animation = `fadeIn 0.5s ${index * 0.05}s both`;
+            });
+        }
+
+        // Open game in modal
+        function openGame(title, url) {
+            const modal = document.getElementById('gameModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const gameFrame = document.getElementById('gameFrame');
+
+            modalTitle.textContent = title;
+            gameFrame.src = url;
+            modal.classList.add('active');
+        }
+
+        // Close modal
+        document.getElementById('closeBtn').addEventListener('click', () => {
+            const modal = document.getElementById('gameModal');
+            const gameFrame = document.getElementById('gameFrame');
+            modal.classList.remove('active');
+            gameFrame.src = '';
+        });
+
+        // Close on background click
+        document.getElementById('gameModal').addEventListener('click', (e) => {
+            if (e.target.id === 'gameModal') {
+                document.getElementById('closeBtn').click();
+            }
+        });
+
+        // Fullscreen
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            const gameFrame = document.getElementById('gameFrame');
+            if (gameFrame.requestFullscreen) {
+                gameFrame.requestFullscreen();
+            } else if (gameFrame.webkitRequestFullscreen) {
+                gameFrame.webkitRequestFullscreen();
+            } else if (gameFrame.msRequestFullscreen) {
+                gameFrame.msRequestFullscreen();
+            }
+        });
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.category;
+                renderGames();
+            });
+        });
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderGames();
+        });
+
+        // Initial render
+        renderGames();
+
+        // Keyboard shortcut to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('closeBtn').click();
+            }
+        });
+    </script>
+</body>
+</html>
