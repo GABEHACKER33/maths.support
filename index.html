@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Math Quest - Unblocked Games</title>
+<title>Math Support</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -78,7 +78,7 @@ header { display:flex; justify-content:space-between; align-items:center; margin
 
 <div class="main-content">
     <header>
-        <h1 style="font-family:'Orbitron'; font-size:22px; margin:0">MATH QUEST</h1>
+        <h1 style="font-family:'Orbitron'; font-size:22px; margin:0">MATH Support</h1>
         <input type="text" id="gameSearch" placeholder="Search games...">
     </header>
 
@@ -132,16 +132,16 @@ document.getElementById('gameSearch').oninput = e => {
 function openGame(url, title) {
     document.getElementById('gameIframe').src = url;
     document.getElementById('game-container').style.display = 'flex';
-    document.title = title + ' - Math Quest';
+    document.title = title + ' - Math Support';
 }
 function closeGame() {
     document.getElementById('game-container').style.display = 'none';
     document.getElementById('gameIframe').src = '';
-    document.title = 'Math Quest';
+    document.title = 'Math Support';
 }
 function toggleFullscreen() {
     const iframe = document.getElementById('iframeContainer');
-    if (!document.fullscreenElement) iframe.requestFullscreen().catch(err => console.log(err));
+    if (!document.fullscreenElement) iframe.reSupportFullscreen().catch(err => console.log(err));
     else document.exitFullscreen();
 }
 </script>
