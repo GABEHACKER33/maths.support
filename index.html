@@ -1,263 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Quest - Fun Math Games</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6d28d9;
-            --primary-dark: #5b21b6;
-            --accent: #22d3ee;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --text: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.1);
-            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.15);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Quest - Fun Math Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #6d28d9;
+    --primary-dark: #5b21b6;
+    --accent: #22d3ee;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.15);
+}
 
-        body.dark {
-            --primary: #a78bfa;
-            --primary-dark: #7c3aed;
-            --accent: #67e8f9;
-            --bg: #0f172a;
-            --surface: #1e293b;
-            --text: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border: #334155;
-            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.3);
-            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.5);
-        }
+body.dark {
+    --primary: #a78bfa;
+    --primary-dark: #7c3aed;
+    --accent: #67e8f9;
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border: #334155;
+    --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.3);
+    --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.5);
+}
 
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            transition: background 0.4s, color 0.4s;
-        }
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background 0.4s, color 0.4s;
+}
 
-        header {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 1.5rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-sm);
-        }
+header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+}
 
-        .header-inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+.header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-        .logo {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+.logo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
-        .theme-toggle {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
+.theme-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
 
-        main {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-        }
+main {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
 
-        h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 2.8rem; margin-bottom: 0.5rem; }
-        .subtitle { color: var(--text-muted); margin-bottom: 1.5rem; }
+h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 2.5rem; margin-bottom: 0.5rem; }
+.subtitle { color: var(--text-muted); margin-bottom: 1.5rem; }
 
-        .recent-section {
-            margin-bottom: 3rem;
-        }
+.recent-section {
+    margin-bottom: 3rem;
+}
 
-        .recent-grid {
-            display: flex;
-            gap: 1.2rem;
-            overflow-x: auto;
-            padding-bottom: 1rem;
-            scrollbar-width: thin;
-        }
+.recent-grid {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scrollbar-width: thin;
+    scroll-behavior: smooth;
+}
 
-        .recent-card {
-            flex: 0 0 220px;
-            background: var(--surface);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.25s;
-        }
+.recent-card {
+    flex: 0 0 160px;
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+}
 
-        .recent-card:hover { transform: scale(1.05); box-shadow: var(--shadow-lg); }
+.recent-card:hover { transform: scale(1.05); box-shadow: var(--shadow-lg); }
 
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
+.recent-card .title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 0.3rem 0;
+}
 
-        .game-card {
-            background: var(--surface);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
-        }
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
 
-        .game-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary);
-        }
+.game-card {
+    background: var(--surface);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
 
-        .thumbnail {
-            height: 180px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            position: relative;
-        }
+.game-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
 
-        .thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.9;
-        }
+.thumbnail {
+    height: 160px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    position: relative;
+}
 
-        .category {
-            position: absolute;
-            bottom: 10px;
-            left: 12px;
-            background: rgba(0,0,0,0.65);
-            color: white;
-            padding: 0.35rem 0.9rem;
-            border-radius: 999px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9;
+    transition: transform 0.3s ease;
+}
 
-        .info {
-            padding: 1.2rem;
-        }
+.game-card:hover .thumbnail img {
+    transform: scale(1.05);
+}
 
-        .title {
-            font-weight: 700;
-            font-size: 1.25rem;
-            margin-bottom: 0.4rem;
-        }
+.category {
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    background: rgba(0,0,0,0.65);
+    color: white;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
 
-        /* Modal - full overlay */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            z-index: 1000;
-            flex-direction: column;
-        }
+.info { padding: 1rem; }
 
-        .modal.active { display: flex; }
+.title {
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin-bottom: 0.2rem;
+}
 
-        .game-header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--surface);
-        }
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;
+}
 
-        .game-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
+.modal.active { display: flex; }
 
-        .game-frame {
-            flex: 1;
-            background: #000;
-        }
+.modal-content {
+    width: 90%;
+    max-width: 1000px;
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 90%;
+}
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+.game-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+}
 
-        .game-controls {
-            position: fixed;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 1.5rem;
-            z-index: 1100;
-        }
+.game-title { font-size: 1.4rem; font-weight: 700; }
 
-        .btn-control {
-            padding: 1rem 2.2rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 999px;
-            cursor: pointer;
-            transition: all 0.25s;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-        }
+.game-frame { flex: 1; }
+iframe { width: 100%; height: 100%; border: none; }
 
-        .btn-exit {
-            background: #ef4444;
-            color: white;
-        }
+.game-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--surface);
+}
 
-        .btn-exit:hover { background: #dc2626; transform: translateY(-2px); }
+.btn-control {
+    padding: 0.75rem 1.8rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
 
-        .btn-fullscreen {
-            background: var(--primary);
-            color: white;
-        }
+.btn-exit { background: #ef4444; color: white; }
+.btn-exit:hover { background: #dc2626; transform: translateY(-2px); }
 
-        .btn-fullscreen:hover { background: var(--primary-dark); transform: translateY(-2px); }
+.btn-fullscreen { background: var(--primary); color: white; }
+.btn-fullscreen:hover { background: var(--primary-dark); transform: translateY(-2px); }
 
-        @media (max-width: 768px) {
-            .games-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
-            .game-controls { bottom: 1rem; gap: 1rem; }
-            .btn-control { padding: 0.9rem 1.8rem; font-size: 1rem; }
-        }
-    </style>
+@media (max-width: 768px) {
+    .games-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    .recent-card { flex: 0 0 140px; }
+    .thumbnail { height: 140px; }
+    .btn-control { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+}
+</style>
 </head>
 <body>
 
 <header>
     <div class="header-inner">
         <div class="logo">Math Quest</div>
-        <button class="theme-toggle" id="themeToggle">🌙</button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">🌙</button>
     </div>
 </header>
 
 <main>
 
     <div class="recent-section">
-        <h2 style="margin-bottom:1rem;">Recently Played</h2>
+        <h2>Recently Played</h2>
         <div class="recent-grid" id="recentGrid"></div>
     </div>
 
@@ -268,128 +278,120 @@
 
 </main>
 
-<!-- Immersive Game Modal -->
+<!-- Game Modal -->
 <div class="modal" id="gameModal">
-    <div class="game-header">
-        <div class="game-title" id="modalTitle">Math Game</div>
-        <button class="btn-control btn-exit" id="exitBtn">Exit</button>
-    </div>
-    <div class="game-frame">
-        <iframe id="gameFrame" allowfullscreen></iframe>
-    </div>
-    <div class="game-controls">
-        <button class="btn-control btn-fullscreen" id="fullscreenBtn">Fullscreen</button>
-        <button class="btn-control btn-exit" id="exitBtnBottom">Exit</button>
+    <div class="modal-content">
+        <div class="game-header">
+            <div class="game-title" id="modalTitle">Math Game</div>
+            <button class="btn-control btn-exit" id="exitBtn">Exit</button>
+        </div>
+        <div class="game-frame">
+            <iframe id="gameFrame" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="game-controls">
+            <button class="btn-control btn-fullscreen" id="fullscreenBtn">Fullscreen</button>
+            <button class="btn-control btn-exit" id="exitBtnBottom">Exit</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // Updated 2026-relevant math games (free, no login, educational)
-    const games = [
-        { id: 'alien-add', title: 'Alien Addition', category: 'Addition', url: 'https://www.coolmath4kids.com/math-games/alien-addition' },
-        { id: 'grand-prix-mult', title: 'Grand Prix Multiplication', category: 'Multiplication', url: 'https://www.coolmath4kids.com/math-games/grand-prix-multiplication' },
-        { id: 'dirt-bike-frac', title: 'Dirt Bike Comparing Fractions', category: 'Fractions', url: 'https://www.coolmath4kids.com/math-games/dirt-bike-fractions' },
-        { id: 'math-slither', title: 'Math Slither', category: 'Arithmetic', url: 'https://www.mathgames.com/play/math-slither.html' },
-        { id: 'demolition-div', title: 'Demolition Division', category: 'Division', url: 'https://www.coolmath4kids.com/math-games/demolition-division' },
-        { id: 'jet-ski-add', title: 'Jet Ski Addition', category: 'Addition', url: 'https://www.coolmath4kids.com/math-games/jet-ski-addition' },
-        { id: 'island-chase', title: 'Island Chase Subtraction', category: 'Subtraction', url: 'https://www.coolmath4kids.com/math-games/island-chase-subtraction' },
-        { id: 'frac-match', title: 'Fraction Matcher', category: 'Fractions', url: 'https://www.mathplayground.com/fraction matcher.html' },
-        { id: 'sum-blocks', title: 'Sum Blocks', category: 'Addition', url: 'https://www.mathplayground.com/sum_blocks.html' },
-        { id: 'math-monster', title: 'Math Monster', category: 'Mixed Operations', url: 'https://www.mathplayground.com/math_monster.html' },
-        { id: 'puppies-decimals', title: 'Puppies & Kittens Decimals', category: 'Decimals', url: 'https://www.mathplayground.com/ASB_Puppies_Kittens.html' }
-    ];
+const games = [
+    { id: 'alien-add', title: 'Alien Addition', category: 'Addition', url: 'https://www.coolmath4kids.com/math-games/alien-addition' },
+    { id: 'grand-prix-mult', title: 'Grand Prix Multiplication', category: 'Multiplication', url: 'https://www.coolmath4kids.com/math-games/grand-prix-multiplication' },
+    { id: 'dirt-bike-frac', title: 'Dirt Bike Comparing Fractions', category: 'Fractions', url: 'https://www.coolmath4kids.com/math-games/dirt-bike-fractions' },
+    { id: 'math-slither', title: 'Math Slither', category: 'Arithmetic', url: 'https://www.mathgames.com/play/math-slither.html' },
+    { id: 'demolition-div', title: 'Demolition Division', category: 'Division', url: 'https://www.coolmath4kids.com/math-games/demolition-division' },
+    { id: 'jet-ski-add', title: 'Jet Ski Addition', category: 'Addition', url: 'https://www.coolmath4kids.com/math-games/jet-ski-addition' }
+];
 
-    let recent = JSON.parse(localStorage.getItem('mathQuestRecent')) || [];
+let recent = JSON.parse(localStorage.getItem('mathQuestRecent')) || [];
 
-    const modal = document.getElementById('gameModal');
-    const frame = document.getElementById('gameFrame');
-    const titleEl = document.getElementById('modalTitle');
-    const exitBtns = [document.getElementById('exitBtn'), document.getElementById('exitBtnBottom')];
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    const themeToggle = document.getElementById('themeToggle');
+const modal = document.getElementById('gameModal');
+const frame = document.getElementById('gameFrame');
+const titleEl = document.getElementById('modalTitle');
+const exitBtns = [document.getElementById('exitBtn'), document.getElementById('exitBtnBottom')];
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+const themeToggle = document.getElementById('themeToggle');
 
-    // Theme (system + manual)
-    function updateTheme() {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const saved = localStorage.getItem('theme');
-        const isDark = saved === 'dark' || (!saved && prefersDark);
-        document.body.classList.toggle('dark', isDark);
-        themeToggle.textContent = isDark ? '☀️' : '🌙';
-    }
-    updateTheme();
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateTheme);
+// Theme toggle
+function updateTheme() {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const saved = localStorage.getItem('theme');
+    const isDark = saved === 'dark' || (!saved && prefersDark);
+    document.body.classList.toggle('dark', isDark);
+    themeToggle.textContent = isDark ? '☀️' : '🌙';
+}
+updateTheme();
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateTheme);
 
-    themeToggle.onclick = () => {
-        const isDark = !document.body.classList.contains('dark');
-        document.body.classList.toggle('dark', isDark);
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        themeToggle.textContent = isDark ? '☀️' : '🌙';
-    };
+themeToggle.onclick = () => {
+    const isDark = !document.body.classList.contains('dark');
+    document.body.classList.toggle('dark', isDark);
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    themeToggle.textContent = isDark ? '☀️' : '🌙';
+};
 
-    // Render games
-    function render(containerId, items) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = items.map(game => `
-            <div class="game-card" data-id="${game.id}">
-                <div class="thumbnail">
-                    <img src="https://images.unsplash.com/photo-1581092160560-1c1e428e9d65?w=600&h=400&fit=crop" alt="${game.title}">
-                    <span class="category">${game.category}</span>
-                </div>
-                <div class="info">
-                    <div class="title">${game.title}</div>
-                </div>
+// Render games
+function render(containerId, items) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = items.map(game => `
+        <div class="game-card" data-id="${game.id}">
+            <div class="thumbnail">
+                <img src="https://images.unsplash.com/photo-1581092160560-1c1e428e9d65?w=600&h=400&fit=crop" alt="${game.title}" loading="lazy">
+                <span class="category">${game.category}</span>
             </div>
-        `).join('');
-    }
-
-    render('gamesGrid', games);
-
-    // Recent
-    function renderRecent() {
-        const recents = recent.map(id => games.find(g => g.id === id)).filter(Boolean);
-        document.getElementById('recentGrid').innerHTML = recents.map(game => `
-            <div class="recent-card" data-id="${game.id}">
-                <div class="thumbnail">
-                    <img src="https://images.unsplash.com/photo-1581092160560-1c1e428e9d65?w=600&h=400&fit=crop" alt="${game.title}">
-                </div>
+            <div class="info">
+                <div class="title">${game.title}</div>
             </div>
-        `).join('');
-    }
+        </div>
+    `).join('');
+}
+render('gamesGrid', games);
+
+// Render recent
+function renderRecent() {
+    const recents = recent.map(id => games.find(g => g.id === id)).filter(Boolean);
+    document.getElementById('recentGrid').innerHTML = recents.map(game => `
+        <div class="recent-card" data-id="${game.id}">
+            <img src="https://images.unsplash.com/photo-1581092160560-1c1e428e9d65?w=600&h=400&fit=crop" alt="${game.title}" loading="lazy">
+            <div class="title-overlay">${game.title}</div>
+        </div>
+    `).join('');
+}
+renderRecent();
+
+// Open game modal
+document.addEventListener('click', e => {
+    const card = e.target.closest('.game-card, .recent-card');
+    if (!card) return;
+    const id = card.dataset.id;
+    const game = games.find(g => g.id === id);
+    if (!game) return;
+
+    titleEl.textContent = game.title;
+    frame.src = game.url;
+    modal.classList.add('active');
+
+    recent = [id, ...recent.filter(r => r !== id)].slice(0, 8);
+    localStorage.setItem('mathQuestRecent', JSON.stringify(recent));
     renderRecent();
+});
 
-    // Open game
-    document.addEventListener('click', e => {
-        const card = e.target.closest('.game-card, .recent-card');
-        if (!card) return;
-        const id = card.dataset.id;
-        const game = games.find(g => g.id === id);
-        if (!game) return;
+// Exit modal
+exitBtns.forEach(btn => btn.onclick = () => { modal.classList.remove('active'); frame.src = ''; });
+modal.addEventListener('click', e => { if(e.target === modal) exitBtns[0].click(); });
 
-        titleEl.textContent = game.title;
-        frame.src = game.url;
-        modal.classList.add('active');
+// Fullscreen
+fullscreenBtn.onclick = () => {
+    if (frame.requestFullscreen) frame.requestFullscreen();
+    else if (frame.webkitRequestFullscreen) frame.webkitRequestFullscreen();
+    else if (frame.msRequestFullscreen) frame.msRequestFullscreen();
+};
 
-        // Update recent
-        recent = [id, ...recent.filter(r => r !== id)].slice(0, 8);
-        localStorage.setItem('mathQuestRecent', JSON.stringify(recent));
-        renderRecent();
-    });
-
-
-
-    // Fullscreen
-    fullscreenBtn.onclick = () => {
-        if (frame.requestFullscreen) frame.requestFullscreen();
-        else if (frame.webkitRequestFullscreen) frame.webkitRequestFullscreen();
-        else if (frame.msRequestFullscreen) frame.msRequestFullscreen();
-    };
-
-    // Close on Esc
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && modal.classList.contains('active')) {
-            exitBtns[0].click();
-        }
-    });
+// Escape key closes modal
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && modal.classList.contains('active')) exitBtns[0].click(); });
 </script>
+
 </body>
 </html>
