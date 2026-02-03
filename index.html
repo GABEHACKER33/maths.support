@@ -375,11 +375,7 @@
         renderRecent();
     });
 
-    // Exit
-    exitBtns.forEach(btn => btn.onclick = () => {
-        modal.classList.remove('active');
-        frame.src = ''; // stop loading
-    });
+
 
     // Fullscreen
     fullscreenBtn.onclick = () => {
