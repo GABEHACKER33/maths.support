@@ -3,935 +3,490 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maths Support - Fun Educational Math Games</title>
+    <title>Math Quest - Educational Math Games</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
-            --primary: #4F46E5;
-            --primary-light: #6366F1;
-            --primary-dark: #4338CA;
-            --secondary: #10B981;
-            --bg: #F9FAFB;
-            --bg-card: #FFFFFF;
-            --text: #111827;
-            --text-secondary: #6B7280;
-            --border: #E5E7EB;
-            --sidebar-bg: #FFFFFF;
-            --shadow: rgba(0, 0, 0, 0.1);
-            --overlay: rgba(0, 0, 0, 0.5);
+            --primary: #5b21b6;
+            --primary-dark: #4c1d95;
+            --accent: #0ea5e9;
+            --bg: #f8fafc;
+            --bg-card: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
-        body.dark-mode {
-            --primary: #6366F1;
-            --primary-light: #818CF8;
-            --primary-dark: #4F46E5;
-            --secondary: #34D399;
-            --bg: #0F172A;
-            --bg-card: #1E293B;
-            --text: #F1F5F9;
-            --text-secondary: #94A3B8;
+        body.dark {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --accent: #38bdf8;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
             --border: #334155;
-            --sidebar-bg: #1E293B;
-            --shadow: rgba(0, 0, 0, 0.3);
-            --overlay: rgba(0, 0, 0, 0.7);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
         }
 
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text);
-            transition: background 0.3s, color 0.3s;
             min-height: 100vh;
+            transition: background 0.4s, color 0.4s;
         }
 
-        .app-container {
-            display: flex;
-            height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 80px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border);
-            padding: 24px 16px;
-            display: flex;
-            flex-direction: column;
-            transition: width 0.3s ease;
-            position: relative;
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
             z-index: 100;
-            overflow: hidden;
+            box-shadow: var(--shadow);
         }
 
-        .sidebar:hover {
-            width: 280px;
-        }
-
-        .logo-section {
+        .nav-bar {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 32px;
-            padding: 0 8px;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-
-        .logo-text {
+        .logo {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 800;
-            color: var(--text);
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.3s;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .sidebar:hover .logo-text,
-        .sidebar:hover .nav-text {
-            opacity: 1;
-        }
-
-        .search-box {
-            position: relative;
-            margin-bottom: 24px;
-            padding: 0 8px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 16px 12px 40px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-            font-size: 18px;
-        }
-
-        .nav-section {
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .nav-item {
+        .nav-links {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 6px;
+            gap: 2rem;
         }
 
-        .nav-item:hover {
-            background: var(--bg);
-        }
-
-        .nav-item.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .nav-icon {
-            font-size: 24px;
-            flex-shrink: 0;
-            min-width: 24px;
-            text-align: center;
-        }
-
-        .nav-text {
-            flex: 1;
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
             font-weight: 500;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.3s;
+            transition: color 0.2s;
         }
 
-        /* Main content */
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 32px;
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
         }
 
-        .page {
-            display: none;
+        main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
         }
 
-        .page.active {
-            display: block;
-        }
-
-        .header {
-            margin-bottom: 32px;
-        }
-
-        .header h1 {
+        h1 {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            color: var(--text);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
         }
 
-        .header p {
-            color: var(--text-secondary);
-            font-size: 1rem;
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
         }
 
-        /* Games grid */
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
         }
 
         .game-card {
             background: var(--bg-card);
-            border: 1px solid var(--border);
             border-radius: 16px;
             overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 1px 3px var(--shadow);
+            box-shadow: var(--shadow);
         }
 
         .game-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px var(--shadow);
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
             border-color: var(--primary);
         }
 
-        .game-thumbnail {
-            width: 100%;
-            height: 180px;
-            background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .thumbnail {
+            height: 160px;
+            background: #000;
             position: relative;
-            overflow: hidden;
         }
 
-        .game-thumbnail img {
+        .thumbnail img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .game-info {
-            padding: 20px;
-        }
-
-        .game-title {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 4px;
-            color: var(--text);
-        }
-
-        /* Account Page */
-        .profile-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 600px;
-            margin-bottom: 24px;
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-        }
-
-        .profile-info h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .profile-info p {
-            color: var(--text-secondary);
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .btn {
-            padding: 12px 24px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin-top: 24px;
-        }
-
-        .stat-card {
-            background: var(--bg);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        /* Settings Page */
-        .settings-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 800px;
-            margin-bottom: 24px;
-        }
-
-        .settings-section h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .setting-item:last-child {
-            border-bottom: none;
-        }
-
-        .setting-info h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .setting-info p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 56px;
-            height: 28px;
-            background: var(--border);
-            border-radius: 14px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .toggle-switch.active {
-            background: var(--primary);
-        }
-
-        .toggle-switch::after {
-            content: '';
+        .badge {
             position: absolute;
-            width: 24px;
-            height: 24px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.3s;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
         }
 
-        .toggle-switch.active::after {
-            transform: translateX(28px);
+        .info {
+            padding: 1.2rem;
         }
 
-        select {
-            padding: 10px 16px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
+        .title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
         }
 
-        select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* Game modal */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--overlay);
+            inset: 0;
+            background: rgba(0,0,0,0.7);
             z-index: 1000;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal.active {
-            display: flex;
             align-items: center;
             justify-content: center;
+            padding: 1rem;
         }
 
+        .modal.active { display: flex; }
+
         .modal-content {
-            width: 90%;
-            max-width: 1200px;
-            height: 90%;
             background: var(--bg-card);
-            border-radius: 20px;
-            padding: 24px;
-            position: relative;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            width: 95%;
+            max-width: 1400px;
+            height: 90vh;
+            max-height: 95vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
         }
 
         .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
         }
 
-        .modal-title {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text);
+        .tab-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: var(--bg-card);
+        }
+
+        .tab-content {
+            flex: 1;
+            display: none;
+            overflow: hidden;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         .close-btn {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-size: 1.5rem;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            font-size: 2rem;
             cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: var(--text-muted);
         }
 
-        .close-btn:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+        .close-btn:hover { color: var(--primary); }
 
-        .game-frame {
-            flex: 1;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: #000;
-        }
-
-        .fullscreen-btn {
-            position: absolute;
-            bottom: 32px;
-            right: 32px;
-            background: var(--primary);
-            border: none;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-        }
-
-        .fullscreen-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
-        }
-
-        /* Mobile responsive */
         @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                left: -80px;
-                height: 100vh;
-                z-index: 200;
-            }
-
-            .sidebar:hover {
-                left: 0;
-            }
-
-            .main-content {
-                padding: 20px;
-            }
-
-            .games-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 16px;
-            }
-
-            .modal-content {
-                width: 95%;
-                height: 85%;
-                padding: 16px;
-            }
-
-            .profile-section,
-            .settings-section {
-                padding: 20px;
-            }
+            .nav-bar { flex-direction: column; gap: 1rem; }
+            .nav-links { flex-wrap: wrap; justify-content: center; }
+            main { padding: 0 1rem; }
         }
     </style>
 </head>
-<body class="dark-mode">  <!-- Start with dark mode so it never looks completely white -->
+<body>
 
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="logo-section">
-                <div class="logo-icon">📐</div>
-                <div class="logo-text">Maths Support</div>
-            </div>
-
-            <div class="search-box">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="Search games...">
-            </div>
-
-            <nav class="nav-section">
-                <div class="nav-item active" data-page="games">
-                    <span class="nav-icon">🎮</span>
-                    <span class="nav-text">Games</span>
-                </div>
-                <div class="nav-item" data-page="account">
-                    <span class="nav-icon">👤</span>
-                    <span class="nav-text">Account</span>
-                </div>
-                <div class="nav-item" data-page="settings">
-                    <span class="nav-icon">⚙️</span>
-                    <span class="nav-text">Settings</span>
-                </div>
-            </nav>
-        </aside>
-
-        <!-- Main content -->
-        <main class="main-content">
-            <!-- Games Page -->
-            <div class="page active" id="gamesPage">
-                <div class="header">
-                    <h1>Educational Math Games</h1>
-                    <p>Fun games to practice addition, multiplication, fractions, geometry and more</p>
-                </div>
-                <div class="games-grid" id="gamesGrid"></div>
-            </div>
-
-            <!-- Account Page -->
-            <div class="page" id="accountPage">
-                <div class="header">
-                    <h1>Account</h1>
-                    <p>Manage your profile and view your stats</p>
-                </div>
-
-                <div class="profile-section">
-                    <div class="profile-header">
-                        <div class="profile-avatar">👤</div>
-                        <div class="profile-info">
-                            <h2>Guest User</h2>
-                            <p>guest@mathssupport.com</p>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Username</label>
-                        <input type="text" placeholder="Enter your username" value="GuestUser">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" placeholder="Enter your email" value="guest@mathssupport.com">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Display Name</label>
-                        <input type="text" placeholder="Enter your display name" value="Guest">
-                    </div>
-
-                    <button class="btn">Save Changes</button>
-
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number">47</div>
-                            <div class="stat-label">Games Played</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">12h</div>
-                            <div class="stat-label">Time Played</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">8</div>
-                            <div class="stat-label">Favorites</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Page -->
-            <div class="page" id="settingsPage">
-                <div class="header">
-                    <h1>Settings</h1>
-                    <p>Customize your gaming experience</p>
-                </div>
-
-                <div class="settings-section">
-                    <h2>Appearance</h2>
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h3>Dark Mode</h3>
-                            <p>Toggle dark mode theme</p>
-                        </div>
-                        <div class="toggle-switch active" id="darkModeToggle"></div>
-                    </div>
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h3>Auto Dark Mode</h3>
-                            <p>Automatically switch based on time (6 PM - 6 AM)</p>
-                        </div>
-                        <div class="toggle-switch active" id="autoDarkModeToggle"></div>
-                    </div>
-                </div>
-
-                <div class="settings-section">
-                    <h2>Gameplay</h2>
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h3>Auto Fullscreen</h3>
-                            <p>Automatically open games in fullscreen mode</p>
-                        </div>
-                        <div class="toggle-switch" id="autoFullscreenToggle"></div>
-                    </div>
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h3>Sound Effects</h3>
-                            <p>Enable click sounds and interactions</p>
-                        </div>
-                        <div class="toggle-switch active" id="soundToggle"></div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Game Modal -->
-    <div class="modal" id="gameModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">Game Title</h2>
-                <button class="close-btn" id="closeBtn">×</button>
-            </div>
-            <iframe class="game-frame" id="gameFrame" frameborder="0" allowfullscreen></iframe>
-            <button class="fullscreen-btn" id="fullscreenBtn">⛶ Fullscreen</button>
+<header>
+    <div class="nav-bar">
+        <div class="logo">Math Quest</div>
+        <div class="nav-links">
+            <a href="#" class="active" data-page="games">Games</a>
+            <a href="#" data-page="recent">Recent</a>
+            <a href="#" data-page="settings">Settings</a>
         </div>
     </div>
+</header>
 
-    <script>
-        // Real educational math games (free browser-playable from trusted sites)
-        const games = [
-            { 
-                title: 'Alien Addition', 
-                category: 'addition', 
-                url: 'https://www.coolmath4kids.com/math-games/alien-addition', 
-                image: 'https://images.unsplash.com/photo-1581092160560-1c1e428e9d65?w=400&h=300&fit=crop'
-            },
-            { 
-                title: 'Grand Prix Multiplication', 
-                category: 'multiplication', 
-                url: 'https://www.coolmath4kids.com/math-games/grand-prix-multiplication', 
-                image: 'https://images.unsplash.com/photo-1567603191355-9a6d0d292268?w=400&h=300&fit=crop'
-            },
-            { 
-                title: 'Dirt Bike Fractions', 
-                category: 'fractions', 
-                url: 'https://www.coolmath4kids.com/math-games/dirt-bike-fractions', 
-                image: 'https://images.unsplash.com/photo-1509228627929-8243eb4676d3?w=400&h=300&fit=crop'
-            },
-            { 
-                title: 'Jet Ski Addition', 
-                category: 'addition', 
-                url: 'https://www.coolmath4kids.com/math-games/jet-ski-addition', 
-                image: 'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=400&h=300&fit=crop'
-            },
-            { 
-                title: 'Demolition Division', 
-                category: 'division', 
-                url: 'https://www.coolmath4kids.com/math-games/demolition-division', 
-                image: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&h=300&fit=crop'
-            },
-            { 
-                title: 'Math Slither', 
-                category: 'arithmetic', 
-                url: 'https://www.mathgames.com/play/math-slither.html', 
-                image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop'
-            },
-            { 
-                title: 'Fraction Tiles', 
-                category: 'fractions', 
-                url: 'https://www.mathplayground.com/fraction_tiles.html', 
-                image: 'https://images.unsplash.com/photo-1590103514966-ae587832a69e?w=400&h=300&fit=crop'
-            },
-            { 
-                title: 'Multiplication Grand Prix', 
-                category: 'multiplication', 
-                url: 'https://www.mathplayground.com/ASB_MultiplicationGrandPrix.html', 
-                image: 'https://images.unsplash.com/photo-1632501641765-e568d28b0015?w=400&h=300&fit=crop'
-            },
-            { 
-                title: 'Island Chase Subtraction', 
-                category: 'subtraction', 
-                url: 'https://www.coolmath4kids.com/math-games/island-chase-subtraction', 
-                image: 'https://images.unsplash.com/photo-1566694271453-390536dd1f0d?w=400&h=300&fit=crop'
-            },
-            { 
-                title: 'Puppies & Kittens Decimals', 
-                category: 'decimals', 
-                url: 'https://www.mathplayground.com/ASB_Puppies_Kittens.html', 
-                image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=300&fit=crop'
-            }
-        ];
+<main>
 
-        let searchQuery = '';
-        let autoDarkMode = true;
+    <!-- Games Section -->
+    <section id="games" class="page active">
+        <h1>Math Games Collection</h1>
+        <p class="subtitle">Practice addition, fractions, geometry, multiplication and more — all free in your browser</p>
+        <div class="games-grid" id="gamesGrid"></div>
+    </section>
 
-        // Force initial theme
-        function setThemeByTime() {
-            if (!autoDarkMode) return;
-            
-            const hour = new Date().getHours();
-            const isDark = hour < 6 || hour >= 18;
-            
-            if (isDark) {
-                document.body.classList.add('dark-mode');
-                document.getElementById('darkModeToggle')?.classList.add('active');
-            } else {
-                document.body.classList.remove('dark-mode');
-                document.getElementById('darkModeToggle')?.classList.remove('active');
-            }
-        }
+    <!-- Recent / Placeholder for now -->
+    <section id="recent" class="page" style="display:none;">
+        <h1>Recently Played</h1>
+        <p class="subtitle">Quick access to your last opened games</p>
+        <div class="games-grid" id="recentGrid"></div>
+    </section>
 
-        // Toggle handlers
-        document.querySelectorAll('.toggle-switch').forEach(toggle => {
-            toggle.addEventListener('click', () => {
-                toggle.classList.toggle('active');
-                
-                if (toggle.id === 'darkModeToggle') {
-                    document.body.classList.toggle('dark-mode');
-                }
-                
-                if (toggle.id === 'autoDarkModeToggle') {
-                    autoDarkMode = toggle.classList.contains('active');
-                    if (autoDarkMode) setThemeByTime();
-                }
-            });
-        });
+    <!-- Settings -->
+    <section id="settings" class="page" style="display:none;">
+        <h1>Settings</h1>
+        <div style="background:var(--bg-card); padding:2rem; border-radius:16px; border:1px solid var(--border); max-width:600px;">
+            <h3 style="margin-bottom:1rem;">Appearance</h3>
+            <label style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem;">
+                <input type="checkbox" id="darkToggle" checked>
+                Dark Mode
+            </label>
 
-        // Navigation
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                
-                const page = item.dataset.page;
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById(page + 'Page').classList.add('active');
-            });
-        });
+            <h3 style="margin:2rem 0 1rem;">Game Tabs</h3>
+            <label style="display:flex; align-items:center; gap:1rem;">
+                <input type="checkbox" id="closeOnSwitch" checked>
+                Auto-close other tabs when switching
+            </label>
+        </div>
+    </section>
 
-        // Render games
-        function renderGames() {
-            const gamesGrid = document.getElementById('gamesGrid');
-            if (!gamesGrid) return;
+</main>
 
-            const filtered = games.filter(g => 
-                g.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                g.category.toLowerCase().includes(searchQuery.toLowerCase())
-            );
+<!-- Game Modal with Tabs -->
+<div class="modal" id="gameModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Game</h2>
+            <span class="close-btn" id="closeModal">×</span>
+        </div>
+        <div class="tab-container">
+            <div class="tabs" id="gameTabs"></div>
+            <div class="tab-content-wrapper" id="tabContents"></div>
+        </div>
+    </div>
+</div>
 
-            gamesGrid.innerHTML = filtered.map(game => `
-                <div class="game-card" onclick="openGame('${game.title.replace(/'/g, "\\'")}', '${game.url}')">
-                    <div class="game-thumbnail">
-                        <img src="${game.image}" alt="${game.title}" 
-                             onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"300\"><rect width=\"100%\" height=\"100%\" fill=\"%234F46E5\"/><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-family=\"Arial\" font-size=\"48\" fill=\"white\">${game.title.substring(0,12)}</text></svg>'">
-                    </div>
-                    <div class="game-info">
-                        <div class="game-title">${game.title}</div>
-                        <small style="color: var(--text-secondary);">${game.category.charAt(0).toUpperCase() + game.category.slice(1)}</small>
-                    </div>
+<script>
+    // Expanded real math games list
+    const games = [
+        {id:'alien-add', title:'Alien Addition', cat:'Addition', url:'https://www.coolmath4kids.com/math-games/alien-addition'},
+        {id:'grand-prix-mult', title:'Grand Prix Multiplication', cat:'Multiplication', url:'https://www.coolmath4kids.com/math-games/grand-prix-multiplication'},
+        {id:'dirt-bike-frac', title:'Dirt Bike Fractions', cat:'Fractions', url:'https://www.coolmath4kids.com/math-games/dirt-bike-fractions'},
+        {id:'jet-ski-add', title:'Jet Ski Addition', cat:'Addition', url:'https://www.coolmath4kids.com/math-games/jet-ski-addition'},
+        {id:'demol-div', title:'Demolition Division', cat:'Division', url:'https://www.coolmath4kids.com/math-games/demolition-division'},
+        {id:'math-slither', title:'Math Slither', cat:'Arithmetic', url:'https://www.mathgames.com/play/math-slither.html'},
+        {id:'frac-tiles', title:'Fraction Tiles', cat:'Fractions', url:'https://www.mathplayground.com/fraction_tiles.html'},
+        {id:'mult-grand-prix', title:'Multiplication Grand Prix', cat:'Multiplication', url:'https://www.mathplayground.com/ASB_MultiplicationGrandPrix.html'},
+        {id:'island-sub', title:'Island Chase Subtraction', cat:'Subtraction', url:'https://www.coolmath4kids.com/math-games/island-chase-subtraction'},
+        {id:'pup-kitten-dec', title:'Puppies & Kittens Decimals', cat:'Decimals', url:'https://www.mathplayground.com/ASB_Puppies_Kittens.html'},
+        {id:'sum-blocks', title:'Sum Blocks', cat:'Addition', url:'https://www.mathplayground.com/sum_blocks.html'},
+        {id:'math-monster', title:'Math Monster', cat:'Mixed', url:'https://www.mathplayground.com/math_monster.html'}
+    ];
+
+    let openTabs = [];          // {id, title, url, tabEl, contentEl}
+    let currentTabId = null;
+    let recentGames = JSON.parse(localStorage.getItem('recentMathGames')) || [];
+
+    const modal = document.getElementById('gameModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const tabsContainer = document.getElementById('gameTabs');
+    const contentsContainer = document.getElementById('tabContents');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    // Render main games grid
+    function renderGames(containerId = 'gamesGrid') {
+        const grid = document.getElementById(containerId);
+        grid.innerHTML = games.map(game => `
+            <div class="game-card" data-id="${game.id}">
+                <div class="thumbnail">
+                    <img src="https://images.unsplash.com/photo-1581092160560-1c1e428e9d65?w=400&h=300&fit=crop" alt="${game.title}" onerror="this.style.display='none'">
+                    <span class="badge">${game.cat}</span>
                 </div>
-            `).join('');
-        }
+                <div class="info">
+                    <div class="title">${game.title}</div>
+                </div>
+            </div>
+        `).join('');
+    }
 
-        // Open game
-        function openGame(title, url) {
-            const modal = document.getElementById('gameModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const gameFrame = document.getElementById('gameFrame');
+    renderGames();
 
-            modalTitle.textContent = title;
-            gameFrame.src = url;
+    // Open game → add tab or switch
+    function openGame(game) {
+        const existing = openTabs.find(t => t.id === game.id);
+        if (existing) {
+            switchToTab(existing.id);
             modal.classList.add('active');
+            return;
         }
 
-        // Close modal
-        document.getElementById('closeBtn')?.addEventListener('click', () => {
-            const modal = document.getElementById('gameModal');
-            const gameFrame = document.getElementById('gameFrame');
-            modal.classList.remove('active');
-            gameFrame.src = '';
-        });
+        // Add new tab
+        const tabId = game.id;
+        const tabEl = document.createElement('div');
+        tabEl.className = 'tab';
+        tabEl.textContent = game.title;
+        tabEl.dataset.tabId = tabId;
+        tabEl.onclick = () => switchToTab(tabId);
 
-        document.getElementById('gameModal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'gameModal') {
-                document.getElementById('closeBtn').click();
+        const closeTab = document.createElement('span');
+        closeTab.textContent = ' ×';
+        closeTab.style.marginLeft = '8px';
+        closeTab.style.cursor = 'pointer';
+        closeTab.onclick = (e) => { e.stopPropagation(); closeTabFunc(tabId); };
+        tabEl.appendChild(closeTab);
+
+        const contentEl = document.createElement('div');
+        contentEl.className = 'tab-content';
+        contentEl.dataset.tabId = tabId;
+        contentEl.innerHTML = `<iframe src="${game.url}" allowfullscreen></iframe>`;
+
+        tabsContainer.appendChild(tabEl);
+        contentsContainer.appendChild(contentEl);
+
+        openTabs.push({id: tabId, title: game.title, url: game.url, tabEl, contentEl});
+
+        switchToTab(tabId);
+        modal.classList.add('active');
+
+        // Save to recent
+        recentGames = [game.id, ...recentGames.filter(id => id !== game.id)].slice(0,6);
+        localStorage.setItem('recentMathGames', JSON.stringify(recentGames));
+        updateRecent();
+    }
+
+    function switchToTab(tabId) {
+        openTabs.forEach(t => {
+            t.tabEl.classList.toggle('active', t.id === tabId);
+            t.contentEl.classList.toggle('active', t.id === tabId);
+        });
+        currentTabId = tabId;
+        modalTitle.textContent = openTabs.find(t => t.id === tabId)?.title || 'Game';
+    }
+
+    function closeTabFunc(tabId) {
+        const idx = openTabs.findIndex(t => t.id === tabId);
+        if (idx === -1) return;
+
+        const tab = openTabs[idx];
+        tab.tabEl.remove();
+        tab.contentEl.remove();
+        openTabs.splice(idx, 1);
+
+        if (currentTabId === tabId) {
+            if (openTabs.length > 0) {
+                switchToTab(openTabs[openTabs.length-1].id);
+            } else {
+                modal.classList.remove('active');
             }
-        });
+        }
+    }
 
-        // Fullscreen
-        document.getElementById('fullscreenBtn')?.addEventListener('click', () => {
-            const gameFrame = document.getElementById('gameFrame');
-            if (gameFrame.requestFullscreen) gameFrame.requestFullscreen();
-            else if (gameFrame.webkitRequestFullscreen) gameFrame.webkitRequestFullscreen();
-            else if (gameFrame.msRequestFullscreen) gameFrame.msRequestFullscreen();
-        });
+    // Close modal
+    closeModalBtn.onclick = () => modal.classList.remove('active');
 
-        // Search
-        document.getElementById('searchInput')?.addEventListener('input', (e) => {
-            searchQuery = e.target.value;
-            renderGames();
-        });
+    modal.onclick = e => {
+        if (e.target === modal) modal.classList.remove('active');
+    };
 
-        // Escape to close
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.getElementById('closeBtn')?.click();
-            }
-        });
+    // Navigation
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.onclick = e => {
+            e.preventDefault();
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            link.classList.add('active');
 
-        // Initialize
-        setThemeByTime();
-        renderGames();
-    </script>
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            document.getElementById(link.dataset.page).style.display = 'block';
+
+            if (link.dataset.page === 'recent') updateRecent();
+        };
+    });
+
+    // Card clicks
+    document.addEventListener('click', e => {
+        const card = e.target.closest('.game-card');
+        if (!card) return;
+        const id = card.dataset.id;
+        const game = games.find(g => g.id === id);
+        if (game) openGame(game);
+    });
+
+    // Recent grid
+    function updateRecent() {
+        const grid = document.getElementById('recentGrid');
+        const recents = recentGames.map(id => games.find(g => g.id === id)).filter(Boolean);
+        grid.innerHTML = recents.length ? recents.map(game => `
+            <div class="game-card" data-id="${game.id}">
+                <div class="thumbnail">
+                    <img src="https://images.unsplash.com/photo-1581092160560-1c1e428e9d65?w=400&h=300&fit=crop" alt="${game.title}">
+                    <span class="badge">${game.cat}</span>
+                </div>
+                <div class="info">
+                    <div class="title">${game.title}</div>
+                </div>
+            </div>
+        `).join('') : '<p style="color:var(--text-muted); text-align:center; padding:3rem 0;">No recent games yet.</p>';
+    }
+
+    // Dark mode
+    const darkToggle = document.getElementById('darkToggle');
+    darkToggle.checked = localStorage.getItem('darkMode') !== 'false';
+    if (darkToggle.checked) document.body.classList.add('dark');
+
+    darkToggle.onchange = () => {
+        document.body.classList.toggle('dark', darkToggle.checked);
+        localStorage.setItem('darkMode', darkToggle.checked);
+    };
+
+    // Init
+    if (recentGames.length) updateRecent();
+</script>
 </body>
 </html>
