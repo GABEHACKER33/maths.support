@@ -13,7 +13,6 @@
         }
 
         :root {
-            /* Light mode colors */
             --primary: #4F46E5;
             --primary-light: #6366F1;
             --primary-dark: #4338CA;
@@ -29,7 +28,6 @@
         }
 
         body.dark-mode {
-            /* Dark mode colors */
             --primary: #6366F1;
             --primary-light: #818CF8;
             --primary-dark: #4F46E5;
@@ -51,7 +49,6 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        /* Layout */
         .app-container {
             display: flex;
             height: 100vh;
@@ -59,19 +56,20 @@
 
         /* Sidebar */
         .sidebar {
-            width: 280px;
+            width: 80px;
             background: var(--sidebar-bg);
             border-right: 1px solid var(--border);
-            padding: 24px;
+            padding: 24px 16px;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s;
+            transition: width 0.3s ease;
             position: relative;
             z-index: 100;
+            overflow: hidden;
         }
 
-        .sidebar.collapsed {
-            width: 80px;
+        .sidebar:hover {
+            width: 280px;
         }
 
         .logo-section {
@@ -79,6 +77,7 @@
             align-items: center;
             gap: 12px;
             margin-bottom: 32px;
+            padding: 0 8px;
         }
 
         .logo-icon {
@@ -99,43 +98,19 @@
             font-weight: 800;
             color: var(--text);
             white-space: nowrap;
+            opacity: 0;
             transition: opacity 0.3s;
         }
 
-        .sidebar.collapsed .logo-text,
-        .sidebar.collapsed .nav-text,
-        .sidebar.collapsed .game-count {
-            opacity: 0;
-            width: 0;
-            overflow: hidden;
-        }
-
-        .toggle-sidebar {
-            position: absolute;
-            top: 24px;
-            right: -12px;
-            width: 24px;
-            height: 24px;
-            background: var(--primary);
-            border: 2px solid var(--bg);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: white;
-            font-size: 12px;
-            transition: all 0.3s;
-        }
-
-        .toggle-sidebar:hover {
-            background: var(--primary-dark);
-            transform: scale(1.1);
+        .sidebar:hover .logo-text,
+        .sidebar:hover .nav-text {
+            opacity: 1;
         }
 
         .search-box {
             position: relative;
             margin-bottom: 24px;
+            padding: 0 8px;
         }
 
         .search-box input {
@@ -158,7 +133,7 @@
 
         .search-icon {
             position: absolute;
-            left: 12px;
+            left: 20px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-secondary);
@@ -166,19 +141,8 @@
         }
 
         .nav-section {
-            margin-bottom: 32px;
             flex: 1;
             overflow-y: auto;
-        }
-
-        .nav-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-            transition: opacity 0.3s;
         }
 
         .nav-item {
@@ -190,8 +154,6 @@
             cursor: pointer;
             transition: all 0.2s;
             margin-bottom: 6px;
-            position: relative;
-            overflow: hidden;
         }
 
         .nav-item:hover {
@@ -204,49 +166,18 @@
         }
 
         .nav-icon {
-            font-size: 20px;
+            font-size: 24px;
             flex-shrink: 0;
+            min-width: 24px;
+            text-align: center;
         }
 
         .nav-text {
             flex: 1;
             font-weight: 500;
             white-space: nowrap;
+            opacity: 0;
             transition: opacity 0.3s;
-        }
-
-        .game-count {
-            background: var(--bg);
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            transition: opacity 0.3s;
-        }
-
-        .nav-item.active .game-count {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .theme-toggle {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: var(--bg);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .theme-toggle:hover {
-            background: var(--border);
-        }
-
-        .theme-icon {
-            font-size: 20px;
         }
 
         /* Main content */
@@ -254,6 +185,14 @@
             flex: 1;
             overflow-y: auto;
             padding: 32px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
         }
 
         .header {
@@ -299,12 +238,18 @@
         .game-thumbnail {
             width: 100%;
             height: 180px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            background: var(--bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 4rem;
             position: relative;
+            overflow: hidden;
+        }
+
+        .game-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .game-info {
@@ -318,14 +263,198 @@
             color: var(--text);
         }
 
-        .game-category {
-            display: inline-block;
-            padding: 4px 12px;
-            background: var(--bg);
-            border-radius: 6px;
-            font-size: 0.8rem;
-            color: var(--primary);
+        /* Account Page */
+        .profile-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 600px;
+            margin-bottom: 24px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .profile-info h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .profile-info p {
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
             font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Settings Page */
+        .settings-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 800px;
+            margin-bottom: 24px;
+        }
+
+        .settings-section h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .setting-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 56px;
+            height: 28px;
+            background: var(--border);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(28px);
+        }
+
+        select {
+            padding: 10px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
         }
 
         /* Game modal */
@@ -436,17 +565,13 @@
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
-                left: -280px;
+                left: -80px;
                 height: 100vh;
                 z-index: 200;
             }
 
-            .sidebar.mobile-open {
+            .sidebar:hover {
                 left: 0;
-            }
-
-            .sidebar.collapsed {
-                left: -80px;
             }
 
             .main-content {
@@ -464,48 +589,10 @@
                 padding: 16px;
             }
 
-            .toggle-sidebar {
-                display: none;
+            .profile-section,
+            .settings-section {
+                padding: 20px;
             }
-        }
-
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 150;
-            background: var(--primary);
-            color: white;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-        }
-
-        @media (max-width: 768px) {
-            .mobile-menu {
-                display: flex;
-            }
-        }
-
-        .overlay-backdrop {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 150;
-        }
-
-        .overlay-backdrop.active {
-            display: block;
         }
     </style>
 </head>
@@ -513,8 +600,6 @@
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-            <div class="toggle-sidebar" id="toggleSidebar">◀</div>
-            
             <div class="logo-section">
                 <div class="logo-icon">📐</div>
                 <div class="logo-text">Maths Support</div>
@@ -526,52 +611,177 @@
             </div>
 
             <nav class="nav-section">
-                <div class="nav-title">Categories</div>
-                <div class="nav-item active" data-category="all">
+                <div class="nav-item active" data-page="games">
                     <span class="nav-icon">🎮</span>
-                    <span class="nav-text">All Games</span>
-                    <span class="game-count" id="allCount">16</span>
+                    <span class="nav-text">Games</span>
                 </div>
-                <div class="nav-item" data-category="puzzle">
-                    <span class="nav-icon">🧩</span>
-                    <span class="nav-text">Puzzle</span>
-                    <span class="game-count" id="puzzleCount">8</span>
+                <div class="nav-item" data-page="account">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">Account</span>
                 </div>
-                <div class="nav-item" data-category="action">
-                    <span class="nav-icon">⚡</span>
-                    <span class="nav-text">Action</span>
-                    <span class="game-count" id="actionCount">1</span>
-                </div>
-                <div class="nav-item" data-category="strategy">
-                    <span class="nav-icon">🎯</span>
-                    <span class="nav-text">Strategy</span>
-                    <span class="game-count" id="strategyCount">3</span>
-                </div>
-                <div class="nav-item" data-category="casual">
-                    <span class="nav-icon">🎨</span>
-                    <span class="nav-text">Casual</span>
-                    <span class="game-count" id="casualCount">4</span>
+                <div class="nav-item" data-page="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Settings</span>
                 </div>
             </nav>
-
-            <div class="theme-toggle" id="themeToggle">
-                <span class="theme-icon">🌙</span>
-                <span class="nav-text">Dark Mode</span>
-            </div>
         </aside>
-
-        <!-- Mobile menu button -->
-        <div class="mobile-menu" id="mobileMenu">☰</div>
-        <div class="overlay-backdrop" id="overlayBackdrop"></div>
 
         <!-- Main content -->
         <main class="main-content">
-            <div class="header">
-                <h1 id="categoryTitle">All Games</h1>
-                <p id="categoryDesc">Browse our collection of educational games</p>
+            <!-- Games Page -->
+            <div class="page active" id="gamesPage">
+                <div class="header">
+                    <h1>All Games</h1>
+                    <p>Browse our collection of educational games</p>
+                </div>
+                <div class="games-grid" id="gamesGrid"></div>
             </div>
 
-            <div class="games-grid" id="gamesGrid"></div>
+            <!-- Account Page -->
+            <div class="page" id="accountPage">
+                <div class="header">
+                    <h1>Account</h1>
+                    <p>Manage your profile and view your stats</p>
+                </div>
+
+                <div class="profile-section">
+                    <div class="profile-header">
+                        <div class="profile-avatar">👤</div>
+                        <div class="profile-info">
+                            <h2>Guest User</h2>
+                            <p>guest@mathssupport.com</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" placeholder="Enter your username" value="GuestUser">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="Enter your email" value="guest@mathssupport.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text" placeholder="Enter your display name" value="Guest">
+                    </div>
+
+                    <button class="btn">Save Changes</button>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">47</div>
+                            <div class="stat-label">Games Played</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">12h</div>
+                            <div class="stat-label">Time Played</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">8</div>
+                            <div class="stat-label">Favorites</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div class="page" id="settingsPage">
+                <div class="header">
+                    <h1>Settings</h1>
+                    <p>Customize your gaming experience</p>
+                </div>
+
+                <div class="settings-section">
+                    <h2>Appearance</h2>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Dark Mode</h3>
+                            <p>Toggle dark mode theme</p>
+                        </div>
+                        <div class="toggle-switch" id="darkModeToggle"></div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Auto Dark Mode</h3>
+                            <p>Automatically switch based on time (6 PM - 6 AM)</p>
+                        </div>
+                        <div class="toggle-switch active" id="autoDarkModeToggle"></div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h2>Gameplay</h2>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Auto Fullscreen</h3>
+                            <p>Automatically open games in fullscreen mode</p>
+                        </div>
+                        <div class="toggle-switch" id="autoFullscreenToggle"></div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Sound Effects</h3>
+                            <p>Enable click sounds and interactions</p>
+                        </div>
+                        <div class="toggle-switch active" id="soundToggle"></div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Default Quality</h3>
+                            <p>Set default game quality</p>
+                        </div>
+                        <select id="qualitySelect">
+                            <option value="high">High</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h2>Privacy</h2>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Save Game History</h3>
+                            <p>Track and save your game history</p>
+                        </div>
+                        <div class="toggle-switch active" id="historyToggle"></div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Analytics</h3>
+                            <p>Help improve the platform with usage data</p>
+                        </div>
+                        <div class="toggle-switch active" id="analyticsToggle"></div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h2>Content Filter</h2>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Safe Mode</h3>
+                            <p>Filter games for educational use only</p>
+                        </div>
+                        <div class="toggle-switch active" id="safeModeToggle"></div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Age Rating</h3>
+                            <p>Filter games by age appropriateness</p>
+                        </div>
+                        <select id="ageSelect">
+                            <option value="all" selected>All Ages</option>
+                            <option value="7">7+</option>
+                            <option value="13">13+</option>
+                            <option value="18">18+</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -588,112 +798,87 @@
     </div>
 
     <script>
-        // Game database
+        // Game database with images
         const games = [
-            { title: '2048', category: 'puzzle', url: 'https://play2048.co/', emoji: '🎯' },
-            { title: 'Tetris', category: 'puzzle', url: 'https://tetris.com/play-tetris', emoji: '🧱' },
-            { title: 'Snake', category: 'casual', url: 'https://playsnake.org/', emoji: '🐍' },
-            { title: 'Pac-Man', category: 'action', url: 'https://www.google.com/logos/2010/pacman10-i.html', emoji: '👾' },
-            { title: 'Chess', category: 'strategy', url: 'https://www.chess.com/play/computer', emoji: '♟️' },
-            { title: 'Sudoku', category: 'puzzle', url: 'https://sudoku.com/', emoji: '🔢' },
-            { title: 'Minesweeper', category: 'puzzle', url: 'https://minesweeperonline.com/', emoji: '💣' },
-            { title: 'Solitaire', category: 'casual', url: 'https://solitaire.org/', emoji: '🃏' },
-            { title: 'Checkers', category: 'strategy', url: 'https://www.247checkers.com/', emoji: '⚫' },
-            { title: 'Bubble Shooter', category: 'casual', url: 'https://www.bubbleshooter.net/', emoji: '🫧' },
-            { title: 'Mahjong', category: 'puzzle', url: 'https://mahjong.org/', emoji: '🀄' },
-            { title: 'Connect 4', category: 'strategy', url: 'https://www.mathsisfun.com/games/connect4.html', emoji: '🔴' },
-            { title: 'Crossword', category: 'puzzle', url: 'https://www.dictionary.com/e/crossword/', emoji: '📝' },
-            { title: 'Word Search', category: 'puzzle', url: 'https://thewordsearch.com/', emoji: '🔤' },
-            { title: 'Quiz Master', category: 'casual', url: 'https://www.sporcle.com/', emoji: '❓' },
-            { title: 'Memory Game', category: 'puzzle', url: 'https://www.memozor.com/', emoji: '🧠' }
+            { title: '2048', category: 'puzzle', url: 'https://play2048.co/', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=300&fit=crop' },
+            { title: 'Tetris', category: 'puzzle', url: 'https://tetris.com/play-tetris', image: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400&h=300&fit=crop' },
+            { title: 'Snake', category: 'casual', url: 'https://playsnake.org/', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop' },
+            { title: 'Pac-Man', category: 'action', url: 'https://www.google.com/logos/2010/pacman10-i.html', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop' },
+            { title: 'Chess', category: 'strategy', url: 'https://www.chess.com/play/computer', image: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&h=300&fit=crop' },
+            { title: 'Sudoku', category: 'puzzle', url: 'https://sudoku.com/', image: 'https://images.unsplash.com/photo-1590103514966-ae587832a69e?w=400&h=300&fit=crop' },
+            { title: 'Minesweeper', category: 'puzzle', url: 'https://minesweeperonline.com/', image: 'https://images.unsplash.com/photo-1594398901394-4e34939a4fd0?w=400&h=300&fit=crop' },
+            { title: 'Solitaire', category: 'casual', url: 'https://solitaire.org/', image: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop' },
+            { title: 'Checkers', category: 'strategy', url: 'https://www.247checkers.com/', image: 'https://images.unsplash.com/photo-1566694271453-390536dd1f0d?w=400&h=300&fit=crop' },
+            { title: 'Bubble Shooter', category: 'casual', url: 'https://www.bubbleshooter.net/', image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=300&fit=crop' },
+            { title: 'Mahjong', category: 'puzzle', url: 'https://mahjong.org/', image: 'https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=400&h=300&fit=crop' },
+            { title: 'Connect 4', category: 'strategy', url: 'https://www.mathsisfun.com/games/connect4.html', image: 'https://images.unsplash.com/photo-1632501641765-e568d28b0015?w=400&h=300&fit=crop' },
+            { title: 'Crossword', category: 'puzzle', url: 'https://www.dictionary.com/e/crossword/', image: 'https://images.unsplash.com/photo-1586769852044-692d6df3c27b?w=400&h=300&fit=crop' },
+            { title: 'Word Search', category: 'puzzle', url: 'https://thewordsearch.com/', image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=300&fit=crop' },
+            { title: 'Quiz Master', category: 'casual', url: 'https://www.sporcle.com/', image: 'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=400&h=300&fit=crop' },
+            { title: 'Memory Game', category: 'puzzle', url: 'https://www.memozor.com/', image: 'https://images.unsplash.com/photo-1591791068585-88481faaa44a?w=400&h=300&fit=crop' }
         ];
 
-        let currentCategory = 'all';
         let searchQuery = '';
-
-        // Category info
-        const categoryInfo = {
-            all: { title: 'All Games', desc: 'Browse our collection of educational games' },
-            puzzle: { title: 'Puzzle Games', desc: 'Challenge your mind with brain teasers' },
-            action: { title: 'Action Games', desc: 'Fast-paced exciting gameplay' },
-            strategy: { title: 'Strategy Games', desc: 'Think ahead and plan your moves' },
-            casual: { title: 'Casual Games', desc: 'Relax and enjoy these fun games' }
-        };
+        let autoDarkMode = true;
 
         // Auto dark mode based on time
         function setThemeByTime() {
+            if (!autoDarkMode) return;
+            
             const hour = new Date().getHours();
-            const isDark = hour < 6 || hour >= 18; // Dark mode from 6 PM to 6 AM
+            const isDark = hour < 6 || hour >= 18;
             
             if (isDark) {
                 document.body.classList.add('dark-mode');
-                document.querySelector('.theme-icon').textContent = '☀️';
-                document.querySelector('.theme-toggle .nav-text').textContent = 'Light Mode';
+                document.getElementById('darkModeToggle').classList.add('active');
             } else {
                 document.body.classList.remove('dark-mode');
-                document.querySelector('.theme-icon').textContent = '🌙';
-                document.querySelector('.theme-toggle .nav-text').textContent = 'Dark Mode';
+                document.getElementById('darkModeToggle').classList.remove('active');
             }
         }
 
-        // Theme toggle
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            document.querySelector('.theme-icon').textContent = isDark ? '☀️' : '🌙';
-            document.querySelector('.theme-toggle .nav-text').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        // Settings toggles
+        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                toggle.classList.toggle('active');
+                
+                if (toggle.id === 'darkModeToggle') {
+                    document.body.classList.toggle('dark-mode');
+                }
+                
+                if (toggle.id === 'autoDarkModeToggle') {
+                    autoDarkMode = toggle.classList.contains('active');
+                    if (autoDarkMode) setThemeByTime();
+                }
+            });
         });
 
-        // Sidebar toggle
-        document.getElementById('toggleSidebar').addEventListener('click', () => {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('collapsed');
-            document.getElementById('toggleSidebar').textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                const page = item.dataset.page;
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(page + 'Page').classList.add('active');
+            });
         });
-
-        // Mobile menu
-        document.getElementById('mobileMenu').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.add('mobile-open');
-            document.getElementById('overlayBackdrop').classList.add('active');
-        });
-
-        document.getElementById('overlayBackdrop').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.remove('mobile-open');
-            document.getElementById('overlayBackdrop').classList.remove('active');
-        });
-
-        // Update counts
-        function updateCounts() {
-            const counts = { all: games.length, puzzle: 0, action: 0, strategy: 0, casual: 0 };
-            games.forEach(game => counts[game.category]++);
-            
-            document.getElementById('allCount').textContent = counts.all;
-            document.getElementById('puzzleCount').textContent = counts.puzzle;
-            document.getElementById('actionCount').textContent = counts.action;
-            document.getElementById('strategyCount').textContent = counts.strategy;
-            document.getElementById('casualCount').textContent = counts.casual;
-        }
 
         // Render games
         function renderGames() {
             const gamesGrid = document.getElementById('gamesGrid');
-            const filteredGames = games.filter(game => {
-                const matchesCategory = currentCategory === 'all' || game.category === currentCategory;
-                const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase());
-                return matchesCategory && matchesSearch;
-            });
-
-            // Update header
-            const info = categoryInfo[currentCategory];
-            document.getElementById('categoryTitle').textContent = info.title;
-            document.getElementById('categoryDesc').textContent = info.desc;
+            const filteredGames = games.filter(game => 
+                game.title.toLowerCase().includes(searchQuery.toLowerCase())
+            );
 
             gamesGrid.innerHTML = filteredGames.map(game => `
                 <div class="game-card" onclick="openGame('${game.title}', '${game.url}')">
-                    <div class="game-thumbnail">${game.emoji}</div>
+                    <div class="game-thumbnail">
+                        <img src="${game.image}" alt="${game.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27400%27 height=%27300%27%3E%3Crect fill=%27%234F46E5%27 width=%27400%27 height=%27300%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 font-family=%27Arial%27 font-size=%2748%27 fill=%27white%27%3E🎮%3C/text%3E%3C/svg%3E'">
+                    </div>
                     <div class="game-info">
                         <div class="game-title">${game.title}</div>
-                        <span class="game-category">${game.category.toUpperCase()}</span>
                     </div>
                 </div>
             `).join('');
@@ -737,20 +922,6 @@
             }
         });
 
-        // Navigation items
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                currentCategory = item.dataset.category;
-                renderGames();
-                
-                // Close mobile menu
-                document.getElementById('sidebar').classList.remove('mobile-open');
-                document.getElementById('overlayBackdrop').classList.remove('active');
-            });
-        });
-
         // Search
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchQuery = e.target.value;
@@ -766,7 +937,6 @@
 
         // Initialize
         setThemeByTime();
-        updateCounts();
         renderGames();
     </script>
 </body>
