@@ -10,13 +10,8 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
     <!-- Supabase SDK -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         * {
@@ -32,11 +27,11 @@
             --accent-primary: #00ff88;
             --accent-secondary: #00ccff;
             --accent-danger: #ff4466;
+            --accent-warning: #ffaa00;
             --text-primary: #ffffff;
             --text-secondary: #a0a0b8;
             --border-color: rgba(255, 255, 255, 0.08);
             --shadow-glow: 0 0 40px rgba(0, 255, 136, 0.15);
-            --proxy-color: #8a2be2;
         }
 
         body {
@@ -82,9 +77,9 @@
             50% { transform: translateY(-10px); }
         }
 
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(138, 43, 226, 0.5); }
-            50% { box-shadow: 0 0 40px rgba(138, 43, 226, 0.8); }
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
         }
 
         /* Scrollbar */
@@ -105,6 +100,24 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--accent-secondary);
         }
+
+        /* Proxy Button Styles */
+        .proxy-button {
+            background: linear-gradient(135deg, var(--accent-warning), #ff6b00);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .proxy-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
     </style>
 </head>
 <body>
@@ -113,41 +126,15 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // Firebase Configuration (TEST CONFIG - replace with your own)
-        const firebaseConfig = {
-            apiKey: "AIzaSyCHkqY2CBLGCmB3KqwTb8FdOHLIT7gKvno",
-            authDomain: "maths-support-test.firebaseapp.com",
-            projectId: "maths-support-test",
-            storageBucket: "maths-support-test.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
-        };
-
-        // Supabase Configuration (TEST CONFIG - replace with your own)
-        const SUPABASE_URL = 'https://hsmfjpetvcsgkpkwpdjr.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzbWZqcGV0dmNzZ2twa3dwZGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3NDc0MzEsImV4cCI6MjA3OTMyMzQzMX0.IBiJtUJBPyjNwGowfgnlfrbHpb46C43NmYY3O9rEFqQ';
-
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        // Supabase Configuration
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // Replace with your Supabase URL
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Replace with your Supabase anon key
 
         // Initialize Supabase
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-                autoRefreshToken: true,
-                persistSession: true
-            }
-        });
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Configure Google Auth Provider to restrict to kcpupils.org
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
-        googleProvider.setCustomParameters({
-            hd: 'kcpupils.org'
-        });
+        // Proxy URL
+        const PROXY_URL = 'https://8021688600113732413547102395624276084104729385613928573282.educationandtraining.info/';
 
         // Games Data
         const GAMES = [
@@ -161,218 +148,332 @@
             { id: '8', title: 'Pac-Man', category: 'Arcade', url: 'https://www.google.com/logos/2010/pacman10-i.html', thumbnail: 'https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&h=300&fit=crop', color: '#ffdd00' },
         ];
 
-        // Simple Proxy Service
-        const ProxyService = {
-            loadProxy: () => {
-                const proxyUrl = 'https://8021688600113732413547102395624276084104729385613928573282.educationandtraining.info/';
-                window.open(proxyUrl, '_blank', 'noopener,noreferrer');
-                
-                // Show success message
-                alert('Proxy is loading in a new tab. This may help access games that are blocked on your network.');
-            }
-        };
-
-        // Firebase Service Functions (Fallback if Supabase fails)
-        const FirebaseService = {
-            createUserProfile: async (user) => {
-                try {
-                    const userRef = db.collection('users').doc(user.uid);
-                    const doc = await userRef.get();
-                    
-                    if (!doc.exists) {
-                        await userRef.set({
-                            uid: user.uid,
-                            email: user.email,
-                            displayName: user.displayName,
-                            photoURL: user.photoURL,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            stats: {
-                                gamesPlayed: 0,
-                                totalTime: 0,
-                                achievements: 0
-                            },
-                            status: 'online',
-                            currentGame: null
-                        });
-                    }
-                    return { success: true };
-                } catch (error) {
-                    console.error('Firebase error:', error);
-                    return { success: false, error };
-                }
-            },
-
-            updateUserStatus: async (uid, status, currentGame = null) => {
-                try {
-                    await db.collection('users').doc(uid).update({
-                        status,
-                        currentGame,
-                        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    return { success: true };
-                } catch (error) {
-                    console.error('Firebase error:', error);
-                    return { success: false, error };
-                }
-            }
-        };
-
         // Supabase Service Functions
         const SupabaseService = {
-            createUserProfile: async (user) => {
-                try {
-                    const { data, error } = await supabase
-                        .from('users')
-                        .upsert({
-                            uid: user.uid,
-                            email: user.email,
-                            display_name: user.displayName || user.email.split('@')[0],
-                            photo_url: user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split('@')[0])}&background=random`,
-                            status: 'online',
-                            current_game: null,
-                            created_at: new Date().toISOString(),
-                            stats: {
-                                games_played: 0,
-                                total_time: 0,
-                                achievements: 0
-                            }
-                        }, {
-                            onConflict: 'uid'
-                        });
-
-                    if (error) {
-                        console.error('Supabase error:', error);
-                        // Fallback to Firebase
-                        return await FirebaseService.createUserProfile(user);
+            // Sign in with Google
+            signInWithGoogle: async () => {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        queryParams: {
+                            hd: 'kcpupils.org'
+                        },
+                        redirectTo: window.location.origin
                     }
-                    return { success: true, data };
-                } catch (error) {
-                    console.error('Error creating profile:', error);
-                    // Fallback to Firebase
-                    return await FirebaseService.createUserProfile(user);
-                }
+                });
+
+                if (error) throw error;
+                return data;
             },
 
-            updateUserStatus: async (uid, status, currentGame = null) => {
-                try {
-                    const { error } = await supabase
-                        .from('users')
-                        .update({
+            // Sign out
+            signOut: async () => {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+            },
+
+            // Get current session
+            getSession: async () => {
+                const { data: { session } } = await supabase.auth.getSession();
+                return session;
+            },
+
+            // Create or update user profile
+            upsertUserProfile: async (user) => {
+                const { data, error } = await supabase
+                    .from('users')
+                    .upsert({
+                        id: user.id,
+                        email: user.email,
+                        display_name: user.user_metadata.full_name || user.email.split('@')[0],
+                        avatar_url: user.user_metadata.avatar_url || '',
+                        status: 'online',
+                        current_game: null,
+                        updated_at: new Date().toISOString()
+                    }, {
+                        onConflict: 'id'
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+                return data;
+            },
+
+            // Update user status
+            updateUserStatus: async (userId, status, currentGame = null) => {
+                const { error } = await supabase
+                    .from('users')
+                    .update({
+                        status,
+                        current_game: currentGame,
+                        last_seen: new Date().toISOString()
+                    })
+                    .eq('id', userId);
+
+                if (error) throw error;
+            },
+
+            // Get friends
+            getFriends: async (userId) => {
+                const { data, error } = await supabase
+                    .from('friends')
+                    .select(`
+                        friend_id,
+                        users!friends_friend_id_fkey (
+                            id,
+                            email,
+                            display_name,
+                            avatar_url,
                             status,
-                            current_game: currentGame,
-                            last_seen: new Date().toISOString()
-                        })
-                        .eq('uid', uid);
+                            current_game
+                        )
+                    `)
+                    .eq('user_id', userId);
 
-                    if (error) {
-                        console.error('Supabase error:', error);
-                        // Fallback to Firebase
-                        return await FirebaseService.updateUserStatus(uid, status, currentGame);
-                    }
-                    return { success: true };
-                } catch (error) {
-                    console.error('Error updating status:', error);
-                    // Fallback to Firebase
-                    return await FirebaseService.updateUserStatus(uid, status, currentGame);
+                if (error) throw error;
+                return data.map(f => f.users);
+            },
+
+            // Subscribe to friends updates
+            subscribeFriends: (userId, callback) => {
+                return supabase
+                    .channel('friends-changes')
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'friends',
+                        filter: `user_id=eq.${userId}`
+                    }, async () => {
+                        const friends = await SupabaseService.getFriends(userId);
+                        callback(friends);
+                    })
+                    .subscribe();
+            },
+
+            // Add friend
+            addFriend: async (currentUserId, friendEmail) => {
+                // Find user by email
+                const { data: users, error: userError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('email', friendEmail)
+                    .limit(1);
+
+                if (userError) throw userError;
+                if (!users || users.length === 0) {
+                    throw new Error('User not found');
                 }
+
+                const friend = users[0];
+
+                if (friend.id === currentUserId) {
+                    throw new Error('Cannot add yourself as a friend');
+                }
+
+                // Check if already friends
+                const { data: existing } = await supabase
+                    .from('friends')
+                    .select('*')
+                    .eq('user_id', currentUserId)
+                    .eq('friend_id', friend.id)
+                    .limit(1);
+
+                if (existing && existing.length > 0) {
+                    throw new Error('Already friends');
+                }
+
+                // Add friendship (bidirectional)
+                const { error: error1 } = await supabase
+                    .from('friends')
+                    .insert({
+                        user_id: currentUserId,
+                        friend_id: friend.id
+                    });
+
+                if (error1) throw error1;
+
+                const { error: error2 } = await supabase
+                    .from('friends')
+                    .insert({
+                        user_id: friend.id,
+                        friend_id: currentUserId
+                    });
+
+                if (error2) throw error2;
+
+                return friend;
             },
 
-            // Simple fallback functions (can be expanded)
-            getFriends: async () => {
-                return [];
+            // Get or create conversation
+            getOrCreateConversation: async (user1Id, user2Id) => {
+                // Check for existing conversation
+                const { data: existing } = await supabase
+                    .from('conversations')
+                    .select('*')
+                    .contains('participants', [user1Id])
+                    .contains('participants', [user2Id])
+                    .limit(1);
+
+                if (existing && existing.length > 0) {
+                    return existing[0].id;
+                }
+
+                // Create new conversation
+                const { data, error } = await supabase
+                    .from('conversations')
+                    .insert({
+                        participants: [user1Id, user2Id]
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+                return data.id;
             },
 
-            addFriend: async () => {
-                return { success: true };
+            // Get conversations
+            getConversations: async (userId) => {
+                const { data, error } = await supabase
+                    .from('conversations')
+                    .select('*')
+                    .contains('participants', [userId])
+                    .order('last_message_at', { ascending: false });
+
+                if (error) throw error;
+
+                // Enrich with friend data
+                const enriched = await Promise.all(data.map(async (conv) => {
+                    const friendId = conv.participants.find(id => id !== userId);
+                    const { data: friend } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', friendId)
+                        .single();
+
+                    return {
+                        id: conv.id,
+                        friendId: friendId,
+                        friendName: friend?.display_name || 'Unknown',
+                        friendAvatar: friend?.avatar_url || '',
+                        friendStatus: friend?.status || 'offline',
+                        lastMessage: conv.last_message || '',
+                        timestamp: conv.last_message_at ? new Date(conv.last_message_at) : new Date(),
+                        unread: 0
+                    };
+                }));
+
+                return enriched;
+            },
+
+            // Subscribe to conversations
+            subscribeConversations: (userId, callback) => {
+                return supabase
+                    .channel('conversations-changes')
+                    .on('postgres_changes', {
+                        event: '*',
+                        schema: 'public',
+                        table: 'conversations'
+                    }, async () => {
+                        const convos = await SupabaseService.getConversations(userId);
+                        callback(convos);
+                    })
+                    .subscribe();
+            },
+
+            // Get messages
+            getMessages: async (conversationId) => {
+                const { data, error } = await supabase
+                    .from('messages')
+                    .select('*')
+                    .eq('conversation_id', conversationId)
+                    .order('created_at', { ascending: true })
+                    .limit(100);
+
+                if (error) throw error;
+                return data.map(msg => ({
+                    id: msg.id,
+                    senderId: msg.sender_id,
+                    text: msg.content,
+                    timestamp: new Date(msg.created_at),
+                    gameInvite: msg.game_invite
+                }));
+            },
+
+            // Subscribe to messages
+            subscribeMessages: (conversationId, callback) => {
+                return supabase
+                    .channel(`messages-${conversationId}`)
+                    .on('postgres_changes', {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'messages',
+                        filter: `conversation_id=eq.${conversationId}`
+                    }, async () => {
+                        const messages = await SupabaseService.getMessages(conversationId);
+                        callback(messages);
+                    })
+                    .subscribe();
+            },
+
+            // Send message
+            sendMessage: async (conversationId, senderId, text, gameInvite = null) => {
+                const { error } = await supabase
+                    .from('messages')
+                    .insert({
+                        conversation_id: conversationId,
+                        sender_id: senderId,
+                        content: text,
+                        game_invite: gameInvite
+                    });
+
+                if (error) throw error;
+
+                // Update conversation last message
+                await supabase
+                    .from('conversations')
+                    .update({
+                        last_message: text,
+                        last_message_at: new Date().toISOString()
+                    })
+                    .eq('id', conversationId);
+            },
+
+            // Get user stats
+            getUserStats: async (userId) => {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('games_played, total_time, achievements')
+                    .eq('id', userId)
+                    .single();
+
+                if (error) return { games_played: 0, total_time: 0, achievements: 0 };
+                return data;
+            },
+
+            // Increment game played
+            incrementGamePlayed: async (userId) => {
+                const { error } = await supabase.rpc('increment_games_played', {
+                    user_id: userId
+                });
+
+                if (error) console.error('Error incrementing games:', error);
             }
-        };
-
-        // Combined Service
-        const UserService = {
-            createUserProfile: async (user) => {
-                return await SupabaseService.createUserProfile(user);
-            },
-
-            updateUserStatus: async (uid, status, currentGame = null) => {
-                return await SupabaseService.updateUserStatus(uid, status, currentGame);
-            },
-
-            loadProxy: ProxyService.loadProxy
         };
 
         // Login Screen Component
         function LoginScreen({ onLoginSuccess }) {
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState('');
-            const [debugInfo, setDebugInfo] = useState('');
 
             const handleGoogleSignIn = async () => {
                 setLoading(true);
                 setError('');
-                setDebugInfo('');
-                
                 try {
-                    // Test if Firebase is initialized
-                    if (!firebase.apps.length) {
-                        throw new Error('Firebase not initialized');
-                    }
-
-                    // Sign in with Google
-                    const result = await auth.signInWithPopup(googleProvider);
-                    
-                    // For testing, allow any email domain, but warn if not kcpupils.org
-                    if (!result.user.email.endsWith('@kcpupils.org')) {
-                        setDebugInfo('Note: Using non-kcpupils.org email for testing');
-                        // Don't sign out - allow for testing
-                    }
-
-                    // Create user profile
-                    const profileResult = await UserService.createUserProfile(result.user);
-                    
-                    if (profileResult.success) {
-                        onLoginSuccess(result.user);
-                    } else {
-                        // Even if profile creation fails, allow login
-                        console.warn('Profile creation failed, but allowing login');
-                        onLoginSuccess(result.user);
-                    }
+                    await SupabaseService.signInWithGoogle();
                 } catch (err) {
                     console.error('Login error:', err);
-                    setDebugInfo(`Error code: ${err.code || 'unknown'}, Message: ${err.message}`);
-                    
-                    if (err.code === 'auth/popup-closed-by-user') {
-                        setError('Sign-in was cancelled. Please click the button again.');
-                    } else if (err.code === 'auth/popup-blocked') {
-                        setError('Pop-up blocked. Please allow pop-ups for this site and try again.');
-                    } else if (err.code === 'auth/network-request-failed') {
-                        setError('Network error. Please check your internet connection.');
-                    } else if (err.code === 'auth/internal-error') {
-                        setError('Firebase configuration error. Using test mode...');
-                        // Create a mock user for testing
-                        const mockUser = {
-                            uid: 'test-user-' + Date.now(),
-                            email: 'test@kcpupils.org',
-                            displayName: 'Test User',
-                            photoURL: 'https://ui-avatars.com/api/?name=Test+User&background=random'
-                        };
-                        setTimeout(() => {
-                            onLoginSuccess(mockUser);
-                        }, 1000);
-                    } else {
-                        setError('Failed to sign in. Please try again or use test mode.');
-                        
-                        // Offer test mode
-                        if (confirm('Sign-in failed. Would you like to enter test mode?')) {
-                            const mockUser = {
-                                uid: 'test-user-' + Date.now(),
-                                email: 'test@kcpupils.org',
-                                displayName: 'Test User',
-                                photoURL: 'https://ui-avatars.com/api/?name=Test+User&background=random'
-                            };
-                            onLoginSuccess(mockUser);
-                        }
-                    }
-                } finally {
+                    setError('Failed to sign in. Please try again.');
                     setLoading(false);
                 }
             };
@@ -392,44 +493,11 @@
                         border: '1px solid var(--border-color)',
                         borderRadius: '24px',
                         padding: '60px 50px',
-                        maxWidth: '500px',
+                        maxWidth: '440px',
                         width: '90%',
                         textAlign: 'center',
-                        boxShadow: 'var(--shadow-glow)',
-                        position: 'relative'
+                        boxShadow: 'var(--shadow-glow)'
                     }}>
-                        <button
-                            onClick={UserService.loadProxy}
-                            style={{
-                                position: 'absolute',
-                                top: '20px',
-                                right: '20px',
-                                padding: '10px 20px',
-                                background: 'var(--proxy-color)',
-                                border: 'none',
-                                borderRadius: '12px',
-                                color: 'white',
-                                fontSize: '14px',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                animation: 'glow 2s ease-in-out infinite',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                zIndex: 10,
-                                transition: 'transform 0.3s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.target.style.transform = 'scale(1.05)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.transform = 'scale(1)';
-                            }}
-                        >
-                            <span>🔒</span>
-                            <span>Load Proxy</span>
-                        </button>
-
                         <div style={{
                             width: '80px',
                             height: '80px',
@@ -462,7 +530,7 @@
                             marginBottom: '40px',
                             fontSize: '15px'
                         }}>
-                            Sign in to access educational games and chat with friends
+                            Sign in with your @kcpupils.org account to access games, chat with friends, and track your progress
                         </p>
 
                         <button
@@ -485,16 +553,6 @@
                                 transition: 'all 0.3s ease',
                                 opacity: loading ? 0.6 : 1
                             }}
-                            onMouseEnter={(e) => {
-                                if (!loading) {
-                                    e.target.style.transform = 'translateY(-2px)';
-                                    e.target.style.boxShadow = '0 8px 24px rgba(255,255,255,0.2)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.transform = 'translateY(0)';
-                                e.target.style.boxShadow = 'none';
-                            }}
                         >
                             {loading ? (
                                 <>
@@ -516,7 +574,7 @@
                                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                                     </svg>
-                                    <span>Sign in with Google</span>
+                                    <span>Continue with Google</span>
                                 </>
                             )}
                         </button>
@@ -532,15 +590,6 @@
                                 fontSize: '14px'
                             }}>
                                 {error}
-                                {debugInfo && (
-                                    <div style={{ 
-                                        fontSize: '12px', 
-                                        marginTop: '8px',
-                                        color: 'var(--text-secondary)' 
-                                    }}>
-                                        {debugInfo}
-                                    </div>
-                                )}
                             </div>
                         )}
 
@@ -550,12 +599,7 @@
                             color: 'var(--text-secondary)',
                             lineHeight: '1.6'
                         }}>
-                            <p style={{ marginBottom: '10px' }}>
-                                <strong>Note for testing:</strong> You can use any Google account
-                            </p>
-                            <p>
-                                If sign-in fails, you'll be offered test mode
-                            </p>
+                            By signing in, you agree to our Terms of Service and Privacy Policy
                         </div>
                     </div>
                 </div>
@@ -567,54 +611,179 @@
             const [user, setUser] = useState(null);
             const [loading, setLoading] = useState(true);
             const [activeSection, setActiveSection] = useState('games');
+            const [friends, setFriends] = useState([]);
+            const [conversations, setConversations] = useState([]);
+            const [activeConversation, setActiveConversation] = useState(null);
+            const [messages, setMessages] = useState([]);
             const [currentGame, setCurrentGame] = useState(null);
             const [searchQuery, setSearchQuery] = useState('');
+            const [showAddFriend, setShowAddFriend] = useState(false);
+            const [showGameInvite, setShowGameInvite] = useState(false);
+            const [selectedFriend, setSelectedFriend] = useState(null);
+
+            const subscriptionsRef = useRef([]);
 
             useEffect(() => {
-                // Check for existing auth state
-                const unsubscribe = auth.onAuthStateChanged((user) => {
-                    if (user) {
-                        setUser(user);
-                        UserService.createUserProfile(user);
-                    } else {
-                        setUser(null);
+                // Check for existing session
+                const initAuth = async () => {
+                    const session = await SupabaseService.getSession();
+                    if (session?.user) {
+                        if (session.user.email.endsWith('@kcpupils.org')) {
+                            await SupabaseService.upsertUserProfile(session.user);
+                            setUser(session.user);
+                            setupSubscriptions(session.user);
+                        } else {
+                            await SupabaseService.signOut();
+                        }
                     }
                     setLoading(false);
+                };
+
+                initAuth();
+
+                // Listen for auth changes
+                const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+                    if (event === 'SIGNED_IN' && session?.user) {
+                        if (session.user.email.endsWith('@kcpupils.org')) {
+                            await SupabaseService.upsertUserProfile(session.user);
+                            setUser(session.user);
+                            setupSubscriptions(session.user);
+                        } else {
+                            await SupabaseService.signOut();
+                            alert('Please use your @kcpupils.org account');
+                        }
+                    } else if (event === 'SIGNED_OUT') {
+                        setUser(null);
+                        cleanupSubscriptions();
+                    }
                 });
 
-                // Also check for test user in localStorage
-                const testUser = localStorage.getItem('testUser');
-                if (testUser && !user) {
-                    setUser(JSON.parse(testUser));
-                    setLoading(false);
-                }
-
-                return () => unsubscribe();
+                return () => {
+                    authListener.subscription.unsubscribe();
+                    cleanupSubscriptions();
+                };
             }, []);
 
-            const handleLogout = async () => {
-                try {
-                    await auth.signOut();
-                    localStorage.removeItem('testUser');
-                } catch (error) {
-                    console.error('Logout error:', error);
+            const setupSubscriptions = async (user) => {
+                // Load initial data
+                const friendsList = await SupabaseService.getFriends(user.id);
+                setFriends(friendsList);
+
+                const convos = await SupabaseService.getConversations(user.id);
+                setConversations(convos);
+
+                // Set up real-time subscriptions
+                const friendsSub = SupabaseService.subscribeFriends(user.id, setFriends);
+                const convoSub = SupabaseService.subscribeConversations(user.id, setConversations);
+                
+                subscriptionsRef.current.push(friendsSub, convoSub);
+            };
+
+            const cleanupSubscriptions = () => {
+                subscriptionsRef.current.forEach(sub => sub.unsubscribe());
+                subscriptionsRef.current = [];
+            };
+
+            useEffect(() => {
+                if (activeConversation) {
+                    const loadMessages = async () => {
+                        const msgs = await SupabaseService.getMessages(activeConversation.id);
+                        setMessages(msgs);
+                    };
+                    loadMessages();
+
+                    const msgSub = SupabaseService.subscribeMessages(activeConversation.id, setMessages);
+                    return () => msgSub.unsubscribe();
                 }
-                setUser(null);
-                setActiveSection('games');
+            }, [activeConversation]);
+
+            useEffect(() => {
+                const handleBeforeUnload = async () => {
+                    if (user) {
+                        await SupabaseService.updateUserStatus(user.id, 'offline');
+                    }
+                };
+
+                window.addEventListener('beforeunload', handleBeforeUnload);
+                return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+            }, [user]);
+
+            const handleLogout = async () => {
+                if (user) {
+                    await SupabaseService.updateUserStatus(user.id, 'offline');
+                    await SupabaseService.signOut();
+                }
+            };
+
+            const openConversation = async (conversation) => {
+                setActiveConversation(conversation);
+                setActiveSection('messages');
+            };
+
+            const sendMessage = async (text, gameInvite = null) => {
+                if ((!text.trim() && !gameInvite) || !activeConversation || !user) return;
+
+                try {
+                    await SupabaseService.sendMessage(
+                        activeConversation.id,
+                        user.id,
+                        text,
+                        gameInvite
+                    );
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    alert('Failed to send message');
+                }
             };
 
             const playGame = async (game) => {
                 setCurrentGame(game);
                 if (user) {
-                    await UserService.updateUserStatus(user.uid, 'online', game.title);
+                    await SupabaseService.updateUserStatus(user.id, 'online', game.title);
+                    await SupabaseService.incrementGamePlayed(user.id);
                 }
             };
 
             const exitGame = async () => {
                 setCurrentGame(null);
                 if (user) {
-                    await UserService.updateUserStatus(user.uid, 'online', null);
+                    await SupabaseService.updateUserStatus(user.id, 'online', null);
                 }
+            };
+
+            const handleAddFriend = async (email) => {
+                try {
+                    await SupabaseService.addFriend(user.id, email);
+                    setShowAddFriend(false);
+                } catch (error) {
+                    console.error('Error adding friend:', error);
+                    alert(error.message);
+                }
+            };
+
+            const handleMessageFriend = async (friend) => {
+                try {
+                    const conversationId = await SupabaseService.getOrCreateConversation(user.id, friend.id);
+                    
+                    const conversation = {
+                        id: conversationId,
+                        friendId: friend.id,
+                        friendName: friend.display_name,
+                        friendAvatar: friend.avatar_url,
+                        friendStatus: friend.status,
+                        lastMessage: '',
+                        timestamp: new Date(),
+                        unread: 0
+                    };
+                    
+                    openConversation(conversation);
+                } catch (error) {
+                    console.error('Error opening conversation:', error);
+                }
+            };
+
+            const loadProxy = () => {
+                window.open(PROXY_URL, '_blank');
             };
 
             const filteredGames = GAMES.filter(game => 
@@ -645,13 +814,7 @@
             }
 
             if (!user) {
-                return <LoginScreen onLoginSuccess={(user) => {
-                    setUser(user);
-                    // Store test user in localStorage
-                    if (user.uid.startsWith('test-user-')) {
-                        localStorage.setItem('testUser', JSON.stringify(user));
-                    }
-                }} />;
+                return <LoginScreen onLoginSuccess={setUser} />;
             }
 
             if (currentGame) {
@@ -664,18 +827,52 @@
                         activeSection={activeSection}
                         onSectionChange={setActiveSection}
                         onLogout={handleLogout}
-                        onLoadProxy={UserService.loadProxy}
+                        onLoadProxy={loadProxy}
                     />
 
                     <MainContent
                         activeSection={activeSection}
                         user={user}
+                        friends={friends}
+                        conversations={conversations}
+                        activeConversation={activeConversation}
+                        messages={messages}
                         games={filteredGames}
                         searchQuery={searchQuery}
                         onSearchChange={setSearchQuery}
                         onPlayGame={playGame}
-                        onLoadProxy={UserService.loadProxy}
+                        onOpenConversation={openConversation}
+                        onSendMessage={sendMessage}
+                        onShowGameInvite={(friend) => {
+                            setSelectedFriend(friend);
+                            setShowGameInvite(true);
+                        }}
                     />
+
+                    <FriendsPanel 
+                        friends={friends}
+                        onMessageFriend={handleMessageFriend}
+                        onAddFriend={() => setShowAddFriend(true)}
+                    />
+
+                    {showAddFriend && (
+                        <AddFriendModal
+                            onClose={() => setShowAddFriend(false)}
+                            onAddFriend={handleAddFriend}
+                        />
+                    )}
+
+                    {showGameInvite && (
+                        <GameInviteModal
+                            games={GAMES}
+                            friend={selectedFriend}
+                            onClose={() => setShowGameInvite(false)}
+                            onInvite={(game) => {
+                                sendMessage(`Let's play ${game.title}!`, game);
+                                setShowGameInvite(false);
+                            }}
+                        />
+                    )}
                 </div>
             );
         }
@@ -729,16 +926,6 @@
                                 cursor: 'pointer',
                                 transition: 'all 0.3s ease'
                             }}
-                            onMouseEnter={(e) => {
-                                if (activeSection !== section.id) {
-                                    e.target.style.background = 'rgba(255, 255, 255, 0.05)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (activeSection !== section.id) {
-                                    e.target.style.background = 'transparent';
-                                }
-                            }}
                             title={section.label}
                         >
                             {section.icon}
@@ -750,28 +937,21 @@
                     {/* Proxy Button */}
                     <button
                         onClick={onLoadProxy}
+                        className="proxy-button"
                         style={{
                             width: '56px',
                             height: '56px',
-                            background: 'var(--proxy-color)',
-                            border: '1px solid var(--proxy-color)',
+                            border: '1px solid var(--accent-warning)',
                             borderRadius: '14px',
-                            color: 'white',
+                            color: '#000',
                             fontSize: '24px',
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
-                            animation: 'glow 2s ease-in-out infinite',
-                            marginBottom: '10px'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.target.style.transform = 'scale(1.1)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.target.style.transform = 'scale(1)';
+                            fontWeight: '700'
                         }}
                         title="Load Proxy"
                     >
-                        🔒
+                        🔓
                     </button>
 
                     <button
@@ -787,14 +967,6 @@
                             cursor: 'pointer',
                             transition: 'all 0.3s ease'
                         }}
-                        onMouseEnter={(e) => {
-                            e.target.style.background = 'rgba(255, 68, 102, 0.1)';
-                            e.target.style.borderColor = 'var(--accent-danger)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.target.style.background = 'transparent';
-                            e.target.style.borderColor = 'transparent';
-                        }}
                         title="Logout"
                     >
                         🚪
@@ -803,309 +975,86 @@
             );
         }
 
-        // Main Content Component
-        function MainContent({ 
-            activeSection, user, games, searchQuery, onSearchChange, onPlayGame, onLoadProxy 
-        }) {
+        // [Include all other components from the previous Firebase version]
+        // For brevity, I'll include the key components needed. The rest remain the same.
+
+        function MainContent({ activeSection, user, friends, conversations, activeConversation, messages, games, searchQuery, onSearchChange, onPlayGame, onOpenConversation, onSendMessage, onShowGameInvite }) {
             return (
-                <div style={{ 
-                    flex: 1, 
-                    overflow: 'auto', 
-                    padding: '40px',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}>
-                    {/* Header with proxy button */}
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginBottom: '40px',
-                        gap: '20px'
-                    }}>
-                        <h1 style={{
-                            fontSize: '36px',
-                            fontWeight: '800',
-                            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text'
-                        }}>
-                            {activeSection === 'games' && 'Game Library'}
-                            {activeSection === 'profile' && 'Profile'}
-                            {activeSection === 'messages' && 'Messages'}
-                            {activeSection === 'favorites' && 'Favorites'}
-                        </h1>
-
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                            {activeSection === 'games' && (
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => onSearchChange(e.target.value)}
-                                    placeholder="Search games..."
-                                    style={{
-                                        padding: '12px 20px',
-                                        background: 'var(--bg-secondary)',
-                                        border: '1px solid var(--border-color)',
-                                        borderRadius: '12px',
-                                        color: 'var(--text-primary)',
-                                        fontSize: '15px',
-                                        width: '300px',
-                                        outline: 'none'
-                                    }}
-                                />
-                            )}
-                            
-                            <button
-                                onClick={onLoadProxy}
-                                style={{
-                                    padding: '12px 20px',
-                                    background: 'var(--proxy-color)',
-                                    border: 'none',
-                                    borderRadius: '12px',
-                                    color: 'white',
-                                    fontSize: '14px',
-                                    fontWeight: '700',
-                                    cursor: 'pointer',
-                                    animation: 'glow 2s ease-in-out infinite',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    transition: 'transform 0.3s ease'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.transform = 'translateY(-2px)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.transform = 'translateY(0)';
-                                }}
-                            >
-                                <span>🔒</span>
-                                <span>Load Proxy</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    {activeSection === 'games' && (
-                        <GamesSection 
-                            games={games}
-                            onPlayGame={onPlayGame}
-                        />
-                    )}
-
-                    {activeSection === 'profile' && (
-                        <ProfileSection user={user} />
-                    )}
-
-                    {activeSection === 'messages' && (
-                        <MessagesSection user={user} />
-                    )}
-
-                    {activeSection === 'favorites' && (
-                        <FavoritesSection games={games.slice(0, 3)} onPlayGame={onPlayGame} />
-                    )}
+                <div style={{ flex: 1, overflow: 'auto', padding: '40px' }}>
+                    {activeSection === 'games' && <GamesSection games={games} searchQuery={searchQuery} onSearchChange={onSearchChange} onPlayGame={onPlayGame} />}
+                    {activeSection === 'profile' && <ProfileSection user={user} friends={friends} />}
+                    {activeSection === 'messages' && <MessagesSection currentUser={user} conversations={conversations} activeConversation={activeConversation} messages={messages} onOpenConversation={onOpenConversation} onSendMessage={onSendMessage} onShowGameInvite={onShowGameInvite} />}
+                    {activeSection === 'favorites' && <FavoritesSection games={games.slice(0, 3)} onPlayGame={onPlayGame} />}
                 </div>
             );
         }
 
-        function GamesSection({ games, onPlayGame }) {
+        function GamesSection({ games, searchQuery, onSearchChange, onPlayGame }) {
             return (
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                    gap: '24px'
-                }}>
-                    {games.map((game, index) => (
-                        <GameCard 
-                            key={game.id} 
-                            game={game} 
-                            onPlay={onPlayGame}
-                            delay={index * 0.05}
-                        />
-                    ))}
+                <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+                        <h1 style={{ fontSize: '36px', fontWeight: '800', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Game Library</h1>
+                        <input type="text" value={searchQuery} onChange={(e) => onSearchChange(e.target.value)} placeholder="Search games..." style={{ padding: '12px 20px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)', fontSize: '15px', width: '300px', outline: 'none' }} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                        {games.map((game, index) => (<GameCard key={game.id} game={game} onPlay={onPlayGame} delay={index * 0.05} />))}
+                    </div>
                 </div>
             );
         }
 
         function GameCard({ game, onPlay, delay }) {
             return (
-                <div
-                    onClick={() => onPlay(game)}
-                    style={{
-                        background: 'var(--bg-secondary)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '16px',
-                        overflow: 'hidden',
-                        cursor: 'pointer',
-                        transition: 'all 0.4s ease',
-                        animation: `fadeIn 0.5s ease-out ${delay}s both`
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-8px)';
-                        e.currentTarget.style.borderColor = game.color;
-                        e.currentTarget.style.boxShadow = `0 20px 40px ${game.color}40`;
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.borderColor = 'var(--border-color)';
-                        e.currentTarget.style.boxShadow = 'none';
-                    }}
-                >
-                    <div style={{
-                        height: '180px',
-                        background: `linear-gradient(135deg, ${game.color}40, ${game.color}20)`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        position: 'relative',
-                        overflow: 'hidden'
-                    }}>
-                        <img 
-                            src={game.thumbnail} 
-                            alt={game.title}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                opacity: 0.6
-                            }}
-                        />
-                        <div style={{
-                            position: 'absolute',
-                            inset: 0,
-                            background: `linear-gradient(to top, ${game.color}60, transparent)`
-                        }} />
+                <div onClick={() => onPlay(game)} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden', cursor: 'pointer', transition: 'all 0.4s ease', animation: `fadeIn 0.5s ease-out ${delay}s both` }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.borderColor = game.color; e.currentTarget.style.boxShadow = `0 20px 40px ${game.color}40`; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.boxShadow = 'none'; }}>
+                    <div style={{ height: '180px', background: `linear-gradient(135deg, ${game.color}40, ${game.color}20)`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                        <img src={game.thumbnail} alt={game.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />
+                        <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${game.color}60, transparent)` }} />
                     </div>
-
                     <div style={{ padding: '20px' }}>
-                        <div style={{
-                            fontSize: '12px',
-                            color: game.color,
-                            fontWeight: '700',
-                            textTransform: 'uppercase',
-                            letterSpacing: '1px',
-                            marginBottom: '8px'
-                        }}>
-                            {game.category}
-                        </div>
-                        <h3 style={{
-                            fontSize: '20px',
-                            fontWeight: '700',
-                            margin: 0
-                        }}>
-                            {game.title}
-                        </h3>
+                        <div style={{ fontSize: '12px', color: game.color, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>{game.category}</div>
+                        <h3 style={{ fontSize: '20px', fontWeight: '700', margin: 0 }}>{game.title}</h3>
                     </div>
                 </div>
             );
         }
 
-        function ProfileSection({ user }) {
+        function ProfileSection({ user, friends }) {
+            const [userStats, setUserStats] = useState({ games_played: 0, total_time: 0, achievements: 0 });
+
+            useEffect(() => {
+                if (user) {
+                    const loadStats = async () => {
+                        const stats = await SupabaseService.getUserStats(user.id);
+                        setUserStats(stats);
+                    };
+                    loadStats();
+                }
+            }, [user]);
+
             return (
-                <div style={{
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '20px',
-                    padding: '40px',
-                    maxWidth: '800px'
-                }}>
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '30px',
-                        marginBottom: '40px'
-                    }}>
-                        <img
-                            src={user.photoURL}
-                            alt={user.displayName}
-                            style={{
-                                width: '120px',
-                                height: '120px',
-                                borderRadius: '24px',
-                                border: '3px solid var(--accent-primary)',
-                                boxShadow: 'var(--shadow-glow)'
-                            }}
-                        />
+                <div style={{ animation: 'fadeIn 0.5s ease-out', maxWidth: '1000px', margin: '0 auto' }}>
+                    <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '40px', marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '30px' }}>
+                        <img src={user.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} alt={user.user_metadata?.full_name} style={{ width: '120px', height: '120px', borderRadius: '24px', border: '3px solid var(--accent-primary)', boxShadow: 'var(--shadow-glow)' }} />
                         <div style={{ flex: 1 }}>
-                            <h2 style={{
-                                fontSize: '32px',
-                                fontWeight: '800',
-                                marginBottom: '8px'
-                            }}>
-                                {user.displayName}
-                            </h2>
-                            <p style={{
-                                color: 'var(--text-secondary)',
-                                fontSize: '16px',
-                                marginBottom: '20px'
-                            }}>
-                                {user.email}
-                            </p>
-                            <div style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                background: 'rgba(0, 255, 136, 0.1)',
-                                border: '1px solid var(--accent-primary)',
-                                padding: '8px 16px',
-                                borderRadius: '20px',
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                color: 'var(--accent-primary)'
-                            }}>
-                                <span style={{
-                                    width: '8px',
-                                    height: '8px',
-                                    background: 'var(--accent-primary)',
-                                    borderRadius: '50%',
-                                    animation: 'pulse 2s ease-in-out infinite'
-                                }} />
-                                {user.uid.startsWith('test-user-') ? 'Test Mode' : 'Online'}
+                            <h2 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>{user.user_metadata?.full_name || user.email.split('@')[0]}</h2>
+                            <p style={{ color: 'var(--text-secondary)', fontSize: '16px', marginBottom: '20px' }}>{user.email}</p>
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(0, 255, 136, 0.1)', border: '1px solid var(--accent-primary)', padding: '8px 16px', borderRadius: '20px', fontSize: '14px', fontWeight: '600', color: 'var(--accent-primary)' }}>
+                                <span style={{ width: '8px', height: '8px', background: 'var(--accent-primary)', borderRadius: '50%', animation: 'pulse 2s ease-in-out infinite' }} />
+                                Online
                             </div>
                         </div>
                     </div>
-
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '20px'
-                    }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
                         {[
-                            { label: 'Games Played', value: '0', icon: '🎮', color: 'var(--accent-primary)' },
-                            { label: 'Friends', value: '0', icon: '👥', color: 'var(--accent-secondary)' },
-                            { label: 'Total Hours', value: '0', icon: '⏱️', color: '#ffaa00' },
-                            { label: 'Achievements', value: '0', icon: '🏆', color: '#ff6b9d' }
+                            { label: 'Games Played', value: userStats.games_played || 0, icon: '🎮', color: 'var(--accent-primary)' },
+                            { label: 'Friends', value: friends.length, icon: '👥', color: 'var(--accent-secondary)' },
+                            { label: 'Total Hours', value: userStats.total_time || 0, icon: '⏱️', color: '#ffaa00' },
+                            { label: 'Achievements', value: userStats.achievements || 0, icon: '🏆', color: '#ff6b9d' }
                         ].map((stat, index) => (
-                            <div
-                                key={index}
-                                style={{
-                                    background: 'var(--bg-tertiary)',
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '16px',
-                                    padding: '24px',
-                                    textAlign: 'center',
-                                    transition: 'all 0.3s ease'
-                                }}
-                            >
+                            <div key={index} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '24px', textAlign: 'center', transition: 'all 0.3s ease', animation: `fadeIn 0.5s ease-out ${index * 0.1}s both` }}>
                                 <div style={{ fontSize: '32px', marginBottom: '12px' }}>{stat.icon}</div>
-                                <div style={{
-                                    fontSize: '36px',
-                                    fontWeight: '800',
-                                    color: stat.color,
-                                    marginBottom: '8px'
-                                }}>
-                                    {stat.value}
-                                </div>
-                                <div style={{
-                                    fontSize: '14px',
-                                    color: 'var(--text-secondary)',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px',
-                                    fontWeight: '600'
-                                }}>
-                                    {stat.label}
-                                </div>
+                                <div style={{ fontSize: '36px', fontWeight: '800', color: stat.color, marginBottom: '8px' }}>{stat.value}</div>
+                                <div style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '600' }}>{stat.label}</div>
                             </div>
                         ))}
                     </div>
@@ -1113,32 +1062,95 @@
             );
         }
 
-        function MessagesSection({ user }) {
+        // MessagesSection, FriendsPanel, Modals, and GamePlayer components remain the same as Firebase version
+        // Including MessagesSection here:
+
+        function MessagesSection({ currentUser, conversations, activeConversation, messages, onOpenConversation, onSendMessage, onShowGameInvite }) {
+            const [messageText, setMessageText] = useState('');
+            const messagesEndRef = useRef(null);
+
+            useEffect(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, [messages]);
+
+            const handleSend = () => {
+                if (messageText.trim()) {
+                    onSendMessage(messageText);
+                    setMessageText('');
+                }
+            };
+
             return (
-                <div style={{
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '20px',
-                    padding: '40px',
-                    textAlign: 'center',
-                    maxWidth: '600px',
-                    margin: '0 auto'
-                }}>
-                    <div style={{ fontSize: '64px', marginBottom: '20px' }}>💬</div>
-                    <h3 style={{ fontSize: '24px', marginBottom: '12px' }}>Messages</h3>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '30px' }}>
-                        Chat functionality will be available soon
-                    </p>
-                    <div style={{
-                        background: 'var(--bg-tertiary)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '12px',
-                        padding: '20px',
-                        marginTop: '20px'
-                    }}>
-                        <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-                            <strong>Note:</strong> Real-time chat requires full Firebase/Supabase setup
-                        </p>
+                <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '24px', height: 'calc(100vh - 80px)', animation: 'fadeIn 0.5s ease-out' }}>
+                    <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ padding: '20px', borderBottom: '1px solid var(--border-color)' }}>
+                            <h2 style={{ fontSize: '20px', fontWeight: '700', margin: 0 }}>Messages</h2>
+                        </div>
+                        <div style={{ flex: 1, overflow: 'auto' }}>
+                            {conversations.length === 0 ? (
+                                <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>💬</div>
+                                    <div>No messages yet</div>
+                                </div>
+                            ) : (
+                                conversations.map(conv => (
+                                    <div key={conv.id} onClick={() => onOpenConversation(conv)} style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)', cursor: 'pointer', background: activeConversation?.id === conv.id ? 'rgba(0, 255, 136, 0.05)' : 'transparent', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ position: 'relative' }}>
+                                            <img src={conv.friendAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${conv.friendId}`} alt={conv.friendName} style={{ width: '48px', height: '48px', borderRadius: '12px' }} />
+                                            <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '12px', height: '12px', background: conv.friendStatus === 'online' ? 'var(--accent-primary)' : 'var(--text-secondary)', border: '2px solid var(--bg-secondary)', borderRadius: '50%' }} />
+                                        </div>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{ fontWeight: '600', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{conv.friendName}</div>
+                                            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{conv.lastMessage || 'No messages yet'}</div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                    <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        {activeConversation ? (
+                            <>
+                                <div style={{ padding: '20px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <img src={activeConversation.friendAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activeConversation.friendId}`} alt={activeConversation.friendName} style={{ width: '48px', height: '48px', borderRadius: '12px' }} />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: '700', fontSize: '18px' }}>{activeConversation.friendName}</div>
+                                        <div style={{ fontSize: '13px', color: activeConversation.friendStatus === 'online' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>{activeConversation.friendStatus === 'online' ? 'Online' : 'Offline'}</div>
+                                    </div>
+                                </div>
+                                <div style={{ flex: 1, padding: '20px', overflow: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                    {messages.map(msg => (
+                                        <div key={msg.id} style={{ display: 'flex', gap: '12px', alignSelf: msg.senderId === currentUser.id ? 'flex-end' : 'flex-start', maxWidth: '70%', flexDirection: msg.senderId === currentUser.id ? 'row-reverse' : 'row' }}>
+                                            <img src={msg.senderId === currentUser.id ? (currentUser.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser.id}`) : activeConversation.friendAvatar} alt="Avatar" style={{ width: '36px', height: '36px', borderRadius: '10px' }} />
+                                            <div>
+                                                <div style={{ background: msg.senderId === currentUser.id ? 'var(--accent-primary)' : 'var(--bg-tertiary)', color: msg.senderId === currentUser.id ? '#000' : 'var(--text-primary)', padding: '12px 16px', borderRadius: '12px', fontSize: '15px', lineHeight: '1.5' }}>{msg.text}</div>
+                                                {msg.gameInvite && (
+                                                    <div style={{ marginTop: '8px', padding: '12px', background: 'rgba(0, 255, 136, 0.1)', border: '1px solid var(--accent-primary)', borderRadius: '10px' }}>
+                                                        <div style={{ fontSize: '13px', color: 'var(--accent-primary)', fontWeight: '600', marginBottom: '8px' }}>🎮 Game Invite</div>
+                                                        <div style={{ fontSize: '14px', marginBottom: '8px' }}>{msg.gameInvite.title}</div>
+                                                        <button onClick={() => window.open(msg.gameInvite.url, '_blank')} style={{ background: 'var(--accent-primary)', color: '#000', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}>Join Game</button>
+                                                    </div>
+                                                )}
+                                                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px', textAlign: msg.senderId === currentUser.id ? 'right' : 'left' }}>{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div ref={messagesEndRef} />
+                                </div>
+                                <div style={{ padding: '20px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+                                    <button onClick={() => onShowGameInvite(activeConversation)} style={{ width: '44px', height: '44px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--accent-primary)', fontSize: '20px', cursor: 'pointer' }} title="Invite to game">🎮</button>
+                                    <textarea value={messageText} onChange={(e) => setMessageText(e.target.value)} onKeyPress={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }} placeholder="Type a message..." style={{ flex: 1, padding: '12px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)', fontSize: '15px', resize: 'none', fontFamily: 'Manrope, sans-serif', outline: 'none', minHeight: '44px', maxHeight: '120px' }} rows={1} />
+                                    <button onClick={handleSend} disabled={!messageText.trim()} style={{ width: '44px', height: '44px', background: messageText.trim() ? 'var(--accent-primary)' : 'var(--bg-tertiary)', border: 'none', borderRadius: '12px', color: messageText.trim() ? '#000' : 'var(--text-secondary)', fontSize: '20px', cursor: messageText.trim() ? 'pointer' : 'not-allowed' }}>➤</button>
+                                </div>
+                            </>
+                        ) : (
+                            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', textAlign: 'center', padding: '40px' }}>
+                                <div>
+                                    <div style={{ fontSize: '64px', marginBottom: '20px' }}>💬</div>
+                                    <div style={{ fontSize: '18px' }}>Select a conversation to start messaging</div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
@@ -1146,33 +1158,111 @@
 
         function FavoritesSection({ games, onPlayGame }) {
             return (
-                <div>
+                <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
+                    <h1 style={{ fontSize: '36px', fontWeight: '800', marginBottom: '40px', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Favorites</h1>
                     {games.length === 0 ? (
-                        <div style={{
-                            textAlign: 'center',
-                            padding: '80px 20px',
-                            color: 'var(--text-secondary)'
-                        }}>
+                        <div style={{ textAlign: 'center', padding: '80px 20px', color: 'var(--text-secondary)' }}>
                             <div style={{ fontSize: '64px', marginBottom: '20px' }}>⭐</div>
                             <h3 style={{ fontSize: '24px', marginBottom: '12px' }}>No favorites yet</h3>
                             <p>Star games to add them to your favorites</p>
                         </div>
                     ) : (
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                            gap: '24px'
-                        }}>
-                            {games.map((game, index) => (
-                                <GameCard 
-                                    key={game.id} 
-                                    game={game} 
-                                    onPlay={onPlayGame}
-                                    delay={index * 0.05}
-                                />
-                            ))}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                            {games.map((game, index) => (<GameCard key={game.id} game={game} onPlay={onPlayGame} delay={index * 0.05} />))}
                         </div>
                     )}
+                </div>
+            );
+        }
+
+        function FriendsPanel({ friends, onMessageFriend, onAddFriend }) {
+            return (
+                <div style={{ width: '320px', background: 'var(--bg-secondary)', borderLeft: '1px solid var(--border-color)', padding: '20px', overflow: 'auto' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <h3 style={{ fontSize: '14px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary)', margin: 0 }}>Friends ({friends.length})</h3>
+                        <button onClick={onAddFriend} style={{ width: '32px', height: '32px', background: 'var(--accent-primary)', border: 'none', borderRadius: '8px', color: '#000', fontSize: '18px', cursor: 'pointer' }} title="Add friend">+</button>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {friends.map(friend => (
+                            <div key={friend.id} onClick={() => onMessageFriend(friend)} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.3s ease' }}>
+                                <div style={{ position: 'relative' }}>
+                                    <img src={friend.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${friend.id}`} alt={friend.display_name} style={{ width: '40px', height: '40px', borderRadius: '10px' }} />
+                                    <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '12px', height: '12px', background: friend.status === 'online' ? 'var(--accent-primary)' : 'var(--text-secondary)', border: '2px solid var(--bg-secondary)', borderRadius: '50%' }} />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontWeight: '600', fontSize: '14px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{friend.display_name}</div>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{friend.current_game || (friend.status === 'online' ? 'Online' : 'Offline')}</div>
+                                </div>
+                            </div>
+                        ))}
+                        {friends.length === 0 && (
+                            <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-secondary)' }}>
+                                <div style={{ fontSize: '48px', marginBottom: '16px' }}>👥</div>
+                                <div style={{ fontSize: '14px' }}>No friends yet</div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function AddFriendModal({ onClose, onAddFriend }) {
+            const [email, setEmail] = useState('');
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+
+            const handleAdd = async () => {
+                setError('');
+                if (!email.trim() || !email.endsWith('@kcpupils.org')) {
+                    setError('Please enter a valid @kcpupils.org email');
+                    return;
+                }
+                setLoading(true);
+                try {
+                    await onAddFriend(email);
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, animation: 'fadeIn 0.3s ease-out' }} onClick={onClose}>
+                    <div onClick={(e) => e.stopPropagation()} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '40px', width: '440px', maxWidth: '90%', boxShadow: 'var(--shadow-glow)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                            <h2 style={{ fontSize: '24px', fontWeight: '700', margin: 0 }}>Add Friend</h2>
+                            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '24px', cursor: 'pointer', padding: 0 }}>×</button>
+                        </div>
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAdd()} placeholder="friend@kcpupils.org" style={{ width: '100%', padding: '14px 18px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)', fontSize: '15px', marginBottom: '20px', outline: 'none' }} />
+                        {error && <div style={{ marginBottom: '20px', padding: '12px', background: 'rgba(255, 68, 102, 0.1)', border: '1px solid var(--accent-danger)', borderRadius: '8px', color: 'var(--accent-danger)', fontSize: '14px' }}>{error}</div>}
+                        <button onClick={handleAdd} disabled={loading} style={{ width: '100%', padding: '14px', background: loading ? 'var(--bg-tertiary)' : 'var(--accent-primary)', color: loading ? 'var(--text-secondary)' : '#000', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer' }}>{loading ? 'Adding...' : 'Add Friend'}</button>
+                    </div>
+                </div>
+            );
+        }
+
+        function GameInviteModal({ games, friend, onClose, onInvite }) {
+            return (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, animation: 'fadeIn 0.3s ease-out' }} onClick={onClose}>
+                    <div onClick={(e) => e.stopPropagation()} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '20px', padding: '40px', width: '500px', maxWidth: '90%', maxHeight: '80vh', overflow: 'auto', boxShadow: 'var(--shadow-glow)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                            <h2 style={{ fontSize: '24px', fontWeight: '700', margin: 0 }}>Invite to Game</h2>
+                            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '24px', cursor: 'pointer', padding: 0 }}>×</button>
+                        </div>
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', fontSize: '15px' }}>Select a game to play with {friend?.friendName}</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {games.map(game => (
+                                <button key={game.id} onClick={() => onInvite(game)} style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '16px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)', cursor: 'pointer', transition: 'all 0.3s ease', textAlign: 'left' }}>
+                                    <div style={{ width: '60px', height: '60px', borderRadius: '10px', background: `linear-gradient(135deg, ${game.color}40, ${game.color}20)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px' }}>🎮</div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontSize: '12px', color: game.color, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>{game.category}</div>
+                                        <div style={{ fontSize: '16px', fontWeight: '700' }}>{game.title}</div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             );
         }
@@ -1192,84 +1282,21 @@
             };
 
             return (
-                <div id="game-player" style={{
-                    position: 'fixed',
-                    inset: 0,
-                    background: '#000',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    zIndex: 9999
-                }}>
-                    <div style={{
-                        background: 'rgba(0, 0, 0, 0.95)',
-                        padding: '16px 24px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        borderBottom: '1px solid var(--border-color)'
-                    }}>
-                        <h2 style={{
-                            fontSize: '20px',
-                            fontWeight: '700',
-                            margin: 0,
-                            fontFamily: 'Space Mono, monospace'
-                        }}>
-                            {game.title}
-                        </h2>
-
+                <div id="game-player" style={{ position: 'fixed', inset: 0, background: '#000', display: 'flex', flexDirection: 'column', zIndex: 9999 }}>
+                    <div style={{ background: 'rgba(0, 0, 0, 0.95)', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)' }}>
+                        <h2 style={{ fontSize: '20px', fontWeight: '700', margin: 0, fontFamily: 'Space Mono, monospace' }}>{game.title}</h2>
                         <div style={{ display: 'flex', gap: '12px' }}>
-                            <button
-                                onClick={toggleFullscreen}
-                                style={{
-                                    padding: '10px 20px',
-                                    background: 'rgba(0, 255, 136, 0.2)',
-                                    border: '1px solid var(--accent-primary)',
-                                    borderRadius: '8px',
-                                    color: 'var(--accent-primary)',
-                                    fontSize: '14px',
-                                    fontWeight: '600',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {isFullscreen ? '⛶ Exit Fullscreen' : '⛶ Fullscreen'}
-                            </button>
-
-                            <button
-                                onClick={onExit}
-                                style={{
-                                    padding: '10px 20px',
-                                    background: 'rgba(255, 68, 102, 0.2)',
-                                    border: '1px solid var(--accent-danger)',
-                                    borderRadius: '8px',
-                                    color: 'var(--accent-danger)',
-                                    fontSize: '14px',
-                                    fontWeight: '600',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                ✕ Exit Game
-                            </button>
+                            <button onClick={toggleFullscreen} style={{ padding: '10px 20px', background: 'rgba(0, 255, 136, 0.2)', border: '1px solid var(--accent-primary)', borderRadius: '8px', color: 'var(--accent-primary)', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>{isFullscreen ? '⛶ Exit Fullscreen' : '⛶ Fullscreen'}</button>
+                            <button onClick={onExit} style={{ padding: '10px 20px', background: 'rgba(255, 68, 102, 0.2)', border: '1px solid var(--accent-danger)', borderRadius: '8px', color: 'var(--accent-danger)', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>✕ Exit Game</button>
                         </div>
                     </div>
-
                     <div style={{ flex: 1 }}>
-                        <iframe
-                            src={game.url}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                border: 'none'
-                            }}
-                            allowFullScreen
-                            allow="autoplay; fullscreen"
-                            title={game.title}
-                        />
+                        <iframe src={game.url} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen allow="autoplay; fullscreen" />
                     </div>
                 </div>
             );
         }
 
-        // Render App
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
