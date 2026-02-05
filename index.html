@@ -128,7 +128,7 @@
             { id: '8', title: 'Pac-Man', category: 'Arcade', url: 'https://www.google.com/logos/2010/pacman10-i.html', thumbnail: 'https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&h=300&fit=crop', color: '#ffdd00' },
         ];
 
-        // Supabase Service Functions
+        // Supabase Service Functions adapted to your table structure
         const SupabaseService = {
             // Sign in with Google
             signInWithGoogle: async () => {
@@ -137,7 +137,7 @@
                         provider: 'google',
                         options: {
                             queryParams: {
-                                hd: 'kcpupils.org' // Restrict to kcpupils.org domain
+                                hd: 'kcpupils.org'
                             },
                             redirectTo: window.location.origin
                         }
@@ -164,13 +164,14 @@
                 if (error) throw error;
             },
 
-            // Create or update user profile
-            createUserProfile: async (user) => {
+            // Create or update user profile (users and user_profiles tables)
+            createUserProfile: async (authUser) => {
                 try {
+                    // Check if user exists in users table
                     const { data: existingUser, error: fetchError } = await supabase
                         .from('users')
                         .select('*')
-                        .eq('id', user.id)
+                        .eq('id', authUser.id)
                         .single();
 
                     if (fetchError && fetchError.code !== 'PGRST116') {
@@ -178,32 +179,43 @@
                     }
 
                     if (!existingUser) {
-                        const { error: insertError } = await supabase
+                        // Create user in users table
+                        const { error: userError } = await supabase
                             .from('users')
                             .insert({
-                                id: user.id,
-                                email: user.email,
-                                display_name: user.user_metadata.full_name,
-                                photo_url: user.user_metadata.avatar_url,
+                                id: authUser.id,
+                                email: authUser.email,
+                                created_at: new Date().toISOString()
+                            });
+
+                        if (userError) throw userError;
+
+                        // Create user profile
+                        const { error: profileError } = await supabase
+                            .from('user_profiles')
+                            .insert({
+                                user_id: authUser.id,
+                                display_name: authUser.user_metadata.full_name,
+                                avatar_url: authUser.user_metadata.avatar_url,
                                 status: 'online',
-                                stats: {
+                                game_stats: {
                                     games_played: 0,
                                     total_time: 0,
                                     achievements: 0
                                 },
-                                created_at: new Date().toISOString()
+                                last_seen: new Date().toISOString()
                             });
 
-                        if (insertError) throw insertError;
+                        if (profileError) throw profileError;
                     } else {
-                        // Update user status
+                        // Update user profile status
                         const { error: updateError } = await supabase
-                            .from('users')
+                            .from('user_profiles')
                             .update({
                                 status: 'online',
                                 last_seen: new Date().toISOString()
                             })
-                            .eq('id', user.id);
+                            .eq('user_id', authUser.id);
 
                         if (updateError) throw updateError;
                     }
@@ -217,13 +229,13 @@
             updateUserStatus: async (userId, status, currentGame = null) => {
                 try {
                     const { error } = await supabase
-                        .from('users')
+                        .from('user_profiles')
                         .update({
                             status,
                             current_game: currentGame,
                             last_seen: new Date().toISOString()
                         })
-                        .eq('id', userId);
+                        .eq('user_id', userId);
 
                     if (error) throw error;
                 } catch (error) {
@@ -232,13 +244,31 @@
                 }
             },
 
+            // Get user profile
+            getUserProfile: async (userId) => {
+                try {
+                    const { data: profile, error } = await supabase
+                        .from('user_profiles')
+                        .select('*')
+                        .eq('user_id', userId)
+                        .single();
+
+                    if (error) throw error;
+                    return profile;
+                } catch (error) {
+                    console.error('Error getting user profile:', error);
+                    return null;
+                }
+            },
+
             // Get friends list
             getFriends: async (userId) => {
                 try {
                     const { data: friendships, error: friendsError } = await supabase
                         .from('friends')
-                        .select('friend_id')
-                        .eq('user_id', userId);
+                        .select('friend_id, status')
+                        .eq('user_id', userId)
+                        .eq('status', 'accepted');
 
                     if (friendsError) throw friendsError;
 
@@ -247,20 +277,24 @@
                     const friendIds = friendships.map(f => f.friend_id);
                     
                     const { data: friends, error: usersError } = await supabase
-                        .from('users')
-                        .select('*')
-                        .in('id', friendIds);
+                        .from('user_profiles')
+                        .select(`
+                            user_id,
+                            display_name,
+                            avatar_url,
+                            status,
+                            current_game
+                        `)
+                        .in('user_id', friendIds);
 
                     if (usersError) throw usersError;
 
                     return friends.map(friend => ({
-                        id: friend.id,
+                        id: friend.user_id,
                         displayName: friend.display_name,
-                        email: friend.email,
-                        photoURL: friend.photo_url,
+                        photoURL: friend.avatar_url,
                         status: friend.status,
-                        currentGame: friend.current_game,
-                        stats: friend.stats
+                        currentGame: friend.current_game
                     }));
                 } catch (error) {
                     console.error('Error getting friends:', error);
@@ -271,10 +305,10 @@
             // Add friend
             addFriend: async (currentUserId, friendEmail) => {
                 try {
-                    // Find user by email
+                    // Find user by email from users table
                     const { data: friendUser, error: findError } = await supabase
                         .from('users')
-                        .select('*')
+                        .select('id')
                         .eq('email', friendEmail)
                         .single();
 
@@ -296,32 +330,31 @@
                         throw new Error('Already friends');
                     }
 
-                    // Add friendship (bidirectional)
+                    // Add friendship request
                     const { error: addError } = await supabase
                         .from('friends')
-                        .insert([
-                            {
-                                user_id: currentUserId,
-                                friend_id: friendUser.id,
-                                created_at: new Date().toISOString()
-                            },
-                            {
-                                user_id: friendUser.id,
-                                friend_id: currentUserId,
-                                created_at: new Date().toISOString()
-                            }
-                        ]);
+                        .insert({
+                            user_id: currentUserId,
+                            friend_id: friendUser.id,
+                            status: 'pending',
+                            created_at: new Date().toISOString()
+                        });
 
                     if (addError) throw addError;
 
+                    // Get friend's profile info
+                    const { data: friendProfile } = await supabase
+                        .from('user_profiles')
+                        .select('display_name, avatar_url, status, current_game')
+                        .eq('user_id', friendUser.id)
+                        .single();
+
                     return {
                         id: friendUser.id,
-                        displayName: friendUser.display_name,
-                        email: friendUser.email,
-                        photoURL: friendUser.photo_url,
-                        status: friendUser.status,
-                        currentGame: friendUser.current_game,
-                        stats: friendUser.stats
+                        displayName: friendProfile?.display_name || 'Unknown',
+                        photoURL: friendProfile?.avatar_url || '',
+                        status: friendProfile?.status || 'offline',
+                        currentGame: friendProfile?.current_game || null
                     };
                 } catch (error) {
                     console.error('Error adding friend:', error);
@@ -332,32 +365,21 @@
             // Get or create conversation
             getOrCreateConversation: async (user1Id, user2Id) => {
                 try {
-                    // Query for existing conversation
-                    const { data: existingConvos, error: findError } = await supabase
-                        .from('conversations')
-                        .select('*')
-                        .contains('participants', [user1Id, user2Id]);
+                    // Query for existing conversation in messages table
+                    const { data: existingMessages, error: findError } = await supabase
+                        .from('messages')
+                        .select('conversation_id')
+                        .or(`and(sender_id.eq.${user1Id},receiver_id.eq.${user2Id}),and(sender_id.eq.${user2Id},receiver_id.eq.${user1Id})`)
+                        .limit(1);
 
                     if (findError) throw findError;
 
                     let conversationId = null;
-                    if (existingConvos && existingConvos.length > 0) {
-                        conversationId = existingConvos[0].id;
+                    if (existingMessages && existingMessages.length > 0) {
+                        conversationId = existingMessages[0].conversation_id;
                     } else {
-                        // Create new conversation
-                        const { data: newConvo, error: createError } = await supabase
-                            .from('conversations')
-                            .insert({
-                                participants: [user1Id, user2Id],
-                                last_message: null,
-                                last_message_time: null,
-                                created_at: new Date().toISOString()
-                            })
-                            .select()
-                            .single();
-
-                        if (createError) throw createError;
-                        conversationId = newConvo.id;
+                        // Create new conversation by sending first message
+                        conversationId = `conv_${user1Id}_${user2Id}_${Date.now()}`;
                     }
 
                     return conversationId;
@@ -367,56 +389,87 @@
                 }
             },
 
-            // Get conversations
+            // Get conversations (from messages table)
             getConversations: async (userId) => {
                 try {
-                    const { data: conversations, error } = await supabase
-                        .from('conversations')
-                        .select('*')
-                        .contains('participants', [userId])
-                        .order('last_message_time', { ascending: false });
+                    // Get unique conversation partners from messages
+                    const { data: sentMessages, error: sentError } = await supabase
+                        .from('messages')
+                        .select('receiver_id, created_at, content')
+                        .eq('sender_id', userId)
+                        .order('created_at', { ascending: false });
 
-                    if (error) throw error;
+                    const { data: receivedMessages, error: receivedError } = await supabase
+                        .from('messages')
+                        .select('sender_id, created_at, content')
+                        .eq('receiver_id', userId)
+                        .order('created_at', { ascending: false });
 
-                    if (!conversations) return [];
+                    if (sentError || receivedError) throw sentError || receivedError;
 
-                    // Get friend details for each conversation
-                    const conversationsWithDetails = await Promise.all(
-                        conversations.map(async (conv) => {
-                            const otherUserId = conv.participants.find(id => id !== userId);
-                            const { data: friend } = await supabase
-                                .from('users')
-                                .select('*')
-                                .eq('id', otherUserId)
+                    // Combine and get unique conversation partners
+                    const conversationPartners = new Map();
+
+                    // Process sent messages
+                    sentMessages?.forEach(msg => {
+                        if (!conversationPartners.has(msg.receiver_id)) {
+                            conversationPartners.set(msg.receiver_id, {
+                                lastMessage: msg.content,
+                                timestamp: new Date(msg.created_at)
+                            });
+                        }
+                    });
+
+                    // Process received messages
+                    receivedMessages?.forEach(msg => {
+                        if (!conversationPartners.has(msg.sender_id) || 
+                            new Date(msg.created_at) > conversationPartners.get(msg.sender_id).timestamp) {
+                            conversationPartners.set(msg.sender_id, {
+                                lastMessage: msg.content,
+                                timestamp: new Date(msg.created_at)
+                            });
+                        }
+                    });
+
+                    // Get profiles for conversation partners
+                    const conversations = await Promise.all(
+                        Array.from(conversationPartners.entries()).map(async ([partnerId, convData]) => {
+                            const { data: friendProfile } = await supabase
+                                .from('user_profiles')
+                                .select('display_name, avatar_url, status')
+                                .eq('user_id', partnerId)
                                 .single();
 
                             return {
-                                id: conv.id,
-                                friendId: otherUserId,
-                                friendName: friend?.display_name || 'Unknown',
-                                friendAvatar: friend?.photo_url || '',
-                                friendStatus: friend?.status || 'offline',
-                                lastMessage: conv.last_message || '',
-                                timestamp: conv.last_message_time ? new Date(conv.last_message_time) : new Date(),
+                                id: `conv_${userId}_${partnerId}`,
+                                friendId: partnerId,
+                                friendName: friendProfile?.display_name || 'Unknown',
+                                friendAvatar: friendProfile?.avatar_url || '',
+                                friendStatus: friendProfile?.status || 'offline',
+                                lastMessage: convData.lastMessage || '',
+                                timestamp: convData.timestamp || new Date(),
                                 unread: 0
                             };
                         })
                     );
 
-                    return conversationsWithDetails;
+                    // Sort by most recent
+                    conversations.sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    return conversations;
                 } catch (error) {
                     console.error('Error getting conversations:', error);
                     return [];
                 }
             },
 
-            // Get messages
-            getMessages: async (conversationId) => {
+            // Get messages between two users
+            getMessages: async (userId, friendId) => {
                 try {
                     const { data: messages, error } = await supabase
                         .from('messages')
                         .select('*')
-                        .eq('conversation_id', conversationId)
+                        .or(`and(sender_id.eq.${userId},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${userId})`)
                         .order('created_at', { ascending: true })
                         .limit(100);
 
@@ -425,8 +478,10 @@
                     return messages.map(msg => ({
                         id: msg.id,
                         senderId: msg.sender_id,
+                        receiverId: msg.receiver_id,
                         text: msg.content,
                         gameInvite: msg.game_invite,
+                        isRead: msg.is_read,
                         timestamp: new Date(msg.created_at)
                     }));
                 } catch (error) {
@@ -436,52 +491,63 @@
             },
 
             // Send message
-            sendMessage: async (conversationId, senderId, text, gameInvite = null) => {
+            sendMessage: async (senderId, receiverId, text, gameInvite = null) => {
                 try {
+                    const conversationId = `conv_${senderId}_${receiverId}`;
+                    
                     // Insert message
                     const { error: messageError } = await supabase
                         .from('messages')
                         .insert({
-                            conversation_id: conversationId,
                             sender_id: senderId,
+                            receiver_id: receiverId,
+                            conversation_id: conversationId,
                             content: text,
                             game_invite: gameInvite,
+                            is_read: false,
                             created_at: new Date().toISOString()
                         });
 
                     if (messageError) throw messageError;
-
-                    // Update conversation
-                    const { error: convError } = await supabase
-                        .from('conversations')
-                        .update({
-                            last_message: text,
-                            last_message_time: new Date().toISOString()
-                        })
-                        .eq('id', conversationId);
-
-                    if (convError) throw convError;
+                    
+                    return conversationId;
                 } catch (error) {
                     console.error('Error sending message:', error);
                     throw error;
                 }
             },
 
+            // Mark message as read
+            markMessageAsRead: async (messageId) => {
+                try {
+                    const { error } = await supabase
+                        .from('messages')
+                        .update({ is_read: true })
+                        .eq('id', messageId);
+
+                    if (error) throw error;
+                } catch (error) {
+                    console.error('Error marking message as read:', error);
+                }
+            },
+
             // Subscribe to real-time messages
-            subscribeToMessages: (conversationId, callback) => {
+            subscribeToMessages: (userId, friendId, callback) => {
                 const subscription = supabase
-                    .channel(`messages:${conversationId}`)
+                    .channel(`messages:${userId}:${friendId}`)
                     .on('postgres_changes', {
                         event: 'INSERT',
                         schema: 'public',
                         table: 'messages',
-                        filter: `conversation_id=eq.${conversationId}`
+                        filter: `or(and(sender_id.eq.${userId},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${userId}))`
                     }, (payload) => {
                         const newMessage = {
                             id: payload.new.id,
                             senderId: payload.new.sender_id,
+                            receiverId: payload.new.receiver_id,
                             text: payload.new.content,
                             gameInvite: payload.new.game_invite,
+                            isRead: payload.new.is_read,
                             timestamp: new Date(payload.new.created_at)
                         };
                         callback(newMessage);
@@ -500,7 +566,7 @@
                     .on('postgres_changes', {
                         event: 'UPDATE',
                         schema: 'public',
-                        table: 'users'
+                        table: 'user_profiles'
                     }, (payload) => {
                         callback(payload.new);
                     })
@@ -511,38 +577,177 @@
                 };
             },
 
-            // Increment game played stat
-            incrementGamePlayed: async (userId) => {
+            // Record game session
+            recordGameSession: async (userId, gameId, gameTitle, duration = 0) => {
                 try {
-                    // First get current value
-                    const { data: user, error: fetchError } = await supabase
-                        .from('users')
-                        .select('stats')
-                        .eq('id', userId)
+                    const { error } = await supabase
+                        .from('game_sessions')
+                        .insert({
+                            user_id: userId,
+                            game_id: gameId,
+                            game_title: gameTitle,
+                            duration: duration,
+                            started_at: new Date().toISOString(),
+                            completed_at: new Date().toISOString()
+                        });
+
+                    if (error) throw error;
+
+                    // Update user game stats
+                    const profile = await this.getUserProfile(userId);
+                    if (profile) {
+                        const newStats = {
+                            ...profile.game_stats,
+                            games_played: (profile.game_stats?.games_played || 0) + 1,
+                            total_time: (profile.game_stats?.total_time || 0) + duration
+                        };
+
+                        const { error: updateError } = await supabase
+                            .from('user_profiles')
+                            .update({ game_stats: newStats })
+                            .eq('user_id', userId);
+
+                        if (updateError) throw updateError;
+                    }
+                } catch (error) {
+                    console.error('Error recording game session:', error);
+                }
+            },
+
+            // Add game to favorites
+            addToFavorites: async (userId, gameId, gameTitle) => {
+                try {
+                    const { error } = await supabase
+                        .from('favorites')
+                        .insert({
+                            user_id: userId,
+                            game_id: gameId,
+                            game_title: gameTitle,
+                            added_at: new Date().toISOString()
+                        });
+
+                    if (error) throw error;
+                } catch (error) {
+                    console.error('Error adding to favorites:', error);
+                }
+            },
+
+            // Remove from favorites
+            removeFromFavorites: async (userId, gameId) => {
+                try {
+                    const { error } = await supabase
+                        .from('favorites')
+                        .delete()
+                        .eq('user_id', userId)
+                        .eq('game_id', gameId);
+
+                    if (error) throw error;
+                } catch (error) {
+                    console.error('Error removing from favorites:', error);
+                }
+            },
+
+            // Get favorite games
+            getFavorites: async (userId) => {
+                try {
+                    const { data: favorites, error } = await supabase
+                        .from('favorites')
+                        .select('game_id, game_title')
+                        .eq('user_id', userId)
+                        .order('added_at', { ascending: false });
+
+                    if (error) throw error;
+
+                    return favorites.map(fav => ({
+                        id: fav.game_id,
+                        title: fav.game_title
+                    }));
+                } catch (error) {
+                    console.error('Error getting favorites:', error);
+                    return [];
+                }
+            },
+
+            // Save user game data
+            saveGameData: async (userId, gameId, gameData) => {
+                try {
+                    // Check if data exists
+                    const { data: existingData } = await supabase
+                        .from('user_game_data')
+                        .select('id')
+                        .eq('user_id', userId)
+                        .eq('game_id', gameId)
                         .single();
 
-                    if (fetchError) throw fetchError;
+                    if (existingData) {
+                        // Update existing
+                        const { error } = await supabase
+                            .from('user_game_data')
+                            .update({
+                                game_data: gameData,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', existingData.id);
 
-                    const newStats = {
-                        ...user.stats,
-                        games_played: (user.stats.games_played || 0) + 1
-                    };
+                        if (error) throw error;
+                    } else {
+                        // Insert new
+                        const { error } = await supabase
+                            .from('user_game_data')
+                            .insert({
+                                user_id: userId,
+                                game_id: gameId,
+                                game_data: gameData,
+                                created_at: new Date().toISOString()
+                            });
 
-                    const { error: updateError } = await supabase
-                        .from('users')
-                        .update({
-                            stats: newStats
-                        })
-                        .eq('id', userId);
-
-                    if (updateError) throw updateError;
+                        if (error) throw error;
+                    }
                 } catch (error) {
-                    console.error('Error incrementing game played:', error);
+                    console.error('Error saving game data:', error);
+                }
+            },
+
+            // Get user game data
+            getGameData: async (userId, gameId) => {
+                try {
+                    const { data: gameData, error } = await supabase
+                        .from('user_game_data')
+                        .select('game_data')
+                        .eq('user_id', userId)
+                        .eq('game_id', gameId)
+                        .single();
+
+                    if (error && error.code !== 'PGRST116') throw error;
+                    
+                    return gameData?.game_data || null;
+                } catch (error) {
+                    console.error('Error getting game data:', error);
+                    return null;
+                }
+            },
+
+            // Record user access
+            recordAccess: async (userId, action, details = {}) => {
+                try {
+                    const { error } = await supabase
+                        .from('user_access')
+                        .insert({
+                            user_id: userId,
+                            action: action,
+                            details: details,
+                            accessed_at: new Date().toISOString(),
+                            ip_address: 'web-client' // In real app, get from request
+                        });
+
+                    if (error) throw error;
+                } catch (error) {
+                    console.error('Error recording access:', error);
                 }
             }
         };
 
-        // Login Screen Component
+        // Login Screen Component (same as before, but using Supabase)
         function LoginScreen({ onLoginSuccess }) {
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState('');
@@ -552,7 +757,7 @@
                 setError('');
                 try {
                     await SupabaseService.signInWithGoogle();
-                    // The actual login will be handled by the auth state change listener
+                    // Auth state change will handle the rest
                 } catch (err) {
                     console.error('Login error:', err);
                     if (err.message === 'Popup window closed') {
@@ -703,9 +908,10 @@
             );
         }
 
-        // Main App Component
+        // Main App Component - adapted for your table structure
         function App() {
             const [user, setUser] = useState(null);
+            const [userProfile, setUserProfile] = useState(null);
             const [loading, setLoading] = useState(true);
             const [activeSection, setActiveSection] = useState('games');
             const [friends, setFriends] = useState([]);
@@ -717,8 +923,10 @@
             const [showAddFriend, setShowAddFriend] = useState(false);
             const [showGameInvite, setShowGameInvite] = useState(false);
             const [selectedFriend, setSelectedFriend] = useState(null);
+            const [favorites, setFavorites] = useState([]);
 
             const unsubscribeRefs = useRef([]);
+            const gameStartTimeRef = useRef(null);
 
             useEffect(() => {
                 // Check for existing session
@@ -735,7 +943,8 @@
                             
                             setUser(session.user);
                             await SupabaseService.createUserProfile(session.user);
-                            setupListeners(session.user);
+                            await setupListeners(session.user);
+                            await SupabaseService.recordAccess(session.user.id, 'login');
                         }
                     } catch (error) {
                         console.error('Session check error:', error);
@@ -757,10 +966,12 @@
                             
                             setUser(session.user);
                             await SupabaseService.createUserProfile(session.user);
-                            setupListeners(session.user);
+                            await setupListeners(session.user);
+                            await SupabaseService.recordAccess(session.user.id, 'login');
                         } else if (event === 'SIGNED_OUT') {
                             cleanupListeners();
                             setUser(null);
+                            setUserProfile(null);
                             setFriends([]);
                             setConversations([]);
                             setActiveConversation(null);
@@ -776,26 +987,36 @@
 
             const setupListeners = async (user) => {
                 try {
+                    // Load user profile
+                    const profile = await SupabaseService.getUserProfile(user.id);
+                    setUserProfile(profile);
+
                     // Load initial data
-                    const [friendsData, conversationsData] = await Promise.all([
+                    const [friendsData, conversationsData, favoritesData] = await Promise.all([
                         SupabaseService.getFriends(user.id),
-                        SupabaseService.getConversations(user.id)
+                        SupabaseService.getConversations(user.id),
+                        SupabaseService.getFavorites(user.id)
                     ]);
                     
                     setFriends(friendsData);
                     setConversations(conversationsData);
+                    setFavorites(favoritesData);
 
                     // Subscribe to user status changes
-                    const statusUnsub = SupabaseService.subscribeToUserStatus((updatedUser) => {
+                    const statusUnsub = SupabaseService.subscribeToUserStatus((updatedProfile) => {
+                        if (updatedProfile.user_id === user.id) {
+                            setUserProfile(updatedProfile);
+                        }
+                        
                         setFriends(prev => prev.map(friend => 
-                            friend.id === updatedUser.id 
-                                ? { ...friend, status: updatedUser.status, currentGame: updatedUser.current_game }
+                            friend.id === updatedProfile.user_id 
+                                ? { ...friend, status: updatedProfile.status, currentGame: updatedProfile.current_game }
                                 : friend
                         ));
                         
                         setConversations(prev => prev.map(conv => 
-                            conv.friendId === updatedUser.id
-                                ? { ...conv, friendStatus: updatedUser.status }
+                            conv.friendId === updatedProfile.user_id
+                                ? { ...conv, friendStatus: updatedProfile.status }
                                 : conv
                         ));
                     });
@@ -817,16 +1038,32 @@
                 if (activeConversation) {
                     // Load messages
                     const loadMessages = async () => {
-                        const messages = await SupabaseService.getMessages(activeConversation.id);
+                        const messages = await SupabaseService.getMessages(
+                            user.id, 
+                            activeConversation.friendId
+                        );
                         setMessages(messages);
+                        
+                        // Mark messages as read
+                        messages.forEach(msg => {
+                            if (msg.senderId !== user.id && !msg.isRead) {
+                                SupabaseService.markMessageAsRead(msg.id);
+                            }
+                        });
                     };
                     loadMessages();
 
                     // Subscribe to new messages
                     const messageUnsub = SupabaseService.subscribeToMessages(
-                        activeConversation.id,
+                        user.id,
+                        activeConversation.friendId,
                         (newMessage) => {
                             setMessages(prev => [...prev, newMessage]);
+                            
+                            // Mark as read if it's from the friend
+                            if (newMessage.senderId !== user.id) {
+                                SupabaseService.markMessageAsRead(newMessage.id);
+                            }
                         }
                     );
 
@@ -834,27 +1071,38 @@
                         if (messageUnsub) messageUnsub();
                     };
                 }
-            }, [activeConversation]);
+            }, [activeConversation, user?.id]);
 
             useEffect(() => {
                 const handleBeforeUnload = async () => {
                     if (user) {
                         await SupabaseService.updateUserStatus(user.id, 'offline');
+                        if (gameStartTimeRef.current) {
+                            const duration = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
+                            await SupabaseService.recordGameSession(
+                                user.id, 
+                                currentGame?.id, 
+                                currentGame?.title, 
+                                duration
+                            );
+                        }
                     }
                 };
 
                 window.addEventListener('beforeunload', handleBeforeUnload);
                 return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-            }, [user]);
+            }, [user, currentGame]);
 
             const handleLogout = async () => {
                 try {
                     if (user) {
                         await SupabaseService.updateUserStatus(user.id, 'offline');
                         await SupabaseService.signOut();
+                        await SupabaseService.recordAccess(user.id, 'logout');
                     }
                     cleanupListeners();
                     setUser(null);
+                    setUserProfile(null);
                     setActiveSection('games');
                     setFriends([]);
                     setConversations([]);
@@ -872,12 +1120,16 @@
                 if ((!text.trim() && !gameInvite) || !activeConversation || !user) return;
 
                 try {
-                    await SupabaseService.sendMessage(
-                        activeConversation.id,
+                    const conversationId = await SupabaseService.sendMessage(
                         user.id,
+                        activeConversation.friendId,
                         text,
                         gameInvite
                     );
+                    
+                    // Refresh conversations list
+                    const updatedConversations = await SupabaseService.getConversations(user.id);
+                    setConversations(updatedConversations);
                 } catch (error) {
                     console.error('Error sending message:', error);
                     alert('Failed to send message');
@@ -886,16 +1138,44 @@
 
             const playGame = async (game) => {
                 setCurrentGame(game);
+                gameStartTimeRef.current = Date.now();
+                
                 if (user) {
                     await SupabaseService.updateUserStatus(user.id, 'online', game.title);
-                    await SupabaseService.incrementGamePlayed(user.id);
+                    await SupabaseService.recordAccess(user.id, 'game_started', { game: game.title });
                 }
             };
 
             const exitGame = async () => {
+                if (user && currentGame && gameStartTimeRef.current) {
+                    const duration = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
+                    await SupabaseService.recordGameSession(
+                        user.id, 
+                        currentGame.id, 
+                        currentGame.title, 
+                        duration
+                    );
+                }
+                
+                gameStartTimeRef.current = null;
                 setCurrentGame(null);
+                
                 if (user) {
                     await SupabaseService.updateUserStatus(user.id, 'online', null);
+                }
+            };
+
+            const toggleFavorite = async (game) => {
+                if (!user) return;
+                
+                const isFavorite = favorites.some(fav => fav.id === game.id);
+                
+                if (isFavorite) {
+                    await SupabaseService.removeFromFavorites(user.id, game.id);
+                    setFavorites(prev => prev.filter(fav => fav.id !== game.id));
+                } else {
+                    await SupabaseService.addToFavorites(user.id, game.id, game.title);
+                    setFavorites(prev => [...prev, { id: game.id, title: game.title }]);
                 }
             };
 
@@ -931,7 +1211,8 @@
                     openConversation(conversation);
                     
                     // Update conversations list
-                    setConversations(prev => [conversation, ...prev.filter(c => c.id !== conversationId)]);
+                    const updatedConversations = await SupabaseService.getConversations(user.id);
+                    setConversations(updatedConversations);
                 } catch (error) {
                     console.error('Error opening conversation:', error);
                 }
@@ -940,6 +1221,10 @@
             const filteredGames = GAMES.filter(game => 
                 game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 game.category.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+
+            const favoriteGames = GAMES.filter(game => 
+                favorites.some(fav => fav.id === game.id)
             );
 
             if (loading) {
@@ -983,16 +1268,20 @@
                     <MainContent
                         activeSection={activeSection}
                         user={user}
+                        userProfile={userProfile}
                         friends={friends}
                         conversations={conversations}
                         activeConversation={activeConversation}
                         messages={messages}
                         games={filteredGames}
+                        favoriteGames={favoriteGames}
+                        favorites={favorites}
                         searchQuery={searchQuery}
                         onSearchChange={setSearchQuery}
                         onPlayGame={playGame}
                         onOpenConversation={openConversation}
                         onSendMessage={sendMessage}
+                        onToggleFavorite={toggleFavorite}
                         onShowGameInvite={(friend) => {
                             setSelectedFriend(friend);
                             setShowGameInvite(true);
@@ -1027,11 +1316,1371 @@
             );
         }
 
-        // ... Rest of the components remain the same as in the original code ...
-        // (Sidebar, MainContent, GamesSection, ProfileSection, MessagesSection, etc.)
-        // Only the data fetching methods have been changed to use Supabase
+        // Sidebar Component (same as before)
+        function Sidebar({ activeSection, onSectionChange, onLogout }) {
+            const sections = [
+                { id: 'games', icon: '🎮', label: 'Games' },
+                { id: 'profile', icon: '👤', label: 'Profile' },
+                { id: 'messages', icon: '💬', label: 'Messages' },
+                { id: 'favorites', icon: '⭐', label: 'Favorites' }
+            ];
 
-        // IMPORTANT: You need to replace 'YOUR_SUPABASE_URL' and 'YOUR_SUPABASE_ANON_KEY' with your actual Supabase credentials
+            return (
+                <div style={{
+                    width: '80px',
+                    background: 'var(--bg-secondary)',
+                    borderRight: '1px solid var(--border-color)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: '20px 0',
+                    gap: '10px'
+                }}>
+                    <div style={{
+                        width: '48px',
+                        height: '48px',
+                        background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '24px',
+                        marginBottom: '20px'
+                    }}>
+                        🎮
+                    </div>
+
+                    {sections.map(section => (
+                        <button
+                            key={section.id}
+                            onClick={() => onSectionChange(section.id)}
+                            style={{
+                                width: '56px',
+                                height: '56px',
+                                background: activeSection === section.id ? 'rgba(0, 255, 136, 0.1)' : 'transparent',
+                                border: activeSection === section.id ? '1px solid var(--accent-primary)' : '1px solid transparent',
+                                borderRadius: '14px',
+                                color: activeSection === section.id ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                                fontSize: '24px',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (activeSection !== section.id) {
+                                    e.target.style.background = 'rgba(255, 255, 255, 0.05)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (activeSection !== section.id) {
+                                    e.target.style.background = 'transparent';
+                                }
+                            }}
+                            title={section.label}
+                        >
+                            {section.icon}
+                        </button>
+                    ))}
+
+                    <div style={{ flex: 1 }} />
+
+                    <button
+                        onClick={onLogout}
+                        style={{
+                            width: '56px',
+                            height: '56px',
+                            background: 'transparent',
+                            border: '1px solid transparent',
+                            borderRadius: '14px',
+                            color: 'var(--accent-danger)',
+                            fontSize: '24px',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.target.style.background = 'rgba(255, 68, 102, 0.1)';
+                            e.target.style.borderColor = 'var(--accent-danger)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.background = 'transparent';
+                            e.target.style.borderColor = 'transparent';
+                        }}
+                        title="Logout"
+                    >
+                        🚪
+                    </button>
+                </div>
+            );
+        }
+
+        // Main Content Component
+        function MainContent({ 
+            activeSection, user, userProfile, friends, conversations, activeConversation, messages,
+            games, favoriteGames, favorites, searchQuery, onSearchChange, onPlayGame, onOpenConversation, 
+            onSendMessage, onToggleFavorite, onShowGameInvite 
+        }) {
+            return (
+                <div style={{ flex: 1, overflow: 'auto', padding: '40px' }}>
+                    {activeSection === 'games' && (
+                        <GamesSection 
+                            games={games}
+                            favorites={favorites}
+                            searchQuery={searchQuery}
+                            onSearchChange={onSearchChange}
+                            onPlayGame={onPlayGame}
+                            onToggleFavorite={onToggleFavorite}
+                        />
+                    )}
+
+                    {activeSection === 'profile' && (
+                        <ProfileSection user={user} userProfile={userProfile} friends={friends} />
+                    )}
+
+                    {activeSection === 'messages' && (
+                        <MessagesSection
+                            currentUser={user}
+                            conversations={conversations}
+                            activeConversation={activeConversation}
+                            messages={messages}
+                            onOpenConversation={onOpenConversation}
+                            onSendMessage={onSendMessage}
+                            onShowGameInvite={onShowGameInvite}
+                        />
+                    )}
+
+                    {activeSection === 'favorites' && (
+                        <FavoritesSection 
+                            games={favoriteGames} 
+                            onPlayGame={onPlayGame}
+                            onToggleFavorite={onToggleFavorite}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        // Games Section Component with favorite toggle
+        function GamesSection({ games, favorites, searchQuery, onSearchChange, onPlayGame, onToggleFavorite }) {
+            return (
+                <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '40px'
+                    }}>
+                        <h1 style={{
+                            fontSize: '36px',
+                            fontWeight: '800',
+                            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                        }}>
+                            Game Library
+                        </h1>
+
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => onSearchChange(e.target.value)}
+                            placeholder="Search games..."
+                            style={{
+                                padding: '12px 20px',
+                                background: 'var(--bg-secondary)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '12px',
+                                color: 'var(--text-primary)',
+                                fontSize: '15px',
+                                width: '300px',
+                                outline: 'none'
+                            }}
+                        />
+                    </div>
+
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                        gap: '24px'
+                    }}>
+                        {games.map((game, index) => {
+                            const isFavorite = favorites.some(fav => fav.id === game.id);
+                            return (
+                                <GameCard 
+                                    key={game.id} 
+                                    game={game} 
+                                    isFavorite={isFavorite}
+                                    onPlay={onPlayGame}
+                                    onToggleFavorite={onToggleFavorite}
+                                    delay={index * 0.05}
+                                />
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        }
+
+        // Game Card Component with favorite button
+        function GameCard({ game, isFavorite, onPlay, onToggleFavorite, delay }) {
+            const handleFavoriteClick = (e) => {
+                e.stopPropagation();
+                onToggleFavorite(game);
+            };
+
+            return (
+                <div
+                    onClick={() => onPlay(game)}
+                    style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '16px',
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        transition: 'all 0.4s ease',
+                        animation: `fadeIn 0.5s ease-out ${delay}s both`,
+                        position: 'relative'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-8px)';
+                        e.currentTarget.style.borderColor = game.color;
+                        e.currentTarget.style.boxShadow = `0 20px 40px ${game.color}40`;
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.borderColor = 'var(--border-color)';
+                        e.currentTarget.style.boxShadow = 'none';
+                    }}
+                >
+                    <button
+                        onClick={handleFavoriteClick}
+                        style={{
+                            position: 'absolute',
+                            top: '12px',
+                            right: '12px',
+                            width: '36px',
+                            height: '36px',
+                            background: 'rgba(0, 0, 0, 0.7)',
+                            border: 'none',
+                            borderRadius: '50%',
+                            color: isFavorite ? '#ffaa00' : 'var(--text-secondary)',
+                            fontSize: '20px',
+                            cursor: 'pointer',
+                            zIndex: 10,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.9)';
+                            e.currentTarget.style.transform = 'scale(1.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)';
+                            e.currentTarget.style.transform = 'scale(1)';
+                        }}
+                    >
+                        {isFavorite ? '⭐' : '☆'}
+                    </button>
+
+                    <div style={{
+                        height: '180px',
+                        background: `linear-gradient(135deg, ${game.color}40, ${game.color}20)`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                        overflow: 'hidden'
+                    }}>
+                        <img 
+                            src={game.thumbnail} 
+                            alt={game.title}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                opacity: 0.6
+                            }}
+                        />
+                        <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            background: `linear-gradient(to top, ${game.color}60, transparent)`
+                        }} />
+                    </div>
+
+                    <div style={{ padding: '20px' }}>
+                        <div style={{
+                            fontSize: '12px',
+                            color: game.color,
+                            fontWeight: '700',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px',
+                            marginBottom: '8px'
+                        }}>
+                            {game.category}
+                        </div>
+                        <h3 style={{
+                            fontSize: '20px',
+                            fontWeight: '700',
+                            margin: 0
+                        }}>
+                            {game.title}
+                        </h3>
+                    </div>
+                </div>
+            );
+        }
+
+        // Profile Section Component
+        function ProfileSection({ user, userProfile, friends }) {
+            const [userStats, setUserStats] = useState({ games_played: 0, total_time: 0, achievements: 0 });
+
+            useEffect(() => {
+                if (userProfile?.game_stats) {
+                    setUserStats(userProfile.game_stats);
+                }
+            }, [userProfile]);
+
+            return (
+                <div style={{ animation: 'fadeIn 0.5s ease-out', maxWidth: '1000px', margin: '0 auto' }}>
+                    <div style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '20px',
+                        padding: '40px',
+                        marginBottom: '30px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '30px'
+                    }}>
+                        <img
+                            src={userProfile?.avatar_url || user.user_metadata?.avatar_url}
+                            alt={userProfile?.display_name || user.user_metadata?.full_name}
+                            style={{
+                                width: '120px',
+                                height: '120px',
+                                borderRadius: '24px',
+                                border: '3px solid var(--accent-primary)',
+                                boxShadow: 'var(--shadow-glow)'
+                            }}
+                        />
+                        <div style={{ flex: 1 }}>
+                            <h2 style={{
+                                fontSize: '32px',
+                                fontWeight: '800',
+                                marginBottom: '8px'
+                            }}>
+                                {userProfile?.display_name || user.user_metadata?.full_name || 'User'}
+                            </h2>
+                            <p style={{
+                                color: 'var(--text-secondary)',
+                                fontSize: '16px',
+                                marginBottom: '20px'
+                            }}>
+                                {user.email}
+                            </p>
+                            <div style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                background: 'rgba(0, 255, 136, 0.1)',
+                                border: '1px solid var(--accent-primary)',
+                                padding: '8px 16px',
+                                borderRadius: '20px',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                color: 'var(--accent-primary)'
+                            }}>
+                                <span style={{
+                                    width: '8px',
+                                    height: '8px',
+                                    background: 'var(--accent-primary)',
+                                    borderRadius: '50%',
+                                    animation: userProfile?.status === 'online' ? 'pulse 2s ease-in-out infinite' : 'none'
+                                }} />
+                                {userProfile?.status === 'online' ? 'Online' : 'Offline'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: '20px'
+                    }}>
+                        {[
+                            { label: 'Games Played', value: userStats.games_played || 0, icon: '🎮', color: 'var(--accent-primary)' },
+                            { label: 'Friends', value: friends.length, icon: '👥', color: 'var(--accent-secondary)' },
+                            { label: 'Total Hours', value: Math.floor((userStats.total_time || 0) / 3600), icon: '⏱️', color: '#ffaa00' },
+                            { label: 'Achievements', value: userStats.achievements || 0, icon: '🏆', color: '#ff6b9d' }
+                        ].map((stat, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    background: 'var(--bg-secondary)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '16px',
+                                    padding: '24px',
+                                    textAlign: 'center',
+                                    transition: 'all 0.3s ease',
+                                    animation: `fadeIn 0.5s ease-out ${index * 0.1}s both`
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = stat.color;
+                                    e.currentTarget.style.transform = 'translateY(-4px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = 'var(--border-color)';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                }}
+                            >
+                                <div style={{ fontSize: '32px', marginBottom: '12px' }}>{stat.icon}</div>
+                                <div style={{
+                                    fontSize: '36px',
+                                    fontWeight: '800',
+                                    color: stat.color,
+                                    marginBottom: '8px'
+                                }}>
+                                    {stat.value}
+                                </div>
+                                <div style={{
+                                    fontSize: '14px',
+                                    color: 'var(--text-secondary)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '1px',
+                                    fontWeight: '600'
+                                }}>
+                                    {stat.label}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // Messages Section Component (adapted for new structure)
+        function MessagesSection({ currentUser, conversations, activeConversation, messages, onOpenConversation, onSendMessage, onShowGameInvite }) {
+            const [messageText, setMessageText] = useState('');
+            const messagesEndRef = useRef(null);
+
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
+
+            const handleSend = () => {
+                if (messageText.trim()) {
+                    onSendMessage(messageText);
+                    setMessageText('');
+                }
+            };
+
+            const handleKeyPress = (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                }
+            };
+
+            return (
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '320px 1fr',
+                    gap: '24px',
+                    height: 'calc(100vh - 80px)',
+                    animation: 'fadeIn 0.5s ease-out'
+                }}>
+                    {/* Conversations List */}
+                    <div style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '16px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
+                        <div style={{
+                            padding: '20px',
+                            borderBottom: '1px solid var(--border-color)'
+                        }}>
+                            <h2 style={{
+                                fontSize: '20px',
+                                fontWeight: '700',
+                                margin: 0
+                            }}>
+                                Messages
+                            </h2>
+                        </div>
+
+                        <div style={{ flex: 1, overflow: 'auto' }}>
+                            {conversations.length === 0 ? (
+                                <div style={{
+                                    padding: '40px 20px',
+                                    textAlign: 'center',
+                                    color: 'var(--text-secondary)'
+                                }}>
+                                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>💬</div>
+                                    <div>No messages yet</div>
+                                    <div style={{ fontSize: '13px', marginTop: '8px' }}>
+                                        Start chatting with friends
+                                    </div>
+                                </div>
+                            ) : (
+                                conversations.map(conv => (
+                                    <div
+                                        key={conv.id}
+                                        onClick={() => onOpenConversation(conv)}
+                                        style={{
+                                            padding: '16px 20px',
+                                            borderBottom: '1px solid var(--border-color)',
+                                            cursor: 'pointer',
+                                            background: activeConversation?.id === conv.id ? 'rgba(0, 255, 136, 0.05)' : 'transparent',
+                                            transition: 'all 0.2s ease',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '12px'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (activeConversation?.id !== conv.id) {
+                                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (activeConversation?.id !== conv.id) {
+                                                e.currentTarget.style.background = 'transparent';
+                                            }
+                                        }}
+                                    >
+                                        <div style={{ position: 'relative' }}>
+                                            <img
+                                                src={conv.friendAvatar}
+                                                alt={conv.friendName}
+                                                style={{
+                                                    width: '48px',
+                                                    height: '48px',
+                                                    borderRadius: '12px'
+                                                }}
+                                            />
+                                            <div style={{
+                                                position: 'absolute',
+                                                bottom: '-2px',
+                                                right: '-2px',
+                                                width: '12px',
+                                                height: '12px',
+                                                background: conv.friendStatus === 'online' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                                                border: '2px solid var(--bg-secondary)',
+                                                borderRadius: '50%'
+                                            }} />
+                                        </div>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{
+                                                fontWeight: '600',
+                                                marginBottom: '4px',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis'
+                                            }}>
+                                                {conv.friendName}
+                                            </div>
+                                            <div style={{
+                                                fontSize: '13px',
+                                                color: 'var(--text-secondary)',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis'
+                                            }}>
+                                                {conv.lastMessage || 'No messages yet'}
+                                            </div>
+                                        </div>
+                                        {conv.unread > 0 && (
+                                            <div style={{
+                                                background: 'var(--accent-primary)',
+                                                color: '#000',
+                                                fontSize: '11px',
+                                                fontWeight: '700',
+                                                padding: '4px 8px',
+                                                borderRadius: '12px',
+                                                minWidth: '20px',
+                                                textAlign: 'center'
+                                            }}>
+                                                {conv.unread}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Chat Area */}
+                    <div style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '16px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
+                        {activeConversation ? (
+                            <>
+                                {/* Chat Header */}
+                                <div style={{
+                                    padding: '20px',
+                                    borderBottom: '1px solid var(--border-color)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px'
+                                }}>
+                                    <img
+                                        src={activeConversation.friendAvatar}
+                                        alt={activeConversation.friendName}
+                                        style={{
+                                            width: '48px',
+                                            height: '48px',
+                                            borderRadius: '12px'
+                                        }}
+                                    />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: '700', fontSize: '18px' }}>
+                                            {activeConversation.friendName}
+                                        </div>
+                                        <div style={{ 
+                                            fontSize: '13px', 
+                                            color: activeConversation.friendStatus === 'online' ? 'var(--accent-primary)' : 'var(--text-secondary)'
+                                        }}>
+                                            {activeConversation.friendStatus === 'online' ? 'Online' : 'Offline'}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Messages */}
+                                <div style={{
+                                    flex: 1,
+                                    padding: '20px',
+                                    overflow: 'auto',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '16px'
+                                }}>
+                                    {messages.map(msg => (
+                                        <div
+                                            key={msg.id}
+                                            style={{
+                                                display: 'flex',
+                                                gap: '12px',
+                                                alignSelf: msg.senderId === currentUser.id ? 'flex-end' : 'flex-start',
+                                                maxWidth: '70%',
+                                                flexDirection: msg.senderId === currentUser.id ? 'row-reverse' : 'row'
+                                            }}
+                                        >
+                                            <img
+                                                src={msg.senderId === currentUser.id 
+                                                    ? (currentUser.user_metadata?.avatar_url) 
+                                                    : activeConversation.friendAvatar}
+                                                alt="Avatar"
+                                                style={{
+                                                    width: '36px',
+                                                    height: '36px',
+                                                    borderRadius: '10px'
+                                                }}
+                                            />
+                                            <div>
+                                                <div style={{
+                                                    background: msg.senderId === currentUser.id 
+                                                        ? 'var(--accent-primary)' 
+                                                        : 'var(--bg-tertiary)',
+                                                    color: msg.senderId === currentUser.id ? '#000' : 'var(--text-primary)',
+                                                    padding: '12px 16px',
+                                                    borderRadius: '12px',
+                                                    fontSize: '15px',
+                                                    lineHeight: '1.5'
+                                                }}>
+                                                    {msg.text}
+                                                </div>
+                                                {msg.gameInvite && (
+                                                    <div style={{
+                                                        marginTop: '8px',
+                                                        padding: '12px',
+                                                        background: 'rgba(0, 255, 136, 0.1)',
+                                                        border: '1px solid var(--accent-primary)',
+                                                        borderRadius: '10px'
+                                                    }}>
+                                                        <div style={{
+                                                            fontSize: '13px',
+                                                            color: 'var(--accent-primary)',
+                                                            fontWeight: '600',
+                                                            marginBottom: '8px'
+                                                        }}>
+                                                            🎮 Game Invite
+                                                        </div>
+                                                        <div style={{ fontSize: '14px', marginBottom: '8px' }}>
+                                                            {msg.gameInvite.title}
+                                                        </div>
+                                                        <button 
+                                                            onClick={() => window.open(msg.gameInvite.url, '_blank')}
+                                                            style={{
+                                                                background: 'var(--accent-primary)',
+                                                                color: '#000',
+                                                                border: 'none',
+                                                                padding: '8px 16px',
+                                                                borderRadius: '8px',
+                                                                fontWeight: '600',
+                                                                fontSize: '13px',
+                                                                cursor: 'pointer'
+                                                            }}
+                                                        >
+                                                            Join Game
+                                                        </button>
+                                                    </div>
+                                                )}
+                                                <div style={{
+                                                    fontSize: '11px',
+                                                    color: 'var(--text-secondary)',
+                                                    marginTop: '4px',
+                                                    textAlign: msg.senderId === currentUser.id ? 'right' : 'left'
+                                                }}>
+                                                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div ref={messagesEndRef} />
+                                </div>
+
+                                {/* Input Area */}
+                                <div style={{
+                                    padding: '20px',
+                                    borderTop: '1px solid var(--border-color)',
+                                    display: 'flex',
+                                    gap: '12px',
+                                    alignItems: 'flex-end'
+                                }}>
+                                    <button
+                                        onClick={() => onShowGameInvite(activeConversation)}
+                                        style={{
+                                            width: '44px',
+                                            height: '44px',
+                                            background: 'var(--bg-tertiary)',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: '12px',
+                                            color: 'var(--accent-primary)',
+                                            fontSize: '20px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                        title="Invite to game"
+                                    >
+                                        🎮
+                                    </button>
+                                    <textarea
+                                        value={messageText}
+                                        onChange={(e) => setMessageText(e.target.value)}
+                                        onKeyPress={handleKeyPress}
+                                        placeholder="Type a message..."
+                                        style={{
+                                            flex: 1,
+                                            padding: '12px 16px',
+                                            background: 'var(--bg-tertiary)',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: '12px',
+                                            color: 'var(--text-primary)',
+                                            fontSize: '15px',
+                                            resize: 'none',
+                                            fontFamily: 'Manrope, sans-serif',
+                                            outline: 'none',
+                                            minHeight: '44px',
+                                            maxHeight: '120px'
+                                        }}
+                                        rows={1}
+                                    />
+                                    <button
+                                        onClick={handleSend}
+                                        disabled={!messageText.trim()}
+                                        style={{
+                                            width: '44px',
+                                            height: '44px',
+                                            background: messageText.trim() ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
+                                            border: 'none',
+                                            borderRadius: '12px',
+                                            color: messageText.trim() ? '#000' : 'var(--text-secondary)',
+                                            fontSize: '20px',
+                                            cursor: messageText.trim() ? 'pointer' : 'not-allowed',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                    >
+                                        ➤
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <div style={{
+                                flex: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'var(--text-secondary)',
+                                textAlign: 'center',
+                                padding: '40px'
+                            }}>
+                                <div>
+                                    <div style={{ fontSize: '64px', marginBottom: '20px' }}>💬</div>
+                                    <div style={{ fontSize: '18px' }}>Select a conversation to start messaging</div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // Favorites Section Component
+        function FavoritesSection({ games, onPlayGame, onToggleFavorite }) {
+            return (
+                <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
+                    <h1 style={{
+                        fontSize: '36px',
+                        fontWeight: '800',
+                        marginBottom: '40px',
+                        background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text'
+                    }}>
+                        Favorites
+                    </h1>
+
+                    {games.length === 0 ? (
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '80px 20px',
+                            color: 'var(--text-secondary)'
+                        }}>
+                            <div style={{ fontSize: '64px', marginBottom: '20px' }}>⭐</div>
+                            <h3 style={{ fontSize: '24px', marginBottom: '12px' }}>No favorites yet</h3>
+                            <p>Click the star icon on games to add them to your favorites</p>
+                        </div>
+                    ) : (
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                            gap: '24px'
+                        }}>
+                            {games.map((game, index) => (
+                                <GameCard 
+                                    key={game.id} 
+                                    game={game} 
+                                    isFavorite={true}
+                                    onPlay={onPlayGame}
+                                    onToggleFavorite={onToggleFavorite}
+                                    delay={index * 0.05}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Friends Panel Component
+        function FriendsPanel({ friends, onMessageFriend, onAddFriend }) {
+            return (
+                <div style={{
+                    width: '320px',
+                    background: 'var(--bg-secondary)',
+                    borderLeft: '1px solid var(--border-color)',
+                    padding: '20px',
+                    overflow: 'auto'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '20px'
+                    }}>
+                        <h3 style={{
+                            fontSize: '14px',
+                            fontWeight: '700',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px',
+                            color: 'var(--text-secondary)',
+                            margin: 0
+                        }}>
+                            Friends ({friends.length})
+                        </h3>
+                        <button
+                            onClick={onAddFriend}
+                            style={{
+                                width: '32px',
+                                height: '32px',
+                                background: 'var(--accent-primary)',
+                                border: 'none',
+                                borderRadius: '8px',
+                                color: '#000',
+                                fontSize: '18px',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease'
+                            }}
+                            title="Add friend"
+                        >
+                            +
+                        </button>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {friends.map(friend => (
+                            <div
+                                key={friend.id}
+                                onClick={() => onMessageFriend(friend)}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    padding: '12px',
+                                    background: 'var(--bg-tertiary)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '12px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'rgba(0, 255, 136, 0.05)';
+                                    e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'var(--bg-tertiary)';
+                                    e.currentTarget.style.borderColor = 'var(--border-color)';
+                                }}
+                            >
+                                <div style={{ position: 'relative' }}>
+                                    <img
+                                        src={friend.photoURL}
+                                        alt={friend.displayName}
+                                        style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '10px'
+                                        }}
+                                    />
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '-2px',
+                                        right: '-2px',
+                                        width: '12px',
+                                        height: '12px',
+                                        background: friend.status === 'online' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                                        border: '2px solid var(--bg-secondary)',
+                                        borderRadius: '50%'
+                                    }} />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{
+                                        fontWeight: '600',
+                                        fontSize: '14px',
+                                        marginBottom: '2px',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                    }}>
+                                        {friend.displayName}
+                                    </div>
+                                    <div style={{
+                                        fontSize: '12px',
+                                        color: 'var(--text-secondary)',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                    }}>
+                                        {friend.currentGame || (friend.status === 'online' ? 'Online' : 'Offline')}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                        {friends.length === 0 && (
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '40px 20px',
+                                color: 'var(--text-secondary)'
+                            }}>
+                                <div style={{ fontSize: '48px', marginBottom: '16px' }}>👥</div>
+                                <div style={{ fontSize: '14px' }}>No friends yet</div>
+                                <div style={{ fontSize: '12px', marginTop: '8px' }}>
+                                    Click + to add friends
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // Add Friend Modal Component
+        function AddFriendModal({ onClose, onAddFriend }) {
+            const [email, setEmail] = useState('');
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+
+            const handleAdd = async () => {
+                setError('');
+                
+                if (!email.trim() || !email.endsWith('@kcpupils.org')) {
+                    setError('Please enter a valid @kcpupils.org email');
+                    return;
+                }
+                
+                setLoading(true);
+                try {
+                    await onAddFriend(email);
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(0, 0, 0, 0.8)',
+                        backdropFilter: 'blur(10px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        animation: 'fadeIn 0.3s ease-out'
+                    }}
+                    onClick={onClose}
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            background: 'var(--bg-secondary)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '20px',
+                            padding: '40px',
+                            width: '440px',
+                            maxWidth: '90%',
+                            boxShadow: 'var(--shadow-glow)'
+                        }}
+                    >
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '24px'
+                        }}>
+                            <h2 style={{
+                                fontSize: '24px',
+                                fontWeight: '700',
+                                margin: 0
+                            }}>
+                                Add Friend
+                            </h2>
+                            <button
+                                onClick={onClose}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--text-secondary)',
+                                    fontSize: '24px',
+                                    cursor: 'pointer',
+                                    padding: 0,
+                                    width: '32px',
+                                    height: '32px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
+                            placeholder="friend@kcpupils.org"
+                            style={{
+                                width: '100%',
+                                padding: '14px 18px',
+                                background: 'var(--bg-tertiary)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '12px',
+                                color: 'var(--text-primary)',
+                                fontSize: '15px',
+                                marginBottom: '20px',
+                                outline: 'none'
+                            }}
+                        />
+
+                        {error && (
+                            <div style={{
+                                marginBottom: '20px',
+                                padding: '12px',
+                                background: 'rgba(255, 68, 102, 0.1)',
+                                border: '1px solid var(--accent-danger)',
+                                borderRadius: '8px',
+                                color: 'var(--accent-danger)',
+                                fontSize: '14px'
+                            }}>
+                                {error}
+                            </div>
+                        )}
+
+                        <button
+                            onClick={handleAdd}
+                            disabled={loading}
+                            style={{
+                                width: '100%',
+                                padding: '14px',
+                                background: loading ? 'var(--bg-tertiary)' : 'var(--accent-primary)',
+                                color: loading ? 'var(--text-secondary)' : '#000',
+                                border: 'none',
+                                borderRadius: '12px',
+                                fontSize: '16px',
+                                fontWeight: '700',
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                                transition: 'all 0.3s ease'
+                            }}
+                        >
+                            {loading ? 'Adding...' : 'Add Friend'}
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Game Invite Modal Component
+        function GameInviteModal({ games, friend, onClose, onInvite }) {
+            return (
+                <div
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(0, 0, 0, 0.8)',
+                        backdropFilter: 'blur(10px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        animation: 'fadeIn 0.3s ease-out'
+                    }}
+                    onClick={onClose}
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            background: 'var(--bg-secondary)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '20px',
+                            padding: '40px',
+                            width: '500px',
+                            maxWidth: '90%',
+                            maxHeight: '80vh',
+                            overflow: 'auto',
+                            boxShadow: 'var(--shadow-glow)'
+                        }}
+                    >
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '24px'
+                        }}>
+                            <h2 style={{
+                                fontSize: '24px',
+                                fontWeight: '700',
+                                margin: 0
+                            }}>
+                                Invite to Game
+                            </h2>
+                            <button
+                                onClick={onClose}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--text-secondary)',
+                                    fontSize: '24px',
+                                    cursor: 'pointer',
+                                    padding: 0
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <p style={{
+                            color: 'var(--text-secondary)',
+                            marginBottom: '24px',
+                            fontSize: '15px'
+                        }}>
+                            Select a game to play with {friend?.friendName}
+                        </p>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {games.map(game => (
+                                <button
+                                    key={game.id}
+                                    onClick={() => onInvite(game)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '16px',
+                                        padding: '16px',
+                                        background: 'var(--bg-tertiary)',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: '12px',
+                                        color: 'var(--text-primary)',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        textAlign: 'left'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.borderColor = game.color;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--border-color)';
+                                    }}
+                                >
+                                    <div style={{
+                                        width: '60px',
+                                        height: '60px',
+                                        borderRadius: '10px',
+                                        background: `linear-gradient(135deg, ${game.color}40, ${game.color}20)`,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '28px'
+                                    }}>
+                                        🎮
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{
+                                            fontSize: '12px',
+                                            color: game.color,
+                                            fontWeight: '700',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '1px',
+                                            marginBottom: '4px'
+                                        }}>
+                                            {game.category}
+                                        </div>
+                                        <div style={{
+                                            fontSize: '16px',
+                                            fontWeight: '700'
+                                        }}>
+                                            {game.title}
+                                        </div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Game Player Component
+        function GamePlayer({ game, onExit }) {
+            const [isFullscreen, setIsFullscreen] = useState(false);
+
+            const toggleFullscreen = () => {
+                const elem = document.getElementById('game-player');
+                if (!document.fullscreenElement) {
+                    elem.requestFullscreen();
+                    setIsFullscreen(true);
+                } else {
+                    document.exitFullscreen();
+                    setIsFullscreen(false);
+                }
+            };
+
+            return (
+                <div id="game-player" style={{
+                    position: 'fixed',
+                    inset: 0,
+                    background: '#000',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    zIndex: 9999
+                }}>
+                    <div style={{
+                        background: 'rgba(0, 0, 0, 0.95)',
+                        padding: '16px 24px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderBottom: '1px solid var(--border-color)'
+                    }}>
+                        <h2 style={{
+                            fontSize: '20px',
+                            fontWeight: '700',
+                            margin: 0,
+                            fontFamily: 'Space Mono, monospace'
+                        }}>
+                            {game.title}
+                        </h2>
+
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <button
+                                onClick={toggleFullscreen}
+                                style={{
+                                    padding: '10px 20px',
+                                    background: 'rgba(0, 255, 136, 0.2)',
+                                    border: '1px solid var(--accent-primary)',
+                                    borderRadius: '8px',
+                                    color: 'var(--accent-primary)',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                {isFullscreen ? '⛶ Exit Fullscreen' : '⛶ Fullscreen'}
+                            </button>
+
+                            <button
+                                onClick={onExit}
+                                style={{
+                                    padding: '10px 20px',
+                                    background: 'rgba(255, 68, 102, 0.2)',
+                                    border: '1px solid var(--accent-danger)',
+                                    borderRadius: '8px',
+                                    color: 'var(--accent-danger)',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                ✕ Exit Game
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                        <iframe
+                            src={game.url}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                border: 'none'
+                            }}
+                            allowFullScreen
+                            allow="autoplay; fullscreen"
+                        />
+                    </div>
+                </div>
+            );
+        }
 
         // Render App
         ReactDOM.render(<App />, document.getElementById('root'));
