@@ -9,6 +9,12 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -58,19 +64,18 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes slideIn {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
-        }
-
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
 
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         /* Scrollbar */
@@ -99,115 +104,30 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // Mock Authentication Service
-        const AuthService = {
-            currentUser: null,
-            
-            signInWithGoogle: async () => {
-                return new Promise((resolve) => {
-                    setTimeout(() => {
-                        const mockUser = {
-                            uid: 'user_' + Date.now(),
-                            email: 'student@kcpupils.org',
-                            displayName: 'Alex Johnson',
-                            photoURL: `https://api.dicebear.com/7.x/avataaars/svg?seed=${Date.now()}`,
-                            stats: {
-                                gamesPlayed: 47,
-                                totalTime: 23,
-                                achievements: 12
-                            }
-                        };
-                        AuthService.currentUser = mockUser;
-                        localStorage.setItem('mathsUser', JSON.stringify(mockUser));
-                        resolve(mockUser);
-                    }, 1500);
-                });
-            },
-
-            signOut: () => {
-                AuthService.currentUser = null;
-                localStorage.removeItem('mathsUser');
-            },
-
-            getCurrentUser: () => {
-                const stored = localStorage.getItem('mathsUser');
-                if (stored) {
-                    AuthService.currentUser = JSON.parse(stored);
-                    return AuthService.currentUser;
-                }
-                return null;
-            }
+        // Firebase Configuration
+        const firebaseConfig = {
+            // REPLACE WITH YOUR FIREBASE CONFIG
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
-        // Mock Database Service
-        const DatabaseService = {
-            getFriends: async (userId) => {
-                return [
-                    { id: '1', name: 'Sarah Chen', email: 'sarah.chen@kcpupils.org', status: 'online', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah', currentGame: 'Drive Mad' },
-                    { id: '2', name: 'Marcus Brown', email: 'marcus.brown@kcpupils.org', status: 'online', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus', currentGame: 'Subway Surfers' },
-                    { id: '3', name: 'Emma Wilson', email: 'emma.wilson@kcpupils.org', status: 'offline', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma', currentGame: null },
-                    { id: '4', name: 'James Lee', email: 'james.lee@kcpupils.org', status: 'online', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=James', currentGame: 'Tetris' },
-                ];
-            },
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
 
-            getConversations: async (userId) => {
-                return [
-                    { 
-                        id: '1', 
-                        friendId: '1',
-                        friendName: 'Sarah Chen', 
-                        friendAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-                        lastMessage: 'Want to play Drive Mad?',
-                        timestamp: new Date(Date.now() - 300000),
-                        unread: 2
-                    },
-                    { 
-                        id: '2', 
-                        friendId: '2',
-                        friendName: 'Marcus Brown', 
-                        friendAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus',
-                        lastMessage: 'GG! That was intense',
-                        timestamp: new Date(Date.now() - 3600000),
-                        unread: 0
-                    }
-                ];
-            },
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-            getMessages: async (conversationId) => {
-                const mockMessages = {
-                    '1': [
-                        { id: '1', senderId: '1', text: 'Hey! Are you free?', timestamp: new Date(Date.now() - 600000) },
-                        { id: '2', senderId: 'me', text: 'Yeah! What\'s up?', timestamp: new Date(Date.now() - 540000) },
-                        { id: '3', senderId: '1', text: 'Want to play Drive Mad?', timestamp: new Date(Date.now() - 300000), gameInvite: { name: 'Drive Mad', url: 'https://games.playtropolis.com/drive-mad-v2/' } },
-                    ],
-                    '2': [
-                        { id: '1', senderId: '2', text: 'That race was crazy!', timestamp: new Date(Date.now() - 7200000) },
-                        { id: '2', senderId: 'me', text: 'I know right! You almost had me', timestamp: new Date(Date.now() - 7000000) },
-                        { id: '3', senderId: '2', text: 'GG! That was intense', timestamp: new Date(Date.now() - 3600000) },
-                    ]
-                };
-                return mockMessages[conversationId] || [];
-            },
-
-            sendMessage: async (conversationId, message) => {
-                return { id: Date.now().toString(), ...message, timestamp: new Date() };
-            },
-
-            addFriend: async (email) => {
-                return new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve({ 
-                            id: Date.now().toString(), 
-                            name: email.split('@')[0], 
-                            email, 
-                            status: 'offline', 
-                            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-                            currentGame: null
-                        });
-                    }, 1000);
-                });
-            }
-        };
+        // Configure Google Auth Provider to restrict to kcpupils.org
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        googleProvider.setCustomParameters({
+            hd: 'kcpupils.org' // Restrict to this domain
+        });
 
         // Games Data
         const GAMES = [
@@ -221,6 +141,228 @@
             { id: '8', title: 'Pac-Man', category: 'Arcade', url: 'https://www.google.com/logos/2010/pacman10-i.html', thumbnail: 'https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&h=300&fit=crop', color: '#ffdd00' },
         ];
 
+        // Firebase Service Functions
+        const FirebaseService = {
+            // Create or update user profile
+            createUserProfile: async (user) => {
+                const userRef = db.collection('users').doc(user.uid);
+                const doc = await userRef.get();
+                
+                if (!doc.exists) {
+                    await userRef.set({
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        stats: {
+                            gamesPlayed: 0,
+                            totalTime: 0,
+                            achievements: 0
+                        },
+                        status: 'online',
+                        currentGame: null
+                    });
+                } else {
+                    // Update status to online
+                    await userRef.update({
+                        status: 'online',
+                        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            },
+
+            // Update user status
+            updateUserStatus: async (uid, status, currentGame = null) => {
+                await db.collection('users').doc(uid).update({
+                    status,
+                    currentGame,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            },
+
+            // Get friends list
+            getFriendsListener: (userId, callback) => {
+                return db.collection('friends')
+                    .where('userId', '==', userId)
+                    .onSnapshot(async (snapshot) => {
+                        const friendIds = snapshot.docs.map(doc => doc.data().friendId);
+                        
+                        if (friendIds.length === 0) {
+                            callback([]);
+                            return;
+                        }
+
+                        const friendsData = await Promise.all(
+                            friendIds.map(async (friendId) => {
+                                const friendDoc = await db.collection('users').doc(friendId).get();
+                                return { id: friendId, ...friendDoc.data() };
+                            })
+                        );
+                        
+                        callback(friendsData);
+                    });
+            },
+
+            // Add friend
+            addFriend: async (currentUserId, friendEmail) => {
+                // Find user by email
+                const usersSnapshot = await db.collection('users')
+                    .where('email', '==', friendEmail)
+                    .limit(1)
+                    .get();
+
+                if (usersSnapshot.empty) {
+                    throw new Error('User not found');
+                }
+
+                const friendDoc = usersSnapshot.docs[0];
+                const friendId = friendDoc.id;
+
+                if (friendId === currentUserId) {
+                    throw new Error('Cannot add yourself as a friend');
+                }
+
+                // Check if already friends
+                const existingFriendship = await db.collection('friends')
+                    .where('userId', '==', currentUserId)
+                    .where('friendId', '==', friendId)
+                    .get();
+
+                if (!existingFriendship.empty) {
+                    throw new Error('Already friends');
+                }
+
+                // Add friendship (bidirectional)
+                const batch = db.batch();
+                
+                batch.set(db.collection('friends').doc(), {
+                    userId: currentUserId,
+                    friendId: friendId,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                batch.set(db.collection('friends').doc(), {
+                    userId: friendId,
+                    friendId: currentUserId,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                await batch.commit();
+
+                return { id: friendId, ...friendDoc.data() };
+            },
+
+            // Get or create conversation
+            getOrCreateConversation: async (user1Id, user2Id) => {
+                // Query for existing conversation
+                const conversationsSnapshot = await db.collection('conversations')
+                    .where('participants', 'array-contains', user1Id)
+                    .get();
+
+                let conversationId = null;
+
+                for (const doc of conversationsSnapshot.docs) {
+                    const participants = doc.data().participants;
+                    if (participants.includes(user2Id)) {
+                        conversationId = doc.id;
+                        break;
+                    }
+                }
+
+                // Create new conversation if doesn't exist
+                if (!conversationId) {
+                    const newConversation = await db.collection('conversations').add({
+                        participants: [user1Id, user2Id],
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastMessage: null,
+                        lastMessageTime: null
+                    });
+                    conversationId = newConversation.id;
+                }
+
+                return conversationId;
+            },
+
+            // Get conversations listener
+            getConversationsListener: (userId, callback) => {
+                return db.collection('conversations')
+                    .where('participants', 'array-contains', userId)
+                    .orderBy('lastMessageTime', 'desc')
+                    .onSnapshot(async (snapshot) => {
+                        const conversations = await Promise.all(
+                            snapshot.docs.map(async (doc) => {
+                                const data = doc.data();
+                                const otherUserId = data.participants.find(id => id !== userId);
+                                const userDoc = await db.collection('users').doc(otherUserId).get();
+                                const userData = userDoc.data();
+
+                                return {
+                                    id: doc.id,
+                                    friendId: otherUserId,
+                                    friendName: userData?.displayName || 'Unknown',
+                                    friendAvatar: userData?.photoURL || '',
+                                    friendStatus: userData?.status || 'offline',
+                                    lastMessage: data.lastMessage || '',
+                                    timestamp: data.lastMessageTime?.toDate() || new Date(),
+                                    unread: 0 // TODO: Implement unread count
+                                };
+                            })
+                        );
+                        
+                        callback(conversations);
+                    });
+            },
+
+            // Get messages listener
+            getMessagesListener: (conversationId, callback) => {
+                return db.collection('conversations')
+                    .doc(conversationId)
+                    .collection('messages')
+                    .orderBy('timestamp', 'asc')
+                    .limit(100)
+                    .onSnapshot((snapshot) => {
+                        const messages = snapshot.docs.map(doc => ({
+                            id: doc.id,
+                            ...doc.data(),
+                            timestamp: doc.data().timestamp?.toDate() || new Date()
+                        }));
+                        callback(messages);
+                    });
+            },
+
+            // Send message
+            sendMessage: async (conversationId, senderId, text, gameInvite = null) => {
+                const messageData = {
+                    senderId,
+                    text,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    gameInvite
+                };
+
+                // Add message to conversation
+                await db.collection('conversations')
+                    .doc(conversationId)
+                    .collection('messages')
+                    .add(messageData);
+
+                // Update conversation with last message
+                await db.collection('conversations')
+                    .doc(conversationId)
+                    .update({
+                        lastMessage: text,
+                        lastMessageTime: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+            },
+
+            // Increment game played stat
+            incrementGamePlayed: async (userId) => {
+                await db.collection('users').doc(userId).update({
+                    'stats.gamesPlayed': firebase.firestore.FieldValue.increment(1)
+                });
+            }
+        };
+
         // Login Screen Component
         function LoginScreen({ onLoginSuccess }) {
             const [loading, setLoading] = useState(false);
@@ -230,10 +372,29 @@
                 setLoading(true);
                 setError('');
                 try {
-                    const user = await AuthService.signInWithGoogle();
-                    onLoginSuccess(user);
+                    const result = await auth.signInWithPopup(googleProvider);
+                    
+                    // Verify email domain
+                    if (!result.user.email.endsWith('@kcpupils.org')) {
+                        await auth.signOut();
+                        setError('Please use your @kcpupils.org account');
+                        setLoading(false);
+                        return;
+                    }
+
+                    // Create user profile
+                    await FirebaseService.createUserProfile(result.user);
+                    
+                    onLoginSuccess(result.user);
                 } catch (err) {
-                    setError('Failed to sign in. Please try again.');
+                    console.error('Login error:', err);
+                    if (err.code === 'auth/popup-closed-by-user') {
+                        setError('Sign-in was cancelled');
+                    } else if (err.code === 'auth/popup-blocked') {
+                        setError('Pop-up blocked. Please allow pop-ups for this site.');
+                    } else {
+                        setError('Failed to sign in. Please try again.');
+                    }
                 } finally {
                     setLoading(false);
                 }
@@ -259,7 +420,6 @@
                         textAlign: 'center',
                         boxShadow: 'var(--shadow-glow)'
                     }}>
-                        {/* Logo */}
                         <div style={{
                             width: '80px',
                             height: '80px',
@@ -374,16 +534,6 @@
                             By signing in, you agree to our Terms of Service and Privacy Policy
                         </div>
                     </div>
-
-                    <style>{`
-                        @keyframes float {
-                            0%, 100% { transform: translateY(0); }
-                            50% { transform: translateY(-10px); }
-                        }
-                        @keyframes spin {
-                            to { transform: rotate(360deg); }
-                        }
-                    `}</style>
                 </div>
             );
         }
@@ -391,6 +541,7 @@
         // Main App Component
         function App() {
             const [user, setUser] = useState(null);
+            const [loading, setLoading] = useState(true);
             const [activeSection, setActiveSection] = useState('games');
             const [friends, setFriends] = useState([]);
             const [conversations, setConversations] = useState([]);
@@ -402,29 +553,72 @@
             const [showGameInvite, setShowGameInvite] = useState(false);
             const [selectedFriend, setSelectedFriend] = useState(null);
 
+            const unsubscribeRefs = useRef([]);
+
             useEffect(() => {
-                const existingUser = AuthService.getCurrentUser();
-                if (existingUser) {
-                    setUser(existingUser);
-                    loadUserData(existingUser);
-                }
+                // Auth state observer
+                const unsubscribe = auth.onAuthStateChanged(async (user) => {
+                    if (user && user.email.endsWith('@kcpupils.org')) {
+                        setUser(user);
+                        await FirebaseService.createUserProfile(user);
+                        setupListeners(user);
+                    } else {
+                        setUser(null);
+                        cleanupListeners();
+                    }
+                    setLoading(false);
+                });
+
+                return () => {
+                    unsubscribe();
+                    cleanupListeners();
+                };
             }, []);
 
-            const loadUserData = async (user) => {
-                const friendsList = await DatabaseService.getFriends(user.uid);
-                setFriends(friendsList);
+            const setupListeners = (user) => {
+                // Friends listener
+                const friendsUnsub = FirebaseService.getFriendsListener(user.uid, setFriends);
+                unsubscribeRefs.current.push(friendsUnsub);
 
-                const convos = await DatabaseService.getConversations(user.uid);
-                setConversations(convos);
+                // Conversations listener
+                const convoUnsub = FirebaseService.getConversationsListener(user.uid, setConversations);
+                unsubscribeRefs.current.push(convoUnsub);
             };
 
-            const handleLogin = (loggedInUser) => {
-                setUser(loggedInUser);
-                loadUserData(loggedInUser);
+            const cleanupListeners = () => {
+                unsubscribeRefs.current.forEach(unsub => unsub());
+                unsubscribeRefs.current = [];
             };
 
-            const handleLogout = () => {
-                AuthService.signOut();
+            useEffect(() => {
+                // Set up messages listener when conversation is selected
+                if (activeConversation) {
+                    const messagesUnsub = FirebaseService.getMessagesListener(
+                        activeConversation.id,
+                        setMessages
+                    );
+                    return () => messagesUnsub();
+                }
+            }, [activeConversation]);
+
+            // Update user status on unmount
+            useEffect(() => {
+                const handleBeforeUnload = async () => {
+                    if (user) {
+                        await FirebaseService.updateUserStatus(user.uid, 'offline');
+                    }
+                };
+
+                window.addEventListener('beforeunload', handleBeforeUnload);
+                return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+            }, [user]);
+
+            const handleLogout = async () => {
+                if (user) {
+                    await FirebaseService.updateUserStatus(user.uid, 'offline');
+                    await auth.signOut();
+                }
+                cleanupListeners();
                 setUser(null);
                 setActiveSection('games');
                 setFriends([]);
@@ -433,29 +627,72 @@
 
             const openConversation = async (conversation) => {
                 setActiveConversation(conversation);
-                const msgs = await DatabaseService.getMessages(conversation.id);
-                setMessages(msgs);
+                setActiveSection('messages');
             };
 
             const sendMessage = async (text, gameInvite = null) => {
-                if (!text.trim() && !gameInvite) return;
+                if ((!text.trim() && !gameInvite) || !activeConversation || !user) return;
 
-                const newMessage = {
-                    senderId: 'me',
-                    text,
-                    gameInvite
-                };
-
-                const sentMessage = await DatabaseService.sendMessage(activeConversation.id, newMessage);
-                setMessages([...messages, sentMessage]);
+                try {
+                    await FirebaseService.sendMessage(
+                        activeConversation.id,
+                        user.uid,
+                        text,
+                        gameInvite
+                    );
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    alert('Failed to send message');
+                }
             };
 
-            const playGame = (game) => {
+            const playGame = async (game) => {
                 setCurrentGame(game);
+                if (user) {
+                    await FirebaseService.updateUserStatus(user.uid, 'online', game.title);
+                    await FirebaseService.incrementGamePlayed(user.uid);
+                }
             };
 
-            const exitGame = () => {
+            const exitGame = async () => {
                 setCurrentGame(null);
+                if (user) {
+                    await FirebaseService.updateUserStatus(user.uid, 'online', null);
+                }
+            };
+
+            const handleAddFriend = async (email) => {
+                try {
+                    await FirebaseService.addFriend(user.uid, email);
+                    setShowAddFriend(false);
+                } catch (error) {
+                    console.error('Error adding friend:', error);
+                    alert(error.message);
+                }
+            };
+
+            const handleMessageFriend = async (friend) => {
+                try {
+                    const conversationId = await FirebaseService.getOrCreateConversation(
+                        user.uid,
+                        friend.id
+                    );
+                    
+                    const conversation = {
+                        id: conversationId,
+                        friendId: friend.id,
+                        friendName: friend.displayName,
+                        friendAvatar: friend.photoURL,
+                        friendStatus: friend.status,
+                        lastMessage: '',
+                        timestamp: new Date(),
+                        unread: 0
+                    };
+                    
+                    openConversation(conversation);
+                } catch (error) {
+                    console.error('Error opening conversation:', error);
+                }
             };
 
             const filteredGames = GAMES.filter(game => 
@@ -463,8 +700,30 @@
                 game.category.toLowerCase().includes(searchQuery.toLowerCase())
             );
 
+            if (loading) {
+                return (
+                    <div style={{
+                        position: 'fixed',
+                        inset: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'var(--bg-primary)'
+                    }}>
+                        <div style={{
+                            width: '50px',
+                            height: '50px',
+                            border: '4px solid var(--bg-secondary)',
+                            borderTop: '4px solid var(--accent-primary)',
+                            borderRadius: '50%',
+                            animation: 'spin 1s linear infinite'
+                        }} />
+                    </div>
+                );
+            }
+
             if (!user) {
-                return <LoginScreen onLoginSuccess={handleLogin} />;
+                return <LoginScreen onLoginSuccess={setUser} />;
             }
 
             if (currentGame) {
@@ -473,14 +732,12 @@
 
             return (
                 <div style={{ display: 'flex', height: '100vh' }}>
-                    {/* Sidebar Navigation */}
                     <Sidebar 
                         activeSection={activeSection}
                         onSectionChange={setActiveSection}
                         onLogout={handleLogout}
                     />
 
-                    {/* Main Content */}
                     <MainContent
                         activeSection={activeSection}
                         user={user}
@@ -494,41 +751,22 @@
                         onPlayGame={playGame}
                         onOpenConversation={openConversation}
                         onSendMessage={sendMessage}
-                        onShowAddFriend={() => setShowAddFriend(true)}
                         onShowGameInvite={(friend) => {
                             setSelectedFriend(friend);
                             setShowGameInvite(true);
                         }}
                     />
 
-                    {/* Friends Panel */}
                     <FriendsPanel 
                         friends={friends}
-                        onMessageFriend={(friend) => {
-                            const conv = conversations.find(c => c.friendId === friend.id) || {
-                                id: friend.id,
-                                friendId: friend.id,
-                                friendName: friend.name,
-                                friendAvatar: friend.avatar,
-                                lastMessage: '',
-                                timestamp: new Date(),
-                                unread: 0
-                            };
-                            openConversation(conv);
-                            setActiveSection('messages');
-                        }}
+                        onMessageFriend={handleMessageFriend}
                         onAddFriend={() => setShowAddFriend(true)}
                     />
 
-                    {/* Modals */}
                     {showAddFriend && (
                         <AddFriendModal
                             onClose={() => setShowAddFriend(false)}
-                            onAddFriend={async (email) => {
-                                const newFriend = await DatabaseService.addFriend(email);
-                                setFriends([...friends, newFriend]);
-                                setShowAddFriend(false);
-                            }}
+                            onAddFriend={handleAddFriend}
                         />
                     )}
 
@@ -567,7 +805,6 @@
                     padding: '20px 0',
                     gap: '10px'
                 }}>
-                    {/* Logo */}
                     <div style={{
                         width: '48px',
                         height: '48px',
@@ -582,7 +819,6 @@
                         🎮
                     </div>
 
-                    {/* Navigation Items */}
                     {sections.map(section => (
                         <button
                             key={section.id}
@@ -596,19 +832,16 @@
                                 color: activeSection === section.id ? 'var(--accent-primary)' : 'var(--text-secondary)',
                                 fontSize: '24px',
                                 cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                                position: 'relative'
+                                transition: 'all 0.3s ease'
                             }}
                             onMouseEnter={(e) => {
                                 if (activeSection !== section.id) {
                                     e.target.style.background = 'rgba(255, 255, 255, 0.05)';
-                                    e.target.style.transform = 'translateY(-2px)';
                                 }
                             }}
                             onMouseLeave={(e) => {
                                 if (activeSection !== section.id) {
                                     e.target.style.background = 'transparent';
-                                    e.target.style.transform = 'translateY(0)';
                                 }
                             }}
                             title={section.label}
@@ -617,10 +850,8 @@
                         </button>
                     ))}
 
-                    {/* Spacer */}
                     <div style={{ flex: 1 }} />
 
-                    {/* Logout */}
                     <button
                         onClick={onLogout}
                         style={{
@@ -650,11 +881,15 @@
             );
         }
 
-        // Main Content Component
+        // Continue with remaining components...
+        // (GamesSection, ProfileSection, MessagesSection, etc. - same as before but with real Firebase data)
+
+        // For brevity, I'll include the key MessagesSection with real Firebase integration:
+
         function MainContent({ 
             activeSection, user, friends, conversations, activeConversation, messages,
             games, searchQuery, onSearchChange, onPlayGame, onOpenConversation, 
-            onSendMessage, onShowAddFriend, onShowGameInvite 
+            onSendMessage, onShowGameInvite 
         }) {
             return (
                 <div style={{ flex: 1, overflow: 'auto', padding: '40px' }}>
@@ -673,6 +908,7 @@
 
                     {activeSection === 'messages' && (
                         <MessagesSection
+                            currentUser={user}
                             conversations={conversations}
                             activeConversation={activeConversation}
                             messages={messages}
@@ -689,7 +925,6 @@
             );
         }
 
-        // Games Section
         function GamesSection({ games, searchQuery, onSearchChange, onPlayGame }) {
             return (
                 <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
@@ -723,16 +958,7 @@
                                 color: 'var(--text-primary)',
                                 fontSize: '15px',
                                 width: '300px',
-                                outline: 'none',
-                                transition: 'all 0.3s ease'
-                            }}
-                            onFocus={(e) => {
-                                e.target.style.borderColor = 'var(--accent-primary)';
-                                e.target.style.background = 'var(--bg-tertiary)';
-                            }}
-                            onBlur={(e) => {
-                                e.target.style.borderColor = 'var(--border-color)';
-                                e.target.style.background = 'var(--bg-secondary)';
+                                outline: 'none'
                             }}
                         />
                     </div>
@@ -755,7 +981,6 @@
             );
         }
 
-        // Game Card Component
         function GameCard({ game, onPlay, delay }) {
             return (
                 <div
@@ -767,8 +992,7 @@
                         overflow: 'hidden',
                         cursor: 'pointer',
                         transition: 'all 0.4s ease',
-                        animation: `fadeIn 0.5s ease-out ${delay}s both`,
-                        position: 'relative'
+                        animation: `fadeIn 0.5s ease-out ${delay}s both`
                     }}
                     onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-8px)';
@@ -787,7 +1011,6 @@
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '64px',
                         position: 'relative',
                         overflow: 'hidden'
                     }}>
@@ -798,16 +1021,7 @@
                                 width: '100%',
                                 height: '100%',
                                 objectFit: 'cover',
-                                opacity: 0.6,
-                                transition: 'all 0.4s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.target.style.transform = 'scale(1.1)';
-                                e.target.style.opacity = '0.8';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.transform = 'scale(1)';
-                                e.target.style.opacity = '0.6';
+                                opacity: 0.6
                             }}
                         />
                         <div style={{
@@ -836,30 +1050,25 @@
                             {game.title}
                         </h3>
                     </div>
-
-                    <div style={{
-                        position: 'absolute',
-                        top: '12px',
-                        right: '12px',
-                        background: 'rgba(0, 0, 0, 0.6)',
-                        backdropFilter: 'blur(10px)',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        color: 'var(--accent-primary)'
-                    }}>
-                        Play Now
-                    </div>
                 </div>
             );
         }
 
-        // Profile Section
         function ProfileSection({ user, friends }) {
+            const [userStats, setUserStats] = useState({ gamesPlayed: 0, totalTime: 0, achievements: 0 });
+
+            useEffect(() => {
+                if (user) {
+                    db.collection('users').doc(user.uid).onSnapshot((doc) => {
+                        if (doc.exists) {
+                            setUserStats(doc.data().stats || { gamesPlayed: 0, totalTime: 0, achievements: 0 });
+                        }
+                    });
+                }
+            }, [user]);
+
             return (
                 <div style={{ animation: 'fadeIn 0.5s ease-out', maxWidth: '1000px', margin: '0 auto' }}>
-                    {/* Profile Header */}
                     <div style={{
                         background: 'var(--bg-secondary)',
                         border: '1px solid var(--border-color)',
@@ -920,18 +1129,16 @@
                         </div>
                     </div>
 
-                    {/* Stats Grid */}
                     <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '20px',
-                        marginBottom: '30px'
+                        gap: '20px'
                     }}>
                         {[
-                            { label: 'Games Played', value: user.stats.gamesPlayed, icon: '🎮', color: 'var(--accent-primary)' },
+                            { label: 'Games Played', value: userStats.gamesPlayed, icon: '🎮', color: 'var(--accent-primary)' },
                             { label: 'Friends', value: friends.length, icon: '👥', color: 'var(--accent-secondary)' },
-                            { label: 'Total Hours', value: user.stats.totalTime, icon: '⏱️', color: '#ffaa00' },
-                            { label: 'Achievements', value: user.stats.achievements, icon: '🏆', color: '#ff6b9d' }
+                            { label: 'Total Hours', value: userStats.totalTime, icon: '⏱️', color: '#ffaa00' },
+                            { label: 'Achievements', value: userStats.achievements, icon: '🏆', color: '#ff6b9d' }
                         ].map((stat, index) => (
                             <div
                                 key={index}
@@ -974,39 +1181,33 @@
                             </div>
                         ))}
                     </div>
-
-                    {/* Recent Activity */}
-                    <div style={{
-                        background: 'var(--bg-secondary)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '16px',
-                        padding: '24px'
-                    }}>
-                        <h3 style={{
-                            fontSize: '20px',
-                            fontWeight: '700',
-                            marginBottom: '20px'
-                        }}>
-                            Recent Activity
-                        </h3>
-                        <div style={{ color: 'var(--text-secondary)' }}>
-                            <p>• Played Drive Mad - 2 hours ago</p>
-                            <p>• Added Marcus Brown as friend - 5 hours ago</p>
-                            <p>• Completed achievement "Speed Demon" - Yesterday</p>
-                        </div>
-                    </div>
                 </div>
             );
         }
 
-        // Messages Section
-        function MessagesSection({ conversations, activeConversation, messages, onOpenConversation, onSendMessage, onShowGameInvite }) {
+        function MessagesSection({ currentUser, conversations, activeConversation, messages, onOpenConversation, onSendMessage, onShowGameInvite }) {
             const [messageText, setMessageText] = useState('');
+            const messagesEndRef = useRef(null);
+
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
 
             const handleSend = () => {
                 if (messageText.trim()) {
                     onSendMessage(messageText);
                     setMessageText('');
+                }
+            };
+
+            const handleKeyPress = (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
                 }
             };
 
@@ -1049,6 +1250,9 @@
                                 }}>
                                     <div style={{ fontSize: '48px', marginBottom: '16px' }}>💬</div>
                                     <div>No messages yet</div>
+                                    <div style={{ fontSize: '13px', marginTop: '8px' }}>
+                                        Start chatting with friends
+                                    </div>
                                 </div>
                             ) : (
                                 conversations.map(conv => (
@@ -1076,15 +1280,27 @@
                                             }
                                         }}
                                     >
-                                        <img
-                                            src={conv.friendAvatar}
-                                            alt={conv.friendName}
-                                            style={{
-                                                width: '48px',
-                                                height: '48px',
-                                                borderRadius: '12px'
-                                            }}
-                                        />
+                                        <div style={{ position: 'relative' }}>
+                                            <img
+                                                src={conv.friendAvatar}
+                                                alt={conv.friendName}
+                                                style={{
+                                                    width: '48px',
+                                                    height: '48px',
+                                                    borderRadius: '12px'
+                                                }}
+                                            />
+                                            <div style={{
+                                                position: 'absolute',
+                                                bottom: '-2px',
+                                                right: '-2px',
+                                                width: '12px',
+                                                height: '12px',
+                                                background: conv.friendStatus === 'online' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                                                border: '2px solid var(--bg-secondary)',
+                                                borderRadius: '50%'
+                                            }} />
+                                        </div>
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                             <div style={{
                                                 fontWeight: '600',
@@ -1102,7 +1318,7 @@
                                                 overflow: 'hidden',
                                                 textOverflow: 'ellipsis'
                                             }}>
-                                                {conv.lastMessage}
+                                                {conv.lastMessage || 'No messages yet'}
                                             </div>
                                         </div>
                                         {conv.unread > 0 && (
@@ -1157,8 +1373,11 @@
                                         <div style={{ fontWeight: '700', fontSize: '18px' }}>
                                             {activeConversation.friendName}
                                         </div>
-                                        <div style={{ fontSize: '13px', color: 'var(--accent-primary)' }}>
-                                            Online
+                                        <div style={{ 
+                                            fontSize: '13px', 
+                                            color: activeConversation.friendStatus === 'online' ? 'var(--accent-primary)' : 'var(--text-secondary)'
+                                        }}>
+                                            {activeConversation.friendStatus === 'online' ? 'Online' : 'Offline'}
                                         </div>
                                     </div>
                                 </div>
@@ -1178,14 +1397,14 @@
                                             style={{
                                                 display: 'flex',
                                                 gap: '12px',
-                                                alignSelf: msg.senderId === 'me' ? 'flex-end' : 'flex-start',
+                                                alignSelf: msg.senderId === currentUser.uid ? 'flex-end' : 'flex-start',
                                                 maxWidth: '70%',
-                                                flexDirection: msg.senderId === 'me' ? 'row-reverse' : 'row'
+                                                flexDirection: msg.senderId === currentUser.uid ? 'row-reverse' : 'row'
                                             }}
                                         >
                                             <img
-                                                src={msg.senderId === 'me' 
-                                                    ? AuthService.currentUser.photoURL 
+                                                src={msg.senderId === currentUser.uid 
+                                                    ? currentUser.photoURL 
                                                     : activeConversation.friendAvatar}
                                                 alt="Avatar"
                                                 style={{
@@ -1196,10 +1415,10 @@
                                             />
                                             <div>
                                                 <div style={{
-                                                    background: msg.senderId === 'me' 
+                                                    background: msg.senderId === currentUser.uid 
                                                         ? 'var(--accent-primary)' 
                                                         : 'var(--bg-tertiary)',
-                                                    color: msg.senderId === 'me' ? '#000' : 'var(--text-primary)',
+                                                    color: msg.senderId === currentUser.uid ? '#000' : 'var(--text-primary)',
                                                     padding: '12px 16px',
                                                     borderRadius: '12px',
                                                     fontSize: '15px',
@@ -1224,18 +1443,21 @@
                                                             🎮 Game Invite
                                                         </div>
                                                         <div style={{ fontSize: '14px', marginBottom: '8px' }}>
-                                                            {msg.gameInvite.name}
+                                                            {msg.gameInvite.title}
                                                         </div>
-                                                        <button style={{
-                                                            background: 'var(--accent-primary)',
-                                                            color: '#000',
-                                                            border: 'none',
-                                                            padding: '8px 16px',
-                                                            borderRadius: '8px',
-                                                            fontWeight: '600',
-                                                            fontSize: '13px',
-                                                            cursor: 'pointer'
-                                                        }}>
+                                                        <button 
+                                                            onClick={() => window.open(msg.gameInvite.url, '_blank')}
+                                                            style={{
+                                                                background: 'var(--accent-primary)',
+                                                                color: '#000',
+                                                                border: 'none',
+                                                                padding: '8px 16px',
+                                                                borderRadius: '8px',
+                                                                fontWeight: '600',
+                                                                fontSize: '13px',
+                                                                cursor: 'pointer'
+                                                            }}
+                                                        >
                                                             Join Game
                                                         </button>
                                                     </div>
@@ -1244,13 +1466,14 @@
                                                     fontSize: '11px',
                                                     color: 'var(--text-secondary)',
                                                     marginTop: '4px',
-                                                    textAlign: msg.senderId === 'me' ? 'right' : 'left'
+                                                    textAlign: msg.senderId === currentUser.uid ? 'right' : 'left'
                                                 }}>
                                                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </div>
                                             </div>
                                         </div>
                                     ))}
+                                    <div ref={messagesEndRef} />
                                 </div>
 
                                 {/* Input Area */}
@@ -1274,14 +1497,6 @@
                                             cursor: 'pointer',
                                             transition: 'all 0.3s ease'
                                         }}
-                                        onMouseEnter={(e) => {
-                                            e.target.style.background = 'var(--accent-primary)';
-                                            e.target.style.color = '#000';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.target.style.background = 'var(--bg-tertiary)';
-                                            e.target.style.color = 'var(--accent-primary)';
-                                        }}
                                         title="Invite to game"
                                     >
                                         🎮
@@ -1289,12 +1504,7 @@
                                     <textarea
                                         value={messageText}
                                         onChange={(e) => setMessageText(e.target.value)}
-                                        onKeyPress={(e) => {
-                                            if (e.key === 'Enter' && !e.shiftKey) {
-                                                e.preventDefault();
-                                                handleSend();
-                                            }
-                                        }}
+                                        onKeyPress={handleKeyPress}
                                         placeholder="Type a message..."
                                         style={{
                                             flex: 1,
@@ -1314,22 +1524,17 @@
                                     />
                                     <button
                                         onClick={handleSend}
+                                        disabled={!messageText.trim()}
                                         style={{
                                             width: '44px',
                                             height: '44px',
-                                            background: 'var(--accent-primary)',
+                                            background: messageText.trim() ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
                                             border: 'none',
                                             borderRadius: '12px',
-                                            color: '#000',
+                                            color: messageText.trim() ? '#000' : 'var(--text-secondary)',
                                             fontSize: '20px',
-                                            cursor: 'pointer',
+                                            cursor: messageText.trim() ? 'pointer' : 'not-allowed',
                                             transition: 'all 0.3s ease'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.target.style.transform = 'scale(1.05)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.target.style.transform = 'scale(1)';
                                         }}
                                     >
                                         ➤
@@ -1357,7 +1562,6 @@
             );
         }
 
-        // Favorites Section
         function FavoritesSection({ games, onPlayGame }) {
             return (
                 <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
@@ -1403,7 +1607,6 @@
             );
         }
 
-        // Friends Panel
         function FriendsPanel({ friends, onMessageFriend, onAddFriend }) {
             return (
                 <div style={{
@@ -1442,12 +1645,6 @@
                                 cursor: 'pointer',
                                 transition: 'all 0.3s ease'
                             }}
-                            onMouseEnter={(e) => {
-                                e.target.style.transform = 'rotate(90deg) scale(1.1)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.transform = 'rotate(0) scale(1)';
-                            }}
                             title="Add friend"
                         >
                             +
@@ -1468,24 +1665,21 @@
                                     border: '1px solid var(--border-color)',
                                     borderRadius: '12px',
                                     cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    position: 'relative'
+                                    transition: 'all 0.3s ease'
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.background = 'rgba(0, 255, 136, 0.05)';
                                     e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                                    e.currentTarget.style.transform = 'translateX(-4px)';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.background = 'var(--bg-tertiary)';
                                     e.currentTarget.style.borderColor = 'var(--border-color)';
-                                    e.currentTarget.style.transform = 'translateX(0)';
                                 }}
                             >
                                 <div style={{ position: 'relative' }}>
                                     <img
-                                        src={friend.avatar}
-                                        alt={friend.name}
+                                        src={friend.photoURL}
+                                        alt={friend.displayName}
                                         style={{
                                             width: '40px',
                                             height: '40px',
@@ -1512,7 +1706,7 @@
                                         overflow: 'hidden',
                                         textOverflow: 'ellipsis'
                                     }}>
-                                        {friend.name}
+                                        {friend.displayName}
                                     </div>
                                     <div style={{
                                         fontSize: '12px',
@@ -1521,29 +1715,51 @@
                                         overflow: 'hidden',
                                         textOverflow: 'ellipsis'
                                     }}>
-                                        {friend.currentGame || 'Offline'}
+                                        {friend.currentGame || (friend.status === 'online' ? 'Online' : 'Offline')}
                                     </div>
                                 </div>
                             </div>
                         ))}
+
+                        {friends.length === 0 && (
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '40px 20px',
+                                color: 'var(--text-secondary)'
+                            }}>
+                                <div style={{ fontSize: '48px', marginBottom: '16px' }}>👥</div>
+                                <div style={{ fontSize: '14px' }}>No friends yet</div>
+                                <div style={{ fontSize: '12px', marginTop: '8px' }}>
+                                    Click + to add friends
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
         }
 
-        // Add Friend Modal
         function AddFriendModal({ onClose, onAddFriend }) {
             const [email, setEmail] = useState('');
             const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
 
             const handleAdd = async () => {
+                setError('');
+                
                 if (!email.trim() || !email.endsWith('@kcpupils.org')) {
-                    alert('Please enter a valid @kcpupils.org email');
+                    setError('Please enter a valid @kcpupils.org email');
                     return;
                 }
+                
                 setLoading(true);
-                await onAddFriend(email);
-                setLoading(false);
+                try {
+                    await onAddFriend(email);
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
             };
 
             return (
@@ -1602,14 +1818,6 @@
                                     justifyContent: 'center',
                                     transition: 'all 0.3s ease'
                                 }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.color = 'var(--accent-danger)';
-                                    e.target.style.transform = 'rotate(90deg)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.color = 'var(--text-secondary)';
-                                    e.target.style.transform = 'rotate(0)';
-                                }}
                             >
                                 ×
                             </button>
@@ -1619,6 +1827,7 @@
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
                             placeholder="friend@kcpupils.org"
                             style={{
                                 width: '100%',
@@ -1629,16 +1838,23 @@
                                 color: 'var(--text-primary)',
                                 fontSize: '15px',
                                 marginBottom: '20px',
-                                outline: 'none',
-                                transition: 'all 0.3s ease'
-                            }}
-                            onFocus={(e) => {
-                                e.target.style.borderColor = 'var(--accent-primary)';
-                            }}
-                            onBlur={(e) => {
-                                e.target.style.borderColor = 'var(--border-color)';
+                                outline: 'none'
                             }}
                         />
+
+                        {error && (
+                            <div style={{
+                                marginBottom: '20px',
+                                padding: '12px',
+                                background: 'rgba(255, 68, 102, 0.1)',
+                                border: '1px solid var(--accent-danger)',
+                                borderRadius: '8px',
+                                color: 'var(--accent-danger)',
+                                fontSize: '14px'
+                            }}>
+                                {error}
+                            </div>
+                        )}
 
                         <button
                             onClick={handleAdd}
@@ -1646,25 +1862,14 @@
                             style={{
                                 width: '100%',
                                 padding: '14px',
-                                background: 'var(--accent-primary)',
-                                color: '#000',
+                                background: loading ? 'var(--bg-tertiary)' : 'var(--accent-primary)',
+                                color: loading ? 'var(--text-secondary)' : '#000',
                                 border: 'none',
                                 borderRadius: '12px',
                                 fontSize: '16px',
                                 fontWeight: '700',
                                 cursor: loading ? 'not-allowed' : 'pointer',
-                                transition: 'all 0.3s ease',
-                                opacity: loading ? 0.6 : 1
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!loading) {
-                                    e.target.style.transform = 'translateY(-2px)';
-                                    e.target.style.boxShadow = 'var(--shadow-glow)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.transform = 'translateY(0)';
-                                e.target.style.boxShadow = 'none';
+                                transition: 'all 0.3s ease'
                             }}
                         >
                             {loading ? 'Adding...' : 'Add Friend'}
@@ -1674,7 +1879,6 @@
             );
         }
 
-        // Game Invite Modal
         function GameInviteModal({ games, friend, onClose, onInvite }) {
             return (
                 <div
@@ -1726,21 +1930,7 @@
                                     color: 'var(--text-secondary)',
                                     fontSize: '24px',
                                     cursor: 'pointer',
-                                    padding: 0,
-                                    width: '32px',
-                                    height: '32px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    transition: 'all 0.3s ease'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.color = 'var(--accent-danger)';
-                                    e.target.style.transform = 'rotate(90deg)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.color = 'var(--text-secondary)';
-                                    e.target.style.transform = 'rotate(0)';
+                                    padding: 0
                                 }}
                             >
                                 ×
@@ -1775,11 +1965,9 @@
                                     }}
                                     onMouseEnter={(e) => {
                                         e.currentTarget.style.borderColor = game.color;
-                                        e.currentTarget.style.transform = 'translateX(4px)';
                                     }}
                                     onMouseLeave={(e) => {
                                         e.currentTarget.style.borderColor = 'var(--border-color)';
-                                        e.currentTarget.style.transform = 'translateX(0)';
                                     }}
                                 >
                                     <div style={{
@@ -1820,7 +2008,6 @@
             );
         }
 
-        // Game Player Component
         function GamePlayer({ game, onExit }) {
             const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -1844,7 +2031,6 @@
                     flexDirection: 'column',
                     zIndex: 9999
                 }}>
-                    {/* Game Header */}
                     <div style={{
                         background: 'rgba(0, 0, 0, 0.95)',
                         padding: '16px 24px',
@@ -1873,16 +2059,7 @@
                                     color: 'var(--accent-primary)',
                                     fontSize: '14px',
                                     fontWeight: '600',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.background = 'var(--accent-primary)';
-                                    e.target.style.color = '#000';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.background = 'rgba(0, 255, 136, 0.2)';
-                                    e.target.style.color = 'var(--accent-primary)';
+                                    cursor: 'pointer'
                                 }}
                             >
                                 {isFullscreen ? '⛶ Exit Fullscreen' : '⛶ Fullscreen'}
@@ -1898,16 +2075,7 @@
                                     color: 'var(--accent-danger)',
                                     fontSize: '14px',
                                     fontWeight: '600',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.background = 'var(--accent-danger)';
-                                    e.target.style.color = '#fff';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.background = 'rgba(255, 68, 102, 0.2)';
-                                    e.target.style.color = 'var(--accent-danger)';
+                                    cursor: 'pointer'
                                 }}
                             >
                                 ✕ Exit Game
@@ -1915,8 +2083,7 @@
                         </div>
                     </div>
 
-                    {/* Game iframe */}
-                    <div style={{ flex: 1, position: 'relative' }}>
+                    <div style={{ flex: 1 }}>
                         <iframe
                             src={game.url}
                             style={{
