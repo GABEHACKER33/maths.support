@@ -1,46 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Loading...</title>
-  <script>
-    // Replace the current page with about:blank
-    document.addEventListener("DOMContentLoaded", () => {
-      document.open();
-      document.write(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <title>Cookie Clicker</title>
-          <style>
-            html, body {
-              margin: 0;
-              padding: 0;
-              width: 100%;
-              height: 100%;
-              overflow: hidden;
-              background: black;
-            }
-            iframe {
-              width: 100%;
-              height: 100%;
-              border: none;
-            }
-          </style>
-        </head>
-        <body>
-          <iframe
-            src="https://cookieclicker.gabriel-oli-ren-micro.workers.dev/"
-            allowfullscreen>
-          </iframe>
-        </body>
-        </html>
-      `);
-      document.close();
-    });
-  </script>
+  <title>about:blank</title>
 </head>
 <body>
+<script>
+  // Take over the current tab and turn it into about:blank
+  document.open();
+  document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Cookie Clicker</title>
+      <style>
+        html, body {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          background: #000;
+        }
+        iframe {
+          width: 100%;
+          height: 100%;
+          border: none;
+        }
+      </style>
+    </head>
+    <body>
+      <iframe src="https://cookieclicker.gabriel-oli-ren-micro.workers.dev/"></iframe>
+    </body>
+    </html>
+  `);
+  document.close();
+</script>
 </body>
 </html>
