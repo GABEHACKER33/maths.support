@@ -3,1221 +3,1937 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maths Support</title>
-    <link rel="icon" href="maths-logo.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Maths Support - Gaming Platform</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        :root {
-            --primary: #4a6bff;
-            --secondary: #6b4aff;
-            --success: #4aff4a;
-            --danger: #ff4a6b;
-            --nav-w: 80px;
-            --nav-hover: 220px;
-            --friend-w: 320px;
-        }
-
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a28;
+            --accent-primary: #00ff88;
+            --accent-secondary: #00ccff;
+            --accent-danger: #ff4466;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --shadow-glow: 0 0 40px rgba(0, 255, 136, 0.15);
+        }
+
         body {
-            margin: 0;
-            font-family: 'Rajdhani', sans-serif;
-            background: #0f0f13 url('https://i.postimg.cc/KzFQVCHM/Copilot-20251119-203242.png') no-repeat center center fixed;
-            background-size: cover;
-            color: #fff;
+            font-family: 'Manrope', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             overflow-x: hidden;
         }
 
-        /* Login Overlay */
-        #login-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(20px);
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s;
-        }
-        
-        .login-container {
-            background: linear-gradient(135deg, rgba(74, 107, 255, 0.1), rgba(107, 74, 255, 0.1));
-            padding: 50px;
-            border-radius: 25px;
-            border: 2px solid rgba(255,255,255,0.1);
-            text-align: center;
-            width: 400px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-        
-        .login-logo {
-            width: 100px;
-            margin-bottom: 20px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .login-title {
-            font-family: 'Orbitron';
-            font-size: 28px;
-            margin: 0 0 10px 0;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .login-subtitle {
-            font-size: 14px;
-            color: #aaa;
-            margin-bottom: 30px;
-        }
-        
-        .google-btn {
-            background: #fff;
-            color: #000;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            font-size: 16px;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(255,255,255,0.2);
-        }
-        
-        .google-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255,255,255,0.3);
-        }
-        
-        .status-msg {
-            margin-top: 20px;
-            font-size: 13px;
-            min-height: 20px;
-        }
-        
-        .status-msg.error {
-            color: var(--danger);
-        }
-        
-        .status-msg.success {
-            color: var(--success);
-        }
-
-        /* Side Navigation */
-        .side-nav {
-            position: fixed;
-            left: 0;
-            top: 0;
-            height: 100vh;
-            width: var(--nav-w);
-            background: rgba(15, 15, 20, 0.95);
-            backdrop-filter: blur(15px);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            transition: width 0.3s ease;
-            border-right: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .side-nav:hover {
-            width: var(--nav-hover);
-        }
-        
-        .nav-logo {
-            padding: 25px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .nav-logo img {
-            width: 45px;
-            transition: transform 0.3s;
-        }
-        
-        .side-nav:hover .nav-logo img {
-            transform: rotate(360deg);
-        }
-        
-        .nav-item {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            padding: 18px 0;
-            color: #ccc;
-            text-decoration: none;
-            transition: all 0.2s;
-            position: relative;
-        }
-        
-        .nav-item::before {
+        body::before {
             content: '';
-            position: absolute;
-            left: 0;
-            height: 100%;
-            width: 4px;
-            background: var(--primary);
-            transform: scaleY(0);
-            transition: transform 0.2s;
-        }
-        
-        .nav-item:hover::before,
-        .nav-item.active::before {
-            transform: scaleY(1);
-        }
-        
-        .nav-item i {
-            min-width: var(--nav-w);
-            text-align: center;
-            font-size: 22px;
-        }
-        
-        .nav-item span {
-            opacity: 0;
-            white-space: nowrap;
-            font-weight: 600;
-            font-size: 15px;
-            transition: opacity 0.2s;
-        }
-        
-        .side-nav:hover .nav-item span {
-            opacity: 1;
-        }
-        
-        .nav-item:hover,
-        .nav-item.active {
-            color: var(--primary);
-            background: rgba(74, 107, 255, 0.1);
-        }
-        
-        .nav-spacer {
-            flex: 1;
-        }
-
-        /* Friends Sidebar */
-        .friends-sidebar {
-            position: fixed;
-            right: 0;
-            top: 0;
-            height: 100vh;
-            width: var(--friend-w);
-            background: rgba(15, 15, 20, 0.95);
-            backdrop-filter: blur(15px);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            border-left: 1px solid rgba(255,255,255,0.1);
-            padding: 20px;
-            overflow-y: auto;
-        }
-        
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .user-profile:hover {
-            background: rgba(255,255,255,0.08);
-            transform: translateY(-2px);
-        }
-        
-        .user-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-            object-fit: cover;
-        }
-        
-        .user-info {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .user-info h4 {
-            margin: 0 0 4px 0;
-            font-size: 16px;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .user-info p {
-            margin: 0;
-            font-size: 12px;
-            color: #aaa;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .friends-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .friends-header h3 {
-            font-family: 'Orbitron';
-            font-size: 14px;
-            margin: 0;
-            letter-spacing: 1px;
-        }
-        
-        .add-friend-btn {
-            background: var(--primary);
-            border: none;
-            color: #fff;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        
-        .add-friend-btn:hover {
-            background: var(--secondary);
-            transform: rotate(90deg);
-        }
-        
-        .friend-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            background: rgba(255,255,255,0.03);
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-        
-        .friend-item:hover {
-            background: rgba(74, 107, 255, 0.15);
-            transform: translateX(-3px);
-        }
-        
-        .friend-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #333;
-            object-fit: cover;
-            position: relative;
-        }
-        
-        .friend-status {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 2px solid #1a1a21;
-            background: #ff4a6b;
-        }
-        
-        .friend-status.online {
-            background: var(--success);
-        }
-        
-        .friend-info {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .friend-name {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .friend-game {
-            font-size: 12px;
-            color: #aaa;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .message-indicator {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--danger);
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: var(--nav-w);
-            margin-right: var(--friend-w);
-            padding: 30px;
-            min-height: 100vh;
-        }
-        
-        .content-section {
-            display: none;
-        }
-        
-        .content-section.active {
-            display: block;
-        }
-        
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        
-        .page-title {
-            font-family: 'Orbitron';
-            font-size: 28px;
-            margin: 0;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .search-box {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 25px;
-            width: 320px;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        
-        .search-box:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: rgba(255,255,255,0.08);
-        }
-        
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 25px;
-            max-width: 1600px;
-        }
-        
-        .game-card {
-            background: #1a1a21;
-            border-radius: 15px;
-            overflow: hidden;
-            height: 220px;
-            position: relative;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.4s ease;
-        }
-        
-        .game-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--primary);
-            box-shadow: 0 15px 40px rgba(74, 107, 255, 0.4);
-        }
-        
-        .game-card-preview {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s;
-            opacity: 0.85;
-        }
-        
-        .game-card:hover .game-card-preview {
-            transform: scale(1.1);
-            opacity: 1;
-        }
-        
-        .game-card-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px;
-            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
-        }
-        
-        .game-card-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin: 0 0 5px 0;
-            font-family: 'Orbitron';
-        }
-        
-        .game-card-tag {
-            font-size: 12px;
-            color: var(--primary);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Game Container */
-        #game-container {
-            display: none;
             position: fixed;
             inset: 0;
-            background: #000;
-            z-index: 9999;
-            flex-direction: column;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 136, 0.03), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(0, 204, 255, 0.03), transparent 40%);
+            pointer-events: none;
+            z-index: 0;
         }
-        
-        .game-header {
-            background: rgba(0,0,0,0.95);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .game-title {
-            font-family: 'Orbitron';
-            font-size: 18px;
-            margin: 0;
-        }
-        
-        .game-controls {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .control-btn {
-            background: rgba(74, 107, 255, 0.8);
-            border: none;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .control-btn:hover {
-            background: var(--primary);
-            transform: translateY(-2px);
-        }
-        
-        .control-btn.exit {
-            background: rgba(255, 74, 107, 0.8);
-        }
-        
-        .control-btn.exit:hover {
-            background: var(--danger);
-        }
-        
-        #game-iframe-container {
-            flex: 1;
+
+        #root {
             position: relative;
-        }
-        
-        #game-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+            z-index: 1;
         }
 
-        /* Profile Page */
-        .profile-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .profile-header {
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-        
-        .profile-avatar-large {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid var(--primary);
-            object-fit: cover;
-        }
-        
-        .profile-details h2 {
-            margin: 0 0 10px 0;
-            font-size: 32px;
-            font-family: 'Orbitron';
-        }
-        
-        .profile-details p {
-            margin: 0;
-            color: #aaa;
-            font-size: 16px;
-        }
-        
-        .profile-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .stat-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 0;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: #aaa;
-            margin: 5px 0 0 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Messages */
-        .messages-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: rgba(255,255,255,0.03);
-            border-radius: 20px;
-            overflow: hidden;
-            height: calc(100vh - 200px);
-            display: flex;
-        }
-        
-        .conversations-list {
-            width: 320px;
-            border-right: 1px solid rgba(255,255,255,0.1);
-            overflow-y: auto;
-        }
-        
-        .conversation-item {
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        
-        .conversation-item:hover,
-        .conversation-item.active {
-            background: rgba(74, 107, 255, 0.1);
-        }
-        
-        .conversation-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        
-        .conversation-info {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .conversation-name {
-            font-weight: 600;
-            margin: 0 0 4px 0;
-            font-size: 15px;
-        }
-        
-        .conversation-preview {
-            font-size: 13px;
-            color: #aaa;
-            margin: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .chat-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .message {
-            display: flex;
-            gap: 10px;
-            max-width: 70%;
-        }
-        
-        .message.sent {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-        
-        .message-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        
-        .message-content {
-            background: rgba(255,255,255,0.08);
-            padding: 12px 16px;
-            border-radius: 15px;
-        }
-        
-        .message.sent .message-content {
-            background: var(--primary);
-        }
-        
-        .message-text {
-            margin: 0;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-        
-        .message-time {
-            font-size: 11px;
-            color: #aaa;
-            margin: 4px 0 0 0;
-        }
-        
-        .game-invite {
-            background: rgba(74, 107, 255, 0.2);
-            border: 1px solid var(--primary);
-            padding: 15px;
-            border-radius: 12px;
-            margin-top: 8px;
-        }
-        
-        .game-invite-title {
-            font-weight: 600;
-            margin: 0 0 8px 0;
-            color: var(--primary);
-        }
-        
-        .join-game-btn {
-            background: var(--primary);
-            border: none;
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: all 0.3s;
-        }
-        
-        .join-game-btn:hover {
-            background: var(--secondary);
-        }
-        
-        .chat-input-area {
-            padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            gap: 10px;
-        }
-        
-        .chat-input {
-            flex: 1;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #fff;
-            padding: 12px 16px;
-            border-radius: 25px;
-            font-size: 14px;
-            resize: none;
-            font-family: 'Rajdhani', sans-serif;
-        }
-        
-        .chat-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        .send-btn, .invite-btn {
-            background: var(--primary);
-            border: none;
-            color: #fff;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        
-        .send-btn:hover, .invite-btn:hover {
-            background: var(--secondary);
-            transform: scale(1.1);
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
         }
 
-        /* Modal */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(20px);
-            z-index: 10001;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal.show {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: linear-gradient(135deg, rgba(74, 107, 255, 0.1), rgba(107, 74, 255, 0.1));
-            padding: 40px;
-            border-radius: 20px;
-            border: 2px solid rgba(255,255,255,0.1);
-            width: 450px;
-            max-width: 90%;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-        
-        .modal-title {
-            font-family: 'Orbitron';
-            font-size: 22px;
-            margin: 0;
-        }
-        
-        .close-modal {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        
-        .close-modal:hover {
-            color: var(--danger);
-            transform: rotate(90deg);
-        }
-        
-        .modal-input {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #fff;
-            padding: 14px 18px;
-            border-radius: 10px;
-            width: 100%;
-            margin-bottom: 15px;
-            font-size: 15px;
-            font-family: 'Rajdhani', sans-serif;
-        }
-        
-        .modal-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: rgba(255,255,255,0.12);
-        }
-        
-        .modal-btn {
-            background: var(--primary);
-            border: none;
-            color: #fff;
-            padding: 14px 28px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 700;
-            width: 100%;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        .modal-btn:hover {
-            background: var(--secondary);
-            transform: translateY(-2px);
-        }
-        
-        .modal-btn.secondary {
-            background: rgba(255,255,255,0.1);
-            margin-top: 10px;
-        }
-        
-        .modal-btn.secondary:hover {
-            background: rgba(255,255,255,0.15);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        /* Empty States */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #aaa;
-        }
-        
-        .empty-state i {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-        
-        .empty-state h3 {
-            margin: 0 0 10px 0;
-            font-size: 24px;
-        }
-        
-        .empty-state p {
-            margin: 0;
-            font-size: 14px;
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
 
         /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: rgba(74, 107, 255, 0.5);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
+            height: 8px;
         }
 
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .friends-sidebar {
-                display: none;
-            }
-            .main-content {
-                margin-right: 0;
-            }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
         }
-        
-        @media (max-width: 768px) {
-            .side-nav {
-                width: 60px;
-            }
-            .main-content {
-                margin-left: 60px;
-                padding: 20px;
-            }
-            .game-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 15px;
-            }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-secondary);
         }
     </style>
 </head>
 <body>
+    <div id="root"></div>
 
-<!-- Login Overlay -->
-<div id="login-overlay">
-    <div class="login-container">
-        <img src="maths-logo.png" class="login-logo" alt="Logo">
-        <h1 class="login-title">MATHS SUPPORT</h1>
-        <p class="login-subtitle">Sign in with your @kcpupils.org account</p>
-        <button class="google-btn" id="login-btn">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="Google">
-            <span>Continue with Google</span>
-        </button>
-        <div class="status-msg" id="login-status"></div>
-    </div>
-</div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-<!-- Main App -->
-<div id="main-app" style="display: none;">
-    <!-- Side Navigation -->
-    <nav class="side-nav">
-        <div class="nav-logo">
-            <img src="maths-logo.png" alt="Logo">
-        </div>
-        <a href="#" class="nav-item active" data-section="games">
-            <i class="fas fa-gamepad"></i>
-            <span>Games</span>
-        </a>
-        <a href="#" class="nav-item" data-section="profile">
-            <i class="fas fa-user"></i>
-            <span>Profile</span>
-        </a>
-        <a href="#" class="nav-item" data-section="messages">
-            <i class="fas fa-comments"></i>
-            <span>Messages</span>
-        </a>
-        <a href="#" class="nav-item" data-section="favorites">
-            <i class="fas fa-star"></i>
-            <span>Favorites</span>
-        </a>
-        <div class="nav-spacer"></div>
-        <a href="#" class="nav-item" id="logout-btn">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-        </a>
-    </nav>
-
-    <!-- Friends Sidebar -->
-    <aside class="friends-sidebar">
-        <div class="user-profile" id="user-profile-click">
-            <img class="user-avatar" id="sidebar-avatar" src="https://via.placeholder.com/48" alt="User">
-            <div class="user-info">
-                <h4 id="sidebar-name">User</h4>
-                <p id="sidebar-email">user@kcpupils.org</p>
-            </div>
-        </div>
-        
-        <div class="friends-header">
-            <h3>FRIENDS</h3>
-            <button class="add-friend-btn" id="add-friend-btn">
-                <i class="fas fa-user-plus"></i>
-            </button>
-        </div>
-        
-        <div id="friends-list"></div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Games Section -->
-        <section id="games-section" class="content-section active">
-            <div class="page-header">
-                <h1 class="page-title">GAME LIBRARY</h1>
-                <input type="text" class="search-box" id="game-search" placeholder="Search games...">
-            </div>
+        // Mock Authentication Service
+        const AuthService = {
+            currentUser: null,
             
-            <div class="game-grid" id="game-grid">
-                <div class="game-card" data-search="drive mad car racing vehicle" 
-                     data-url="https://games.playtropolis.com/drive-mad-v2/" 
-                     data-title="Drive Mad">
-                    <img class="game-card-preview" src="img/drive-mad.png" alt="Drive Mad">
-                    <div class="game-card-overlay">
-                        <h3 class="game-card-title">Drive Mad</h3>
-                        <p class="game-card-tag">Racing</p>
-                    </div>
-                </div>
-                <!-- Add more game cards here -->
-            </div>
-        </section>
+            signInWithGoogle: async () => {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const mockUser = {
+                            uid: 'user_' + Date.now(),
+                            email: 'student@kcpupils.org',
+                            displayName: 'Alex Johnson',
+                            photoURL: `https://api.dicebear.com/7.x/avataaars/svg?seed=${Date.now()}`,
+                            stats: {
+                                gamesPlayed: 47,
+                                totalTime: 23,
+                                achievements: 12
+                            }
+                        };
+                        AuthService.currentUser = mockUser;
+                        localStorage.setItem('mathsUser', JSON.stringify(mockUser));
+                        resolve(mockUser);
+                    }, 1500);
+                });
+            },
 
-        <!-- Profile Section -->
-        <section id="profile-section" class="content-section">
-            <div class="profile-container">
-                <div class="profile-header">
-                    <img class="profile-avatar-large" id="profile-avatar" src="https://via.placeholder.com/120" alt="Profile">
-                    <div class="profile-details">
-                        <h2 id="profile-name">User Name</h2>
-                        <p id="profile-email">user@kcpupils.org</p>
-                    </div>
-                </div>
-                
-                <div class="profile-stats">
-                    <div class="stat-card">
-                        <h3 class="stat-value" id="games-played">0</h3>
-                        <p class="stat-label">Games Played</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3 class="stat-value" id="friends-count">0</h3>
-                        <p class="stat-label">Friends</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3 class="stat-value" id="total-time">0h</h3>
-                        <p class="stat-label">Total Time</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+            signOut: () => {
+                AuthService.currentUser = null;
+                localStorage.removeItem('mathsUser');
+            },
 
-        <!-- Messages Section -->
-        <section id="messages-section" class="content-section">
-            <div class="page-header">
-                <h1 class="page-title">MESSAGES</h1>
-            </div>
-            
-            <div class="messages-container">
-                <div class="conversations-list" id="conversations-list">
-                    <div class="empty-state">
-                        <i class="fas fa-comments"></i>
-                        <h3>No Messages</h3>
-                        <p>Start chatting with friends</p>
-                    </div>
-                </div>
-                
-                <div class="chat-area" id="chat-area" style="display: none;">
-                    <div class="chat-header">
-                        <img class="conversation-avatar" id="chat-avatar" src="https://via.placeholder.com/48" alt="Friend">
-                        <div>
-                            <h3 style="margin: 0; font-size: 18px;" id="chat-name">Friend Name</h3>
-                            <p style="margin: 0; font-size: 13px; color: #aaa;" id="chat-status">Online</p>
+            getCurrentUser: () => {
+                const stored = localStorage.getItem('mathsUser');
+                if (stored) {
+                    AuthService.currentUser = JSON.parse(stored);
+                    return AuthService.currentUser;
+                }
+                return null;
+            }
+        };
+
+        // Mock Database Service
+        const DatabaseService = {
+            getFriends: async (userId) => {
+                return [
+                    { id: '1', name: 'Sarah Chen', email: 'sarah.chen@kcpupils.org', status: 'online', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah', currentGame: 'Drive Mad' },
+                    { id: '2', name: 'Marcus Brown', email: 'marcus.brown@kcpupils.org', status: 'online', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus', currentGame: 'Subway Surfers' },
+                    { id: '3', name: 'Emma Wilson', email: 'emma.wilson@kcpupils.org', status: 'offline', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma', currentGame: null },
+                    { id: '4', name: 'James Lee', email: 'james.lee@kcpupils.org', status: 'online', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=James', currentGame: 'Tetris' },
+                ];
+            },
+
+            getConversations: async (userId) => {
+                return [
+                    { 
+                        id: '1', 
+                        friendId: '1',
+                        friendName: 'Sarah Chen', 
+                        friendAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+                        lastMessage: 'Want to play Drive Mad?',
+                        timestamp: new Date(Date.now() - 300000),
+                        unread: 2
+                    },
+                    { 
+                        id: '2', 
+                        friendId: '2',
+                        friendName: 'Marcus Brown', 
+                        friendAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus',
+                        lastMessage: 'GG! That was intense',
+                        timestamp: new Date(Date.now() - 3600000),
+                        unread: 0
+                    }
+                ];
+            },
+
+            getMessages: async (conversationId) => {
+                const mockMessages = {
+                    '1': [
+                        { id: '1', senderId: '1', text: 'Hey! Are you free?', timestamp: new Date(Date.now() - 600000) },
+                        { id: '2', senderId: 'me', text: 'Yeah! What\'s up?', timestamp: new Date(Date.now() - 540000) },
+                        { id: '3', senderId: '1', text: 'Want to play Drive Mad?', timestamp: new Date(Date.now() - 300000), gameInvite: { name: 'Drive Mad', url: 'https://games.playtropolis.com/drive-mad-v2/' } },
+                    ],
+                    '2': [
+                        { id: '1', senderId: '2', text: 'That race was crazy!', timestamp: new Date(Date.now() - 7200000) },
+                        { id: '2', senderId: 'me', text: 'I know right! You almost had me', timestamp: new Date(Date.now() - 7000000) },
+                        { id: '3', senderId: '2', text: 'GG! That was intense', timestamp: new Date(Date.now() - 3600000) },
+                    ]
+                };
+                return mockMessages[conversationId] || [];
+            },
+
+            sendMessage: async (conversationId, message) => {
+                return { id: Date.now().toString(), ...message, timestamp: new Date() };
+            },
+
+            addFriend: async (email) => {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve({ 
+                            id: Date.now().toString(), 
+                            name: email.split('@')[0], 
+                            email, 
+                            status: 'offline', 
+                            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
+                            currentGame: null
+                        });
+                    }, 1000);
+                });
+            }
+        };
+
+        // Games Data
+        const GAMES = [
+            { id: '1', title: 'Drive Mad', category: 'Racing', url: 'https://games.playtropolis.com/drive-mad-v2/', thumbnail: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=400&h=300&fit=crop', color: '#ff4466' },
+            { id: '2', title: 'Subway Surfers', category: 'Endless Runner', url: 'https://poki.com/en/g/subway-surfers', thumbnail: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop', color: '#00ccff' },
+            { id: '3', title: 'Tetris', category: 'Puzzle', url: 'https://tetris.com/play-tetris', thumbnail: 'https://images.unsplash.com/photo-1607853202273-797f1c22a38e?w=400&h=300&fit=crop', color: '#00ff88' },
+            { id: '4', title: 'Snake', category: 'Arcade', url: 'https://playsnake.org/', thumbnail: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400&h=300&fit=crop', color: '#ffaa00' },
+            { id: '5', title: 'Chess', category: 'Strategy', url: 'https://www.chess.com/play/computer', thumbnail: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&h=300&fit=crop', color: '#8844ff' },
+            { id: '6', title: '2048', category: 'Puzzle', url: 'https://play2048.co/', thumbnail: 'https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=400&h=300&fit=crop', color: '#ff6b9d' },
+            { id: '7', title: 'Minesweeper', category: 'Logic', url: 'https://minesweeper.online/', thumbnail: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=300&fit=crop', color: '#66ddff' },
+            { id: '8', title: 'Pac-Man', category: 'Arcade', url: 'https://www.google.com/logos/2010/pacman10-i.html', thumbnail: 'https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&h=300&fit=crop', color: '#ffdd00' },
+        ];
+
+        // Login Screen Component
+        function LoginScreen({ onLoginSuccess }) {
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+
+            const handleGoogleSignIn = async () => {
+                setLoading(true);
+                setError('');
+                try {
+                    const user = await AuthService.signInWithGoogle();
+                    onLoginSuccess(user);
+                } catch (err) {
+                    setError('Failed to sign in. Please try again.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--bg-primary)',
+                    animation: 'fadeIn 0.6s ease-out'
+                }}>
+                    <div style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '24px',
+                        padding: '60px 50px',
+                        maxWidth: '440px',
+                        width: '90%',
+                        textAlign: 'center',
+                        boxShadow: 'var(--shadow-glow)'
+                    }}>
+                        {/* Logo */}
+                        <div style={{
+                            width: '80px',
+                            height: '80px',
+                            margin: '0 auto 30px',
+                            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                            borderRadius: '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '40px',
+                            animation: 'float 3s ease-in-out infinite'
+                        }}>
+                            🎮
+                        </div>
+
+                        <h1 style={{
+                            fontSize: '32px',
+                            fontWeight: '800',
+                            marginBottom: '12px',
+                            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                        }}>
+                            Maths Support
+                        </h1>
+
+                        <p style={{
+                            color: 'var(--text-secondary)',
+                            marginBottom: '40px',
+                            fontSize: '15px'
+                        }}>
+                            Sign in with your @kcpupils.org account to access games, chat with friends, and track your progress
+                        </p>
+
+                        <button
+                            onClick={handleGoogleSignIn}
+                            disabled={loading}
+                            style={{
+                                width: '100%',
+                                padding: '16px',
+                                background: '#fff',
+                                color: '#000',
+                                border: 'none',
+                                borderRadius: '12px',
+                                fontSize: '16px',
+                                fontWeight: '700',
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '12px',
+                                transition: 'all 0.3s ease',
+                                opacity: loading ? 0.6 : 1
+                            }}
+                            onMouseEnter={(e) => {
+                                if (!loading) {
+                                    e.target.style.transform = 'translateY(-2px)';
+                                    e.target.style.boxShadow = '0 8px 24px rgba(255,255,255,0.2)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = 'none';
+                            }}
+                        >
+                            {loading ? (
+                                <>
+                                    <div style={{ 
+                                        width: '20px', 
+                                        height: '20px', 
+                                        border: '3px solid #ddd', 
+                                        borderTop: '3px solid #000',
+                                        borderRadius: '50%',
+                                        animation: 'spin 1s linear infinite'
+                                    }} />
+                                    <span>Signing in...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <svg width="20" height="20" viewBox="0 0 24 24">
+                                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                    </svg>
+                                    <span>Continue with Google</span>
+                                </>
+                            )}
+                        </button>
+
+                        {error && (
+                            <div style={{
+                                marginTop: '20px',
+                                padding: '12px',
+                                background: 'rgba(255, 68, 102, 0.1)',
+                                border: '1px solid var(--accent-danger)',
+                                borderRadius: '8px',
+                                color: 'var(--accent-danger)',
+                                fontSize: '14px'
+                            }}>
+                                {error}
+                            </div>
+                        )}
+
+                        <div style={{
+                            marginTop: '30px',
+                            fontSize: '13px',
+                            color: 'var(--text-secondary)',
+                            lineHeight: '1.6'
+                        }}>
+                            By signing in, you agree to our Terms of Service and Privacy Policy
                         </div>
                     </div>
-                    
-                    <div class="chat-messages" id="chat-messages"></div>
-                    
-                    <div class="chat-input-area">
-                        <textarea class="chat-input" id="message-input" placeholder="Type a message..." rows="1"></textarea>
-                        <button class="invite-btn" id="invite-game-btn" title="Invite to game">
-                            <i class="fas fa-gamepad"></i>
+
+                    <style>{`
+                        @keyframes float {
+                            0%, 100% { transform: translateY(0); }
+                            50% { transform: translateY(-10px); }
+                        }
+                        @keyframes spin {
+                            to { transform: rotate(360deg); }
+                        }
+                    `}</style>
+                </div>
+            );
+        }
+
+        // Main App Component
+        function App() {
+            const [user, setUser] = useState(null);
+            const [activeSection, setActiveSection] = useState('games');
+            const [friends, setFriends] = useState([]);
+            const [conversations, setConversations] = useState([]);
+            const [activeConversation, setActiveConversation] = useState(null);
+            const [messages, setMessages] = useState([]);
+            const [currentGame, setCurrentGame] = useState(null);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [showAddFriend, setShowAddFriend] = useState(false);
+            const [showGameInvite, setShowGameInvite] = useState(false);
+            const [selectedFriend, setSelectedFriend] = useState(null);
+
+            useEffect(() => {
+                const existingUser = AuthService.getCurrentUser();
+                if (existingUser) {
+                    setUser(existingUser);
+                    loadUserData(existingUser);
+                }
+            }, []);
+
+            const loadUserData = async (user) => {
+                const friendsList = await DatabaseService.getFriends(user.uid);
+                setFriends(friendsList);
+
+                const convos = await DatabaseService.getConversations(user.uid);
+                setConversations(convos);
+            };
+
+            const handleLogin = (loggedInUser) => {
+                setUser(loggedInUser);
+                loadUserData(loggedInUser);
+            };
+
+            const handleLogout = () => {
+                AuthService.signOut();
+                setUser(null);
+                setActiveSection('games');
+                setFriends([]);
+                setConversations([]);
+            };
+
+            const openConversation = async (conversation) => {
+                setActiveConversation(conversation);
+                const msgs = await DatabaseService.getMessages(conversation.id);
+                setMessages(msgs);
+            };
+
+            const sendMessage = async (text, gameInvite = null) => {
+                if (!text.trim() && !gameInvite) return;
+
+                const newMessage = {
+                    senderId: 'me',
+                    text,
+                    gameInvite
+                };
+
+                const sentMessage = await DatabaseService.sendMessage(activeConversation.id, newMessage);
+                setMessages([...messages, sentMessage]);
+            };
+
+            const playGame = (game) => {
+                setCurrentGame(game);
+            };
+
+            const exitGame = () => {
+                setCurrentGame(null);
+            };
+
+            const filteredGames = GAMES.filter(game => 
+                game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                game.category.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+
+            if (!user) {
+                return <LoginScreen onLoginSuccess={handleLogin} />;
+            }
+
+            if (currentGame) {
+                return <GamePlayer game={currentGame} onExit={exitGame} />;
+            }
+
+            return (
+                <div style={{ display: 'flex', height: '100vh' }}>
+                    {/* Sidebar Navigation */}
+                    <Sidebar 
+                        activeSection={activeSection}
+                        onSectionChange={setActiveSection}
+                        onLogout={handleLogout}
+                    />
+
+                    {/* Main Content */}
+                    <MainContent
+                        activeSection={activeSection}
+                        user={user}
+                        friends={friends}
+                        conversations={conversations}
+                        activeConversation={activeConversation}
+                        messages={messages}
+                        games={filteredGames}
+                        searchQuery={searchQuery}
+                        onSearchChange={setSearchQuery}
+                        onPlayGame={playGame}
+                        onOpenConversation={openConversation}
+                        onSendMessage={sendMessage}
+                        onShowAddFriend={() => setShowAddFriend(true)}
+                        onShowGameInvite={(friend) => {
+                            setSelectedFriend(friend);
+                            setShowGameInvite(true);
+                        }}
+                    />
+
+                    {/* Friends Panel */}
+                    <FriendsPanel 
+                        friends={friends}
+                        onMessageFriend={(friend) => {
+                            const conv = conversations.find(c => c.friendId === friend.id) || {
+                                id: friend.id,
+                                friendId: friend.id,
+                                friendName: friend.name,
+                                friendAvatar: friend.avatar,
+                                lastMessage: '',
+                                timestamp: new Date(),
+                                unread: 0
+                            };
+                            openConversation(conv);
+                            setActiveSection('messages');
+                        }}
+                        onAddFriend={() => setShowAddFriend(true)}
+                    />
+
+                    {/* Modals */}
+                    {showAddFriend && (
+                        <AddFriendModal
+                            onClose={() => setShowAddFriend(false)}
+                            onAddFriend={async (email) => {
+                                const newFriend = await DatabaseService.addFriend(email);
+                                setFriends([...friends, newFriend]);
+                                setShowAddFriend(false);
+                            }}
+                        />
+                    )}
+
+                    {showGameInvite && (
+                        <GameInviteModal
+                            games={GAMES}
+                            friend={selectedFriend}
+                            onClose={() => setShowGameInvite(false)}
+                            onInvite={(game) => {
+                                sendMessage(`Let's play ${game.title}!`, game);
+                                setShowGameInvite(false);
+                            }}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        // Sidebar Component
+        function Sidebar({ activeSection, onSectionChange, onLogout }) {
+            const sections = [
+                { id: 'games', icon: '🎮', label: 'Games' },
+                { id: 'profile', icon: '👤', label: 'Profile' },
+                { id: 'messages', icon: '💬', label: 'Messages' },
+                { id: 'favorites', icon: '⭐', label: 'Favorites' }
+            ];
+
+            return (
+                <div style={{
+                    width: '80px',
+                    background: 'var(--bg-secondary)',
+                    borderRight: '1px solid var(--border-color)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: '20px 0',
+                    gap: '10px'
+                }}>
+                    {/* Logo */}
+                    <div style={{
+                        width: '48px',
+                        height: '48px',
+                        background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '24px',
+                        marginBottom: '20px'
+                    }}>
+                        🎮
+                    </div>
+
+                    {/* Navigation Items */}
+                    {sections.map(section => (
+                        <button
+                            key={section.id}
+                            onClick={() => onSectionChange(section.id)}
+                            style={{
+                                width: '56px',
+                                height: '56px',
+                                background: activeSection === section.id ? 'rgba(0, 255, 136, 0.1)' : 'transparent',
+                                border: activeSection === section.id ? '1px solid var(--accent-primary)' : '1px solid transparent',
+                                borderRadius: '14px',
+                                color: activeSection === section.id ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                                fontSize: '24px',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease',
+                                position: 'relative'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (activeSection !== section.id) {
+                                    e.target.style.background = 'rgba(255, 255, 255, 0.05)';
+                                    e.target.style.transform = 'translateY(-2px)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (activeSection !== section.id) {
+                                    e.target.style.background = 'transparent';
+                                    e.target.style.transform = 'translateY(0)';
+                                }
+                            }}
+                            title={section.label}
+                        >
+                            {section.icon}
                         </button>
-                        <button class="send-btn" id="send-message-btn">
-                            <i class="fas fa-paper-plane"></i>
+                    ))}
+
+                    {/* Spacer */}
+                    <div style={{ flex: 1 }} />
+
+                    {/* Logout */}
+                    <button
+                        onClick={onLogout}
+                        style={{
+                            width: '56px',
+                            height: '56px',
+                            background: 'transparent',
+                            border: '1px solid transparent',
+                            borderRadius: '14px',
+                            color: 'var(--accent-danger)',
+                            fontSize: '24px',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.target.style.background = 'rgba(255, 68, 102, 0.1)';
+                            e.target.style.borderColor = 'var(--accent-danger)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.background = 'transparent';
+                            e.target.style.borderColor = 'transparent';
+                        }}
+                        title="Logout"
+                    >
+                        🚪
+                    </button>
+                </div>
+            );
+        }
+
+        // Main Content Component
+        function MainContent({ 
+            activeSection, user, friends, conversations, activeConversation, messages,
+            games, searchQuery, onSearchChange, onPlayGame, onOpenConversation, 
+            onSendMessage, onShowAddFriend, onShowGameInvite 
+        }) {
+            return (
+                <div style={{ flex: 1, overflow: 'auto', padding: '40px' }}>
+                    {activeSection === 'games' && (
+                        <GamesSection 
+                            games={games}
+                            searchQuery={searchQuery}
+                            onSearchChange={onSearchChange}
+                            onPlayGame={onPlayGame}
+                        />
+                    )}
+
+                    {activeSection === 'profile' && (
+                        <ProfileSection user={user} friends={friends} />
+                    )}
+
+                    {activeSection === 'messages' && (
+                        <MessagesSection
+                            conversations={conversations}
+                            activeConversation={activeConversation}
+                            messages={messages}
+                            onOpenConversation={onOpenConversation}
+                            onSendMessage={onSendMessage}
+                            onShowGameInvite={onShowGameInvite}
+                        />
+                    )}
+
+                    {activeSection === 'favorites' && (
+                        <FavoritesSection games={games.slice(0, 3)} onPlayGame={onPlayGame} />
+                    )}
+                </div>
+            );
+        }
+
+        // Games Section
+        function GamesSection({ games, searchQuery, onSearchChange, onPlayGame }) {
+            return (
+                <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '40px'
+                    }}>
+                        <h1 style={{
+                            fontSize: '36px',
+                            fontWeight: '800',
+                            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                        }}>
+                            Game Library
+                        </h1>
+
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => onSearchChange(e.target.value)}
+                            placeholder="Search games..."
+                            style={{
+                                padding: '12px 20px',
+                                background: 'var(--bg-secondary)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '12px',
+                                color: 'var(--text-primary)',
+                                fontSize: '15px',
+                                width: '300px',
+                                outline: 'none',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onFocus={(e) => {
+                                e.target.style.borderColor = 'var(--accent-primary)';
+                                e.target.style.background = 'var(--bg-tertiary)';
+                            }}
+                            onBlur={(e) => {
+                                e.target.style.borderColor = 'var(--border-color)';
+                                e.target.style.background = 'var(--bg-secondary)';
+                            }}
+                        />
+                    </div>
+
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                        gap: '24px'
+                    }}>
+                        {games.map((game, index) => (
+                            <GameCard 
+                                key={game.id} 
+                                game={game} 
+                                onPlay={onPlayGame}
+                                delay={index * 0.05}
+                            />
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // Game Card Component
+        function GameCard({ game, onPlay, delay }) {
+            return (
+                <div
+                    onClick={() => onPlay(game)}
+                    style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '16px',
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        transition: 'all 0.4s ease',
+                        animation: `fadeIn 0.5s ease-out ${delay}s both`,
+                        position: 'relative'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-8px)';
+                        e.currentTarget.style.borderColor = game.color;
+                        e.currentTarget.style.boxShadow = `0 20px 40px ${game.color}40`;
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.borderColor = 'var(--border-color)';
+                        e.currentTarget.style.boxShadow = 'none';
+                    }}
+                >
+                    <div style={{
+                        height: '180px',
+                        background: `linear-gradient(135deg, ${game.color}40, ${game.color}20)`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '64px',
+                        position: 'relative',
+                        overflow: 'hidden'
+                    }}>
+                        <img 
+                            src={game.thumbnail} 
+                            alt={game.title}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                opacity: 0.6,
+                                transition: 'all 0.4s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.transform = 'scale(1.1)';
+                                e.target.style.opacity = '0.8';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = 'scale(1)';
+                                e.target.style.opacity = '0.6';
+                            }}
+                        />
+                        <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            background: `linear-gradient(to top, ${game.color}60, transparent)`
+                        }} />
+                    </div>
+
+                    <div style={{ padding: '20px' }}>
+                        <div style={{
+                            fontSize: '12px',
+                            color: game.color,
+                            fontWeight: '700',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px',
+                            marginBottom: '8px'
+                        }}>
+                            {game.category}
+                        </div>
+                        <h3 style={{
+                            fontSize: '20px',
+                            fontWeight: '700',
+                            margin: 0
+                        }}>
+                            {game.title}
+                        </h3>
+                    </div>
+
+                    <div style={{
+                        position: 'absolute',
+                        top: '12px',
+                        right: '12px',
+                        background: 'rgba(0, 0, 0, 0.6)',
+                        backdropFilter: 'blur(10px)',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: 'var(--accent-primary)'
+                    }}>
+                        Play Now
+                    </div>
+                </div>
+            );
+        }
+
+        // Profile Section
+        function ProfileSection({ user, friends }) {
+            return (
+                <div style={{ animation: 'fadeIn 0.5s ease-out', maxWidth: '1000px', margin: '0 auto' }}>
+                    {/* Profile Header */}
+                    <div style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '20px',
+                        padding: '40px',
+                        marginBottom: '30px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '30px'
+                    }}>
+                        <img
+                            src={user.photoURL}
+                            alt={user.displayName}
+                            style={{
+                                width: '120px',
+                                height: '120px',
+                                borderRadius: '24px',
+                                border: '3px solid var(--accent-primary)',
+                                boxShadow: 'var(--shadow-glow)'
+                            }}
+                        />
+                        <div style={{ flex: 1 }}>
+                            <h2 style={{
+                                fontSize: '32px',
+                                fontWeight: '800',
+                                marginBottom: '8px'
+                            }}>
+                                {user.displayName}
+                            </h2>
+                            <p style={{
+                                color: 'var(--text-secondary)',
+                                fontSize: '16px',
+                                marginBottom: '20px'
+                            }}>
+                                {user.email}
+                            </p>
+                            <div style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                background: 'rgba(0, 255, 136, 0.1)',
+                                border: '1px solid var(--accent-primary)',
+                                padding: '8px 16px',
+                                borderRadius: '20px',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                color: 'var(--accent-primary)'
+                            }}>
+                                <span style={{
+                                    width: '8px',
+                                    height: '8px',
+                                    background: 'var(--accent-primary)',
+                                    borderRadius: '50%',
+                                    animation: 'pulse 2s ease-in-out infinite'
+                                }} />
+                                Online
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Stats Grid */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: '20px',
+                        marginBottom: '30px'
+                    }}>
+                        {[
+                            { label: 'Games Played', value: user.stats.gamesPlayed, icon: '🎮', color: 'var(--accent-primary)' },
+                            { label: 'Friends', value: friends.length, icon: '👥', color: 'var(--accent-secondary)' },
+                            { label: 'Total Hours', value: user.stats.totalTime, icon: '⏱️', color: '#ffaa00' },
+                            { label: 'Achievements', value: user.stats.achievements, icon: '🏆', color: '#ff6b9d' }
+                        ].map((stat, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    background: 'var(--bg-secondary)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '16px',
+                                    padding: '24px',
+                                    textAlign: 'center',
+                                    transition: 'all 0.3s ease',
+                                    animation: `fadeIn 0.5s ease-out ${index * 0.1}s both`
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.borderColor = stat.color;
+                                    e.currentTarget.style.transform = 'translateY(-4px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.borderColor = 'var(--border-color)';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                }}
+                            >
+                                <div style={{ fontSize: '32px', marginBottom: '12px' }}>{stat.icon}</div>
+                                <div style={{
+                                    fontSize: '36px',
+                                    fontWeight: '800',
+                                    color: stat.color,
+                                    marginBottom: '8px'
+                                }}>
+                                    {stat.value}
+                                </div>
+                                <div style={{
+                                    fontSize: '14px',
+                                    color: 'var(--text-secondary)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '1px',
+                                    fontWeight: '600'
+                                }}>
+                                    {stat.label}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Recent Activity */}
+                    <div style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '16px',
+                        padding: '24px'
+                    }}>
+                        <h3 style={{
+                            fontSize: '20px',
+                            fontWeight: '700',
+                            marginBottom: '20px'
+                        }}>
+                            Recent Activity
+                        </h3>
+                        <div style={{ color: 'var(--text-secondary)' }}>
+                            <p>• Played Drive Mad - 2 hours ago</p>
+                            <p>• Added Marcus Brown as friend - 5 hours ago</p>
+                            <p>• Completed achievement "Speed Demon" - Yesterday</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Messages Section
+        function MessagesSection({ conversations, activeConversation, messages, onOpenConversation, onSendMessage, onShowGameInvite }) {
+            const [messageText, setMessageText] = useState('');
+
+            const handleSend = () => {
+                if (messageText.trim()) {
+                    onSendMessage(messageText);
+                    setMessageText('');
+                }
+            };
+
+            return (
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '320px 1fr',
+                    gap: '24px',
+                    height: 'calc(100vh - 80px)',
+                    animation: 'fadeIn 0.5s ease-out'
+                }}>
+                    {/* Conversations List */}
+                    <div style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '16px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
+                        <div style={{
+                            padding: '20px',
+                            borderBottom: '1px solid var(--border-color)'
+                        }}>
+                            <h2 style={{
+                                fontSize: '20px',
+                                fontWeight: '700',
+                                margin: 0
+                            }}>
+                                Messages
+                            </h2>
+                        </div>
+
+                        <div style={{ flex: 1, overflow: 'auto' }}>
+                            {conversations.length === 0 ? (
+                                <div style={{
+                                    padding: '40px 20px',
+                                    textAlign: 'center',
+                                    color: 'var(--text-secondary)'
+                                }}>
+                                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>💬</div>
+                                    <div>No messages yet</div>
+                                </div>
+                            ) : (
+                                conversations.map(conv => (
+                                    <div
+                                        key={conv.id}
+                                        onClick={() => onOpenConversation(conv)}
+                                        style={{
+                                            padding: '16px 20px',
+                                            borderBottom: '1px solid var(--border-color)',
+                                            cursor: 'pointer',
+                                            background: activeConversation?.id === conv.id ? 'rgba(0, 255, 136, 0.05)' : 'transparent',
+                                            transition: 'all 0.2s ease',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '12px'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (activeConversation?.id !== conv.id) {
+                                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (activeConversation?.id !== conv.id) {
+                                                e.currentTarget.style.background = 'transparent';
+                                            }
+                                        }}
+                                    >
+                                        <img
+                                            src={conv.friendAvatar}
+                                            alt={conv.friendName}
+                                            style={{
+                                                width: '48px',
+                                                height: '48px',
+                                                borderRadius: '12px'
+                                            }}
+                                        />
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{
+                                                fontWeight: '600',
+                                                marginBottom: '4px',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis'
+                                            }}>
+                                                {conv.friendName}
+                                            </div>
+                                            <div style={{
+                                                fontSize: '13px',
+                                                color: 'var(--text-secondary)',
+                                                whiteSpace: 'nowrap',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis'
+                                            }}>
+                                                {conv.lastMessage}
+                                            </div>
+                                        </div>
+                                        {conv.unread > 0 && (
+                                            <div style={{
+                                                background: 'var(--accent-primary)',
+                                                color: '#000',
+                                                fontSize: '11px',
+                                                fontWeight: '700',
+                                                padding: '4px 8px',
+                                                borderRadius: '12px',
+                                                minWidth: '20px',
+                                                textAlign: 'center'
+                                            }}>
+                                                {conv.unread}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Chat Area */}
+                    <div style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '16px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
+                        {activeConversation ? (
+                            <>
+                                {/* Chat Header */}
+                                <div style={{
+                                    padding: '20px',
+                                    borderBottom: '1px solid var(--border-color)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px'
+                                }}>
+                                    <img
+                                        src={activeConversation.friendAvatar}
+                                        alt={activeConversation.friendName}
+                                        style={{
+                                            width: '48px',
+                                            height: '48px',
+                                            borderRadius: '12px'
+                                        }}
+                                    />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: '700', fontSize: '18px' }}>
+                                            {activeConversation.friendName}
+                                        </div>
+                                        <div style={{ fontSize: '13px', color: 'var(--accent-primary)' }}>
+                                            Online
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Messages */}
+                                <div style={{
+                                    flex: 1,
+                                    padding: '20px',
+                                    overflow: 'auto',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '16px'
+                                }}>
+                                    {messages.map(msg => (
+                                        <div
+                                            key={msg.id}
+                                            style={{
+                                                display: 'flex',
+                                                gap: '12px',
+                                                alignSelf: msg.senderId === 'me' ? 'flex-end' : 'flex-start',
+                                                maxWidth: '70%',
+                                                flexDirection: msg.senderId === 'me' ? 'row-reverse' : 'row'
+                                            }}
+                                        >
+                                            <img
+                                                src={msg.senderId === 'me' 
+                                                    ? AuthService.currentUser.photoURL 
+                                                    : activeConversation.friendAvatar}
+                                                alt="Avatar"
+                                                style={{
+                                                    width: '36px',
+                                                    height: '36px',
+                                                    borderRadius: '10px'
+                                                }}
+                                            />
+                                            <div>
+                                                <div style={{
+                                                    background: msg.senderId === 'me' 
+                                                        ? 'var(--accent-primary)' 
+                                                        : 'var(--bg-tertiary)',
+                                                    color: msg.senderId === 'me' ? '#000' : 'var(--text-primary)',
+                                                    padding: '12px 16px',
+                                                    borderRadius: '12px',
+                                                    fontSize: '15px',
+                                                    lineHeight: '1.5'
+                                                }}>
+                                                    {msg.text}
+                                                </div>
+                                                {msg.gameInvite && (
+                                                    <div style={{
+                                                        marginTop: '8px',
+                                                        padding: '12px',
+                                                        background: 'rgba(0, 255, 136, 0.1)',
+                                                        border: '1px solid var(--accent-primary)',
+                                                        borderRadius: '10px'
+                                                    }}>
+                                                        <div style={{
+                                                            fontSize: '13px',
+                                                            color: 'var(--accent-primary)',
+                                                            fontWeight: '600',
+                                                            marginBottom: '8px'
+                                                        }}>
+                                                            🎮 Game Invite
+                                                        </div>
+                                                        <div style={{ fontSize: '14px', marginBottom: '8px' }}>
+                                                            {msg.gameInvite.name}
+                                                        </div>
+                                                        <button style={{
+                                                            background: 'var(--accent-primary)',
+                                                            color: '#000',
+                                                            border: 'none',
+                                                            padding: '8px 16px',
+                                                            borderRadius: '8px',
+                                                            fontWeight: '600',
+                                                            fontSize: '13px',
+                                                            cursor: 'pointer'
+                                                        }}>
+                                                            Join Game
+                                                        </button>
+                                                    </div>
+                                                )}
+                                                <div style={{
+                                                    fontSize: '11px',
+                                                    color: 'var(--text-secondary)',
+                                                    marginTop: '4px',
+                                                    textAlign: msg.senderId === 'me' ? 'right' : 'left'
+                                                }}>
+                                                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Input Area */}
+                                <div style={{
+                                    padding: '20px',
+                                    borderTop: '1px solid var(--border-color)',
+                                    display: 'flex',
+                                    gap: '12px',
+                                    alignItems: 'flex-end'
+                                }}>
+                                    <button
+                                        onClick={() => onShowGameInvite(activeConversation)}
+                                        style={{
+                                            width: '44px',
+                                            height: '44px',
+                                            background: 'var(--bg-tertiary)',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: '12px',
+                                            color: 'var(--accent-primary)',
+                                            fontSize: '20px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.background = 'var(--accent-primary)';
+                                            e.target.style.color = '#000';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.background = 'var(--bg-tertiary)';
+                                            e.target.style.color = 'var(--accent-primary)';
+                                        }}
+                                        title="Invite to game"
+                                    >
+                                        🎮
+                                    </button>
+                                    <textarea
+                                        value={messageText}
+                                        onChange={(e) => setMessageText(e.target.value)}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleSend();
+                                            }
+                                        }}
+                                        placeholder="Type a message..."
+                                        style={{
+                                            flex: 1,
+                                            padding: '12px 16px',
+                                            background: 'var(--bg-tertiary)',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: '12px',
+                                            color: 'var(--text-primary)',
+                                            fontSize: '15px',
+                                            resize: 'none',
+                                            fontFamily: 'Manrope, sans-serif',
+                                            outline: 'none',
+                                            minHeight: '44px',
+                                            maxHeight: '120px'
+                                        }}
+                                        rows={1}
+                                    />
+                                    <button
+                                        onClick={handleSend}
+                                        style={{
+                                            width: '44px',
+                                            height: '44px',
+                                            background: 'var(--accent-primary)',
+                                            border: 'none',
+                                            borderRadius: '12px',
+                                            color: '#000',
+                                            fontSize: '20px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.transform = 'scale(1.05)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.transform = 'scale(1)';
+                                        }}
+                                    >
+                                        ➤
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <div style={{
+                                flex: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'var(--text-secondary)',
+                                textAlign: 'center',
+                                padding: '40px'
+                            }}>
+                                <div>
+                                    <div style={{ fontSize: '64px', marginBottom: '20px' }}>💬</div>
+                                    <div style={{ fontSize: '18px' }}>Select a conversation to start messaging</div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // Favorites Section
+        function FavoritesSection({ games, onPlayGame }) {
+            return (
+                <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
+                    <h1 style={{
+                        fontSize: '36px',
+                        fontWeight: '800',
+                        marginBottom: '40px',
+                        background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text'
+                    }}>
+                        Favorites
+                    </h1>
+
+                    {games.length === 0 ? (
+                        <div style={{
+                            textAlign: 'center',
+                            padding: '80px 20px',
+                            color: 'var(--text-secondary)'
+                        }}>
+                            <div style={{ fontSize: '64px', marginBottom: '20px' }}>⭐</div>
+                            <h3 style={{ fontSize: '24px', marginBottom: '12px' }}>No favorites yet</h3>
+                            <p>Star games to add them to your favorites</p>
+                        </div>
+                    ) : (
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                            gap: '24px'
+                        }}>
+                            {games.map((game, index) => (
+                                <GameCard 
+                                    key={game.id} 
+                                    game={game} 
+                                    onPlay={onPlayGame}
+                                    delay={index * 0.05}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Friends Panel
+        function FriendsPanel({ friends, onMessageFriend, onAddFriend }) {
+            return (
+                <div style={{
+                    width: '320px',
+                    background: 'var(--bg-secondary)',
+                    borderLeft: '1px solid var(--border-color)',
+                    padding: '20px',
+                    overflow: 'auto'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '20px'
+                    }}>
+                        <h3 style={{
+                            fontSize: '14px',
+                            fontWeight: '700',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px',
+                            color: 'var(--text-secondary)',
+                            margin: 0
+                        }}>
+                            Friends ({friends.length})
+                        </h3>
+                        <button
+                            onClick={onAddFriend}
+                            style={{
+                                width: '32px',
+                                height: '32px',
+                                background: 'var(--accent-primary)',
+                                border: 'none',
+                                borderRadius: '8px',
+                                color: '#000',
+                                fontSize: '18px',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.transform = 'rotate(90deg) scale(1.1)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = 'rotate(0) scale(1)';
+                            }}
+                            title="Add friend"
+                        >
+                            +
+                        </button>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {friends.map(friend => (
+                            <div
+                                key={friend.id}
+                                onClick={() => onMessageFriend(friend)}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    padding: '12px',
+                                    background: 'var(--bg-tertiary)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '12px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease',
+                                    position: 'relative'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'rgba(0, 255, 136, 0.05)';
+                                    e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                                    e.currentTarget.style.transform = 'translateX(-4px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'var(--bg-tertiary)';
+                                    e.currentTarget.style.borderColor = 'var(--border-color)';
+                                    e.currentTarget.style.transform = 'translateX(0)';
+                                }}
+                            >
+                                <div style={{ position: 'relative' }}>
+                                    <img
+                                        src={friend.avatar}
+                                        alt={friend.name}
+                                        style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '10px'
+                                        }}
+                                    />
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '-2px',
+                                        right: '-2px',
+                                        width: '12px',
+                                        height: '12px',
+                                        background: friend.status === 'online' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                                        border: '2px solid var(--bg-secondary)',
+                                        borderRadius: '50%'
+                                    }} />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{
+                                        fontWeight: '600',
+                                        fontSize: '14px',
+                                        marginBottom: '2px',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                    }}>
+                                        {friend.name}
+                                    </div>
+                                    <div style={{
+                                        fontSize: '12px',
+                                        color: 'var(--text-secondary)',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                    }}>
+                                        {friend.currentGame || 'Offline'}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // Add Friend Modal
+        function AddFriendModal({ onClose, onAddFriend }) {
+            const [email, setEmail] = useState('');
+            const [loading, setLoading] = useState(false);
+
+            const handleAdd = async () => {
+                if (!email.trim() || !email.endsWith('@kcpupils.org')) {
+                    alert('Please enter a valid @kcpupils.org email');
+                    return;
+                }
+                setLoading(true);
+                await onAddFriend(email);
+                setLoading(false);
+            };
+
+            return (
+                <div
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(0, 0, 0, 0.8)',
+                        backdropFilter: 'blur(10px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        animation: 'fadeIn 0.3s ease-out'
+                    }}
+                    onClick={onClose}
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            background: 'var(--bg-secondary)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '20px',
+                            padding: '40px',
+                            width: '440px',
+                            maxWidth: '90%',
+                            boxShadow: 'var(--shadow-glow)'
+                        }}
+                    >
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '24px'
+                        }}>
+                            <h2 style={{
+                                fontSize: '24px',
+                                fontWeight: '700',
+                                margin: 0
+                            }}>
+                                Add Friend
+                            </h2>
+                            <button
+                                onClick={onClose}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--text-secondary)',
+                                    fontSize: '24px',
+                                    cursor: 'pointer',
+                                    padding: 0,
+                                    width: '32px',
+                                    height: '32px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.color = 'var(--accent-danger)';
+                                    e.target.style.transform = 'rotate(90deg)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.color = 'var(--text-secondary)';
+                                    e.target.style.transform = 'rotate(0)';
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="friend@kcpupils.org"
+                            style={{
+                                width: '100%',
+                                padding: '14px 18px',
+                                background: 'var(--bg-tertiary)',
+                                border: '1px solid var(--border-color)',
+                                borderRadius: '12px',
+                                color: 'var(--text-primary)',
+                                fontSize: '15px',
+                                marginBottom: '20px',
+                                outline: 'none',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onFocus={(e) => {
+                                e.target.style.borderColor = 'var(--accent-primary)';
+                            }}
+                            onBlur={(e) => {
+                                e.target.style.borderColor = 'var(--border-color)';
+                            }}
+                        />
+
+                        <button
+                            onClick={handleAdd}
+                            disabled={loading}
+                            style={{
+                                width: '100%',
+                                padding: '14px',
+                                background: 'var(--accent-primary)',
+                                color: '#000',
+                                border: 'none',
+                                borderRadius: '12px',
+                                fontSize: '16px',
+                                fontWeight: '700',
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                                transition: 'all 0.3s ease',
+                                opacity: loading ? 0.6 : 1
+                            }}
+                            onMouseEnter={(e) => {
+                                if (!loading) {
+                                    e.target.style.transform = 'translateY(-2px)';
+                                    e.target.style.boxShadow = 'var(--shadow-glow)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = 'none';
+                            }}
+                        >
+                            {loading ? 'Adding...' : 'Add Friend'}
                         </button>
                     </div>
                 </div>
-            </div>
-        </section>
+            );
+        }
 
-        <!-- Favorites Section -->
-        <section id="favorites-section" class="content-section">
-            <div class="page-header">
-                <h1 class="page-title">FAVORITES</h1>
-            </div>
-            <div class="game-grid" id="favorites-grid">
-                <div class="empty-state">
-                    <i class="fas fa-star"></i>
-                    <h3>No Favorites Yet</h3>
-                    <p>Star games to add them here</p>
+        // Game Invite Modal
+        function GameInviteModal({ games, friend, onClose, onInvite }) {
+            return (
+                <div
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(0, 0, 0, 0.8)',
+                        backdropFilter: 'blur(10px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        animation: 'fadeIn 0.3s ease-out'
+                    }}
+                    onClick={onClose}
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            background: 'var(--bg-secondary)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '20px',
+                            padding: '40px',
+                            width: '500px',
+                            maxWidth: '90%',
+                            maxHeight: '80vh',
+                            overflow: 'auto',
+                            boxShadow: 'var(--shadow-glow)'
+                        }}
+                    >
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '24px'
+                        }}>
+                            <h2 style={{
+                                fontSize: '24px',
+                                fontWeight: '700',
+                                margin: 0
+                            }}>
+                                Invite to Game
+                            </h2>
+                            <button
+                                onClick={onClose}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--text-secondary)',
+                                    fontSize: '24px',
+                                    cursor: 'pointer',
+                                    padding: 0,
+                                    width: '32px',
+                                    height: '32px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.color = 'var(--accent-danger)';
+                                    e.target.style.transform = 'rotate(90deg)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.color = 'var(--text-secondary)';
+                                    e.target.style.transform = 'rotate(0)';
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <p style={{
+                            color: 'var(--text-secondary)',
+                            marginBottom: '24px',
+                            fontSize: '15px'
+                        }}>
+                            Select a game to play with {friend?.friendName}
+                        </p>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {games.map(game => (
+                                <button
+                                    key={game.id}
+                                    onClick={() => onInvite(game)}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '16px',
+                                        padding: '16px',
+                                        background: 'var(--bg-tertiary)',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: '12px',
+                                        color: 'var(--text-primary)',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        textAlign: 'left'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.borderColor = game.color;
+                                        e.currentTarget.style.transform = 'translateX(4px)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.borderColor = 'var(--border-color)';
+                                        e.currentTarget.style.transform = 'translateX(0)';
+                                    }}
+                                >
+                                    <div style={{
+                                        width: '60px',
+                                        height: '60px',
+                                        borderRadius: '10px',
+                                        background: `linear-gradient(135deg, ${game.color}40, ${game.color}20)`,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '28px'
+                                    }}>
+                                        🎮
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{
+                                            fontSize: '12px',
+                                            color: game.color,
+                                            fontWeight: '700',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '1px',
+                                            marginBottom: '4px'
+                                        }}>
+                                            {game.category}
+                                        </div>
+                                        <div style={{
+                                            fontSize: '16px',
+                                            fontWeight: '700'
+                                        }}>
+                                            {game.title}
+                                        </div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </section>
-    </main>
-</div>
+            );
+        }
 
-<!-- Game Container -->
-<div id="game-container">
-    <div class="game-header">
-        <h2 class="game-title" id="current-game-title">Game</h2>
-        <div class="game-controls">
-            <button class="control-btn" id="fullscreen-btn">
-                <i class="fas fa-expand"></i>
-                <span>Fullscreen</span>
-            </button>
-            <button class="control-btn exit" id="exit-game-btn">
-                <i class="fas fa-times"></i>
-                <span>Exit</span>
-            </button>
-        </div>
-    </div>
-    <div id="game-iframe-container">
-        <iframe id="game-iframe" src="" allowfullscreen allow="autoplay; fullscreen"></iframe>
-    </div>
-</div>
+        // Game Player Component
+        function GamePlayer({ game, onExit }) {
+            const [isFullscreen, setIsFullscreen] = useState(false);
 
-<!-- Add Friend Modal -->
-<div id="add-friend-modal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="modal-title">Add Friend</h3>
-            <button class="close-modal" onclick="closeModal('add-friend-modal')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <input type="email" class="modal-input" id="friend-email-input" placeholder="friend@kcpupils.org">
-        <button class="modal-btn" id="add-friend-submit">Add Friend</button>
-        <button class="modal-btn secondary" onclick="closeModal('add-friend-modal')">Cancel</button>
-    </div>
-</div>
+            const toggleFullscreen = () => {
+                const elem = document.getElementById('game-player');
+                if (!document.fullscreenElement) {
+                    elem.requestFullscreen();
+                    setIsFullscreen(true);
+                } else {
+                    document.exitFullscreen();
+                    setIsFullscreen(false);
+                }
+            };
 
-<!-- Game Invite Modal -->
-<div id="game-invite-modal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="modal-title">Invite to Game</h3>
-            <button class="close-modal" onclick="closeModal('game-invite-modal')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <p style="margin: 0 0 20px 0; color: #aaa;">Select a game to invite your friend to:</p>
-        <div id="game-select-list" style="max-height: 400px; overflow-y: auto;"></div>
-    </div>
-</div>
+            return (
+                <div id="game-player" style={{
+                    position: 'fixed',
+                    inset: 0,
+                    background: '#000',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    zIndex: 9999
+                }}>
+                    {/* Game Header */}
+                    <div style={{
+                        background: 'rgba(0, 0, 0, 0.95)',
+                        padding: '16px 24px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderBottom: '1px solid var(--border-color)'
+                    }}>
+                        <h2 style={{
+                            fontSize: '20px',
+                            fontWeight: '700',
+                            margin: 0,
+                            fontFamily: 'Space Mono, monospace'
+                        }}>
+                            {game.title}
+                        </h2>
 
-<script src="app.js"></script>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <button
+                                onClick={toggleFullscreen}
+                                style={{
+                                    padding: '10px 20px',
+                                    background: 'rgba(0, 255, 136, 0.2)',
+                                    border: '1px solid var(--accent-primary)',
+                                    borderRadius: '8px',
+                                    color: 'var(--accent-primary)',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.background = 'var(--accent-primary)';
+                                    e.target.style.color = '#000';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.background = 'rgba(0, 255, 136, 0.2)';
+                                    e.target.style.color = 'var(--accent-primary)';
+                                }}
+                            >
+                                {isFullscreen ? '⛶ Exit Fullscreen' : '⛶ Fullscreen'}
+                            </button>
+
+                            <button
+                                onClick={onExit}
+                                style={{
+                                    padding: '10px 20px',
+                                    background: 'rgba(255, 68, 102, 0.2)',
+                                    border: '1px solid var(--accent-danger)',
+                                    borderRadius: '8px',
+                                    color: 'var(--accent-danger)',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.background = 'var(--accent-danger)';
+                                    e.target.style.color = '#fff';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.background = 'rgba(255, 68, 102, 0.2)';
+                                    e.target.style.color = 'var(--accent-danger)';
+                                }}
+                            >
+                                ✕ Exit Game
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Game iframe */}
+                    <div style={{ flex: 1, position: 'relative' }}>
+                        <iframe
+                            src={game.url}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                border: 'none'
+                            }}
+                            allowFullScreen
+                            allow="autoplay; fullscreen"
+                        />
+                    </div>
+                </div>
+            );
+        }
+
+        // Render App
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
 </body>
 </html>
