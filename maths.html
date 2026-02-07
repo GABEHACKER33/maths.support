@@ -110,6 +110,74 @@
             transition: margin-left 0.3s ease;
         }
 
+        /* Top Navigation Bar */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .site-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            white-space: nowrap;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-bar::placeholder {
+            color: #999;
+        }
+
+        .ai-helper-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-helper-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
         .header {
             text-align: center;
             color: white;
@@ -130,10 +198,34 @@
         /* Game Grid */
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(5, 1fr);
             gap: 20px;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto 40px;
+        }
+
+        @media (max-width: 1400px) {
+            .games-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .games-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .game-button {
@@ -296,12 +388,26 @@
                 font-size: 2em;
             }
 
-            .games-grid {
-                grid-template-columns: 1fr;
-            }
-
             .main-content {
                 padding: 20px;
+            }
+
+            .top-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .site-name {
+                font-size: 1.5em;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
+
+            .ai-helper-btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -326,6 +432,18 @@
 
     <!-- Main Content -->
     <div class="main-content">
+        <!-- Top Navigation Bar -->
+        <div class="top-nav">
+            <div class="site-name">Maths Support</div>
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="Search for games...">
+            </div>
+            <button class="ai-helper-btn" onclick="openAIHelper()">
+                <span>🤖</span>
+                <span>AI Helper</span>
+            </button>
+        </div>
+
         <div class="header">
             <h1>🎮 Maths Support Gaming Hub</h1>
             <p>Choose a game to play and have fun!</p>
@@ -475,6 +593,10 @@
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openAIHelper() {
+            alert('AI Helper feature coming soon! 🤖\n\nThis will help you find the perfect game or answer your questions.');
         }
 
         // Update fullscreen button text when entering/exiting fullscreen
