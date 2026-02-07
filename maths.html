@@ -11,6 +11,95 @@
             box-sizing: border-box;
         }
 
+        /* Password Overlay */
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+
+        .password-overlay.hidden {
+            display: none;
+        }
+
+        .password-box {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .password-box h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .password-box p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .password-input:focus {
+            border-color: #667eea;
+        }
+
+        .password-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .password-submit:hover {
+            transform: translateY(-2px);
+        }
+
+        .password-error {
+            color: #ff4444;
+            margin-top: 15px;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .password-error.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: url('https://i.postimg.cc/BQsspvpv/maths-bg.png');
@@ -468,6 +557,23 @@
     </style>
 </head>
 <body>
+    <!-- Password Protection Overlay -->
+    <div class="password-overlay" id="passwordOverlay">
+        <div class="password-box">
+            <h2>🔒 Maths Support</h2>
+            <p>Enter password to access</p>
+            <input 
+                type="password" 
+                class="password-input" 
+                id="passwordInput" 
+                placeholder="Enter password"
+                autocomplete="off"
+            >
+            <button class="password-submit" onclick="checkPassword()">Unlock</button>
+            <div class="password-error" id="passwordError">Incorrect password. Please try again.</div>
+        </div>
+    </div>
+
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-logo">
@@ -518,7 +624,7 @@
             </button>
 
             <button class="game-button" onclick="openGame('Tetris', 'https://tetris.com/play-tetris')">
-                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/86/FallGuys2024Logo.png/250px-FallGuys2024Logo.png" alt="Tetris Game" class="game-image">
+                <img src="games/tetris.png" alt="Tetris Game" class="game-image">
                 <div class="game-info">
                     <h3>🧱 Tetris</h3>
                     <p>Arrange falling blocks</p>
@@ -576,7 +682,156 @@
         <iframe id="aiFrame" class="ai-frame" src=""></iframe>
     </div>
 
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://hsmfjpetvcsgkpkwpdjr.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzbWZqcGV0dmNzZ2twa3dwZGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3NDc0MzEsImV4cCI6MjA3OTMyMzQzMX0.IBiJtUJBPyjNwGowfgnlfrbHpb46C43NmYY3O9rEFqQ';
+        
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Session management
+        let isAuthenticated = sessionStorage.getItem('auth') === 'true';
+
+        // Initialize page
+        window.addEventListener('load', function() {
+            if (isAuthenticated) {
+                document.getElementById('passwordOverlay').classList.add('hidden');
+            } else {
+                enableSecurityProtection();
+            }
+        });
+
+        // Check password with Supabase
+        async function checkPassword() {
+            const input = document.getElementById('passwordInput');
+            const error = document.getElementById('passwordError');
+            const password = input.value;
+
+            if (!password) {
+                error.classList.add('show');
+                error.textContent = 'Please enter a password';
+                return;
+            }
+
+            try {
+                // Query Supabase to check if password exists
+                const { data, error: supabaseError } = await supabase
+                    .from('passwords')
+                    .select('*')
+                    .eq('password', password)
+                    .single();
+
+                if (supabaseError || !data) {
+                    // Wrong password
+                    error.classList.add('show');
+                    error.textContent = 'Incorrect password. Please try again.';
+                    input.value = '';
+                    
+                    // Add shake animation
+                    input.style.animation = 'shake 0.5s';
+                    setTimeout(() => {
+                        input.style.animation = '';
+                    }, 500);
+                } else {
+                    // Correct password
+                    sessionStorage.setItem('auth', 'true');
+                    isAuthenticated = true;
+                    document.getElementById('passwordOverlay').classList.add('hidden');
+                    disableSecurityProtection();
+                    input.value = '';
+                    error.classList.remove('show');
+                }
+            } catch (err) {
+                error.classList.add('show');
+                error.textContent = 'Connection error. Please try again.';
+                console.error('Error:', err);
+            }
+        }
+
+        // Allow Enter key to submit password
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('passwordInput');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        checkPassword();
+                    }
+                });
+            }
+        });
+
+        // Security protection functions
+        function enableSecurityProtection() {
+            // Disable right-click
+            document.addEventListener('contextmenu', preventAction);
+            
+            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            document.addEventListener('keydown', preventDevTools);
+            
+            // Detect DevTools opening
+            detectDevTools();
+        }
+
+        function disableSecurityProtection() {
+            document.removeEventListener('contextmenu', preventAction);
+            document.removeEventListener('keydown', preventDevTools);
+        }
+
+        function preventAction(e) {
+            if (!isAuthenticated) {
+                e.preventDefault();
+                return false;
+            }
+        }
+
+        function preventDevTools(e) {
+            if (!isAuthenticated) {
+                // F12
+                if (e.keyCode === 123) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+                if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+U (view source)
+                if (e.ctrlKey && e.keyCode === 85) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        }
+
+        function detectDevTools() {
+            const threshold = 160;
+            const check = setInterval(() => {
+                if (!isAuthenticated) {
+                    if (window.outerWidth - window.innerWidth > threshold || 
+                        window.outerHeight - window.innerHeight > threshold) {
+                        sessionStorage.clear();
+                        window.location.reload();
+                    }
+                } else {
+                    clearInterval(check);
+                }
+            }, 1000);
+        }
+
+        // Protect against inspect element
+        if (!isAuthenticated) {
+            setInterval(() => {
+                if (!isAuthenticated) {
+                    debugger;
+                }
+            }, 100);
+        }
+
         function openGame(gameName, gameUrl) {
             const gameContainer = document.getElementById('gameContainer');
             const gameFrame = document.getElementById('gameFrame');
