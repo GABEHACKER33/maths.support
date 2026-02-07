@@ -346,6 +346,20 @@
             gap: 20px;
             max-width: 1400px;
             margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+            font-size: 1.3em;
+            display: none;
+        }
+
+        .no-results.show {
+            display: block;
         }
 
         @media (max-width: 1400px) {
@@ -607,6 +621,10 @@
 
         <!-- Games Grid -->
         <div class="games-grid" id="gamesGrid">
+            <div class="no-results" id="noResults">
+                🔍 No games found matching your search
+            </div>
+            
             <button class="game-button" onclick="openGame('2048', 'https://play2048.co/')">
                 <img src="games/2048.png" alt="2048 Game" class="game-image">
                 <div class="game-info">
@@ -924,6 +942,42 @@
             aiFrame.src = '';
             aiOverlay.classList.remove('active');
         }
+
+        // Search functionality
+        function searchGames() {
+            const searchInput = document.querySelector('.search-bar');
+            const searchTerm = searchInput.value.toLowerCase();
+            const gameButtons = document.querySelectorAll('.game-button');
+            const noResults = document.getElementById('noResults');
+            let visibleCount = 0;
+
+            gameButtons.forEach(button => {
+                const gameName = button.querySelector('h3').textContent.toLowerCase();
+                const gameDescription = button.querySelector('p').textContent.toLowerCase();
+                
+                if (gameName.includes(searchTerm) || gameDescription.includes(searchTerm)) {
+                    button.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    button.style.display = 'none';
+                }
+            });
+
+            // Show/hide no results message
+            if (visibleCount === 0 && searchTerm !== '') {
+                noResults.classList.add('show');
+            } else {
+                noResults.classList.remove('show');
+            }
+        }
+
+        // Add search event listener
+        window.addEventListener('load', function() {
+            const searchBar = document.querySelector('.search-bar');
+            if (searchBar) {
+                searchBar.addEventListener('input', searchGames);
+            }
+        });
 
         // Update fullscreen button text when entering/exiting fullscreen
         document.addEventListener('fullscreenchange', function() {
