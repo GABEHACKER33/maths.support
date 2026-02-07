@@ -1,19 +1,19 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>about:blank</title>
+  <title>Loading…</title>
 </head>
 <body>
 <script>
-  // Take over the current tab and turn it into about:blank
-  document.open();
-  document.write(`
+  const win = window.open("about:blank", "_blank");
+
+  win.document.open();
+  win.document.write(`
     <!DOCTYPE html>
     <html>
     <head>
-      <meta charset="UTF-8">
-      <title>Cookie Clicker</title>
+      <title>about:blank</title>
       <style>
         html, body {
           margin: 0;
@@ -21,7 +21,6 @@
           width: 100%;
           height: 100%;
           overflow: hidden;
-          background: #000;
         }
         iframe {
           width: 100%;
@@ -31,11 +30,13 @@
       </style>
     </head>
     <body>
-      <iframe src="maths.html/"></iframe>
+      <iframe src="maths.html"></iframe>
     </body>
     </html>
   `);
-  document.close();
+  win.document.close();
+
+  window.location.replace("https://canvas.inspirededucationschools.com");
 </script>
 </body>
 </html>
