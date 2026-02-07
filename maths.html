@@ -121,6 +121,16 @@
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .top-nav.minimal {
+            justify-content: flex-start;
+        }
+
+        .top-nav.minimal .search-container,
+        .top-nav.minimal .ai-helper-btn {
+            display: none;
         }
 
         .site-name {
@@ -176,6 +186,51 @@
         .ai-helper-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* AI Helper Overlay */
+        .ai-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 9999;
+            display: none;
+        }
+
+        .ai-overlay.active {
+            display: block;
+        }
+
+        .ai-close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff4444;
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 10000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .ai-close-btn:hover {
+            background: #cc0000;
+            transform: scale(1.1);
+        }
+
+        .ai-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         .header {
@@ -433,7 +488,7 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Top Navigation Bar -->
-        <div class="top-nav">
+        <div class="top-nav" id="topNav">
             <div class="site-name">Maths Support</div>
             <div class="search-container">
                 <input type="text" class="search-bar" placeholder="Search for games...">
@@ -442,11 +497,6 @@
                 <span>🤖</span>
                 <span>AI Helper</span>
             </button>
-        </div>
-
-        <div class="header">
-            <h1>🎮 Maths Support Gaming Hub</h1>
-            <p>Choose a game to play and have fun!</p>
         </div>
 
         <!-- Games Grid -->
@@ -520,18 +570,26 @@
         </div>
     </div>
 
+    <!-- AI Helper Overlay -->
+    <div class="ai-overlay" id="aiOverlay">
+        <button class="ai-close-btn" onclick="closeAIHelper()">✕</button>
+        <iframe id="aiFrame" class="ai-frame" src=""></iframe>
+    </div>
+
     <script>
         function openGame(gameName, gameUrl) {
             const gameContainer = document.getElementById('gameContainer');
             const gameFrame = document.getElementById('gameFrame');
             const gameTitle = document.getElementById('gameTitle');
             const gamesGrid = document.getElementById('gamesGrid');
+            const topNav = document.getElementById('topNav');
 
             gameTitle.textContent = gameName;
             gameFrame.src = gameUrl;
             
             gamesGrid.style.display = 'none';
             gameContainer.classList.add('active');
+            topNav.classList.add('minimal');
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -540,6 +598,7 @@
             const gameContainer = document.getElementById('gameContainer');
             const gameFrame = document.getElementById('gameFrame');
             const gamesGrid = document.getElementById('gamesGrid');
+            const topNav = document.getElementById('topNav');
 
             // Exit fullscreen if active
             if (document.fullscreenElement) {
@@ -549,6 +608,7 @@
             gameFrame.src = '';
             gameContainer.classList.remove('active');
             gamesGrid.style.display = 'grid';
+            topNav.classList.remove('minimal');
         }
 
         function toggleFullscreen() {
@@ -567,7 +627,7 @@
             const gamesGrid = document.getElementById('gamesGrid');
             const gameContainer = document.getElementById('gameContainer');
             const constructionPage = document.getElementById('constructionPage');
-            const header = document.querySelector('.header');
+            const topNav = document.getElementById('topNav');
             const homeBtn = document.getElementById('homeBtn');
             const appsBtn = document.getElementById('appsBtn');
 
@@ -583,12 +643,12 @@
             if (section === 'home') {
                 gamesGrid.style.display = 'grid';
                 constructionPage.classList.remove('active');
-                header.style.display = 'block';
+                topNav.classList.remove('minimal');
                 homeBtn.classList.add('active');
             } else if (section === 'apps') {
                 gamesGrid.style.display = 'none';
                 constructionPage.classList.add('active');
-                header.style.display = 'none';
+                topNav.classList.remove('minimal');
                 appsBtn.classList.add('active');
             }
 
@@ -596,7 +656,19 @@
         }
 
         function openAIHelper() {
-            alert('AI Helper feature coming soon! 🤖\n\nThis will help you find the perfect game or answer your questions.');
+            const aiOverlay = document.getElementById('aiOverlay');
+            const aiFrame = document.getElementById('aiFrame');
+            
+            aiFrame.src = 'https://chatgpt.com';
+            aiOverlay.classList.add('active');
+        }
+
+        function closeAIHelper() {
+            const aiOverlay = document.getElementById('aiOverlay');
+            const aiFrame = document.getElementById('aiFrame');
+            
+            aiFrame.src = '';
+            aiOverlay.classList.remove('active');
         }
 
         // Update fullscreen button text when entering/exiting fullscreen
