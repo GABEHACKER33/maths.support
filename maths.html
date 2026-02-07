@@ -89,16 +89,28 @@
             background: white;
             border: none;
             border-radius: 15px;
-            padding: 30px 20px;
+            padding: 0;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
+            overflow: hidden;
         }
 
         .game-button:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .game-info {
+            padding: 20px;
         }
 
         .game-button h3 {
@@ -140,7 +152,7 @@
             font-size: 1.5em;
         }
 
-        .close-button {
+        .close-button, .fullscreen-button {
             background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
@@ -149,10 +161,16 @@
             cursor: pointer;
             font-size: 1em;
             transition: background 0.3s ease;
+            margin-left: 10px;
         }
 
-        .close-button:hover {
+        .close-button:hover, .fullscreen-button:hover {
             background: rgba(255, 255, 255, 0.3);
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 10px;
         }
 
         .game-frame {
@@ -160,6 +178,14 @@
             height: 600px;
             border: none;
             background: #f5f5f5;
+        }
+
+        .game-container:fullscreen {
+            background: black;
+        }
+
+        .game-container:fullscreen .game-frame {
+            height: calc(100vh - 60px);
         }
 
         /* Responsive Design */
@@ -196,33 +222,51 @@
         <!-- Games Grid -->
         <div class="games-grid" id="gamesGrid">
             <button class="game-button" onclick="openGame('2048', 'https://play2048.co/')">
-                <h3>🎯 2048</h3>
-                <p>Combine tiles to reach 2048!</p>
+                <img src="games/2048.png" alt="2048 Game" class="game-image">
+                <div class="game-info">
+                    <h3>🎯 2048</h3>
+                    <p>Combine tiles to reach 2048!</p>
+                </div>
             </button>
 
             <button class="game-button" onclick="openGame('Snake', 'https://playsnake.org/')">
-                <h3>🐍 Snake</h3>
-                <p>Classic snake game</p>
+                <img src="games/snake.png" alt="Snake Game" class="game-image">
+                <div class="game-info">
+                    <h3>🐍 Snake</h3>
+                    <p>Classic snake game</p>
+                </div>
             </button>
 
             <button class="game-button" onclick="openGame('Tetris', 'https://tetris.com/play-tetris')">
-                <h3>🧱 Tetris</h3>
-                <p>Arrange falling blocks</p>
+                <img src="games/tetris.png" alt="Tetris Game" class="game-image">
+                <div class="game-info">
+                    <h3>🧱 Tetris</h3>
+                    <p>Arrange falling blocks</p>
+                </div>
             </button>
 
             <button class="game-button" onclick="openGame('Pac-Man', 'https://pacman.com/en/')">
-                <h3>👻 Pac-Man</h3>
-                <p>Eat dots, avoid ghosts!</p>
+                <img src="games/pacman.png" alt="Pac-Man Game" class="game-image">
+                <div class="game-info">
+                    <h3>👻 Pac-Man</h3>
+                    <p>Eat dots, avoid ghosts!</p>
+                </div>
             </button>
 
             <button class="game-button" onclick="openGame('Chess', 'https://www.chess.com/play/computer')">
-                <h3>♟️ Chess</h3>
-                <p>Play against the computer</p>
+                <img src="games/chess.png" alt="Chess Game" class="game-image">
+                <div class="game-info">
+                    <h3>♟️ Chess</h3>
+                    <p>Play against the computer</p>
+                </div>
             </button>
 
             <button class="game-button" onclick="openGame('Sudoku', 'https://sudoku.com/')">
-                <h3>🔢 Sudoku</h3>
-                <p>Number puzzle challenge</p>
+                <img src="games/sudoku.png" alt="Sudoku Game" class="game-image">
+                <div class="game-info">
+                    <h3>🔢 Sudoku</h3>
+                    <p>Number puzzle challenge</p>
+                </div>
             </button>
         </div>
 
@@ -230,7 +274,10 @@
         <div class="game-container" id="gameContainer">
             <div class="game-header">
                 <h2 id="gameTitle">Game</h2>
-                <button class="close-button" onclick="closeGame()">✕ Close Game</button>
+                <div class="game-controls">
+                    <button class="fullscreen-button" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+                    <button class="close-button" onclick="closeGame()">✕ Close Game</button>
+                </div>
             </div>
             <iframe id="gameFrame" class="game-frame" src=""></iframe>
         </div>
@@ -257,10 +304,37 @@
             const gameFrame = document.getElementById('gameFrame');
             const gamesGrid = document.getElementById('gamesGrid');
 
+            // Exit fullscreen if active
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+
             gameFrame.src = '';
             gameContainer.classList.remove('active');
             gamesGrid.style.display = 'grid';
         }
+
+        function toggleFullscreen() {
+            const gameContainer = document.getElementById('gameContainer');
+            
+            if (!document.fullscreenElement) {
+                gameContainer.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Update fullscreen button text when entering/exiting fullscreen
+        document.addEventListener('fullscreenchange', function() {
+            const fullscreenButton = document.querySelector('.fullscreen-button');
+            if (document.fullscreenElement) {
+                fullscreenButton.textContent = '⛶ Exit Fullscreen';
+            } else {
+                fullscreenButton.textContent = '⛶ Fullscreen';
+            }
+        });
     </script>
 </body>
 </html>
