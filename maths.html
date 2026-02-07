@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maths Support - Gaming Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 60px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            transition: width 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar:hover {
+            width: 250px;
+        }
+
+        .sidebar-logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo img {
+            width: 40px;
+            height: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar:hover .sidebar-logo img {
+            width: 80px;
+            height: 80px;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 60px;
+            padding: 40px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        /* Game Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto 40px;
+        }
+
+        .game-button {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            padding: 30px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .game-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-button h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .game-button p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Game Container */
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        .game-container.active {
+            display: block;
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-header h2 {
+            font-size: 1.5em;
+        }
+
+        .close-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s ease;
+        }
+
+        .close-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .game-frame {
+            width: 100%;
+            height: 600px;
+            border: none;
+            background: #f5f5f5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <img src="maths-logo.png" alt="Maths Support Logo">
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>🎮 Maths Support Gaming Hub</h1>
+            <p>Choose a game to play and have fun!</p>
+        </div>
+
+        <!-- Games Grid -->
+        <div class="games-grid" id="gamesGrid">
+            <button class="game-button" onclick="openGame('2048', 'https://play2048.co/')">
+                <h3>🎯 2048</h3>
+                <p>Combine tiles to reach 2048!</p>
+            </button>
+
+            <button class="game-button" onclick="openGame('Snake', 'https://playsnake.org/')">
+                <h3>🐍 Snake</h3>
+                <p>Classic snake game</p>
+            </button>
+
+            <button class="game-button" onclick="openGame('Tetris', 'https://tetris.com/play-tetris')">
+                <h3>🧱 Tetris</h3>
+                <p>Arrange falling blocks</p>
+            </button>
+
+            <button class="game-button" onclick="openGame('Pac-Man', 'https://pacman.com/en/')">
+                <h3>👻 Pac-Man</h3>
+                <p>Eat dots, avoid ghosts!</p>
+            </button>
+
+            <button class="game-button" onclick="openGame('Chess', 'https://www.chess.com/play/computer')">
+                <h3>♟️ Chess</h3>
+                <p>Play against the computer</p>
+            </button>
+
+            <button class="game-button" onclick="openGame('Sudoku', 'https://sudoku.com/')">
+                <h3>🔢 Sudoku</h3>
+                <p>Number puzzle challenge</p>
+            </button>
+        </div>
+
+        <!-- Game Container (Hidden by default) -->
+        <div class="game-container" id="gameContainer">
+            <div class="game-header">
+                <h2 id="gameTitle">Game</h2>
+                <button class="close-button" onclick="closeGame()">✕ Close Game</button>
+            </div>
+            <iframe id="gameFrame" class="game-frame" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        function openGame(gameName, gameUrl) {
+            const gameContainer = document.getElementById('gameContainer');
+            const gameFrame = document.getElementById('gameFrame');
+            const gameTitle = document.getElementById('gameTitle');
+            const gamesGrid = document.getElementById('gamesGrid');
+
+            gameTitle.textContent = gameName;
+            gameFrame.src = gameUrl;
+            
+            gamesGrid.style.display = 'none';
+            gameContainer.classList.add('active');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeGame() {
+            const gameContainer = document.getElementById('gameContainer');
+            const gameFrame = document.getElementById('gameFrame');
+            const gamesGrid = document.getElementById('gamesGrid');
+
+            gameFrame.src = '';
+            gameContainer.classList.remove('active');
+            gamesGrid.style.display = 'grid';
+        }
+    </script>
+</body>
+</html>
