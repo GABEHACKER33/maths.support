@@ -691,7 +691,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzbWZqcGV0dmNzZ2twa3dwZGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3NDc0MzEsImV4cCI6MjA3OTMyMzQzMX0.IBiJtUJBPyjNwGowfgnlfrbHpb46C43NmYY3O9rEFqQ';
         
         // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Session management
         let isAuthenticated = sessionStorage.getItem('auth') === 'true';
@@ -702,6 +702,17 @@
                 document.getElementById('passwordOverlay').classList.add('hidden');
             } else {
                 enableSecurityProtection();
+            }
+            
+            // Add Enter key listener for password input
+            const passwordInput = document.getElementById('passwordInput');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        checkPassword();
+                    }
+                });
             }
         });
 
@@ -719,7 +730,7 @@
 
             try {
                 // Query Supabase to check if password exists
-                const { data, error: supabaseError } = await supabase
+                const { data, error: supabaseError } = await supabaseClient
                     .from('passwords')
                     .select('*')
                     .eq('password', password)
@@ -751,18 +762,6 @@
                 console.error('Error:', err);
             }
         }
-
-        // Allow Enter key to submit password
-        document.addEventListener('DOMContentLoaded', function() {
-            const input = document.getElementById('passwordInput');
-            if (input) {
-                input.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        checkPassword();
-                    }
-                });
-            }
-        });
 
         // Security protection functions
         function enableSecurityProtection() {
