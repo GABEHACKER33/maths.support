@@ -809,20 +809,11 @@
                 </div>
             </button>
 
-            <button class="game-button" onclick="openGame('Strong Dog', 'https://strongdog.com/')">
-                <img src="games/strong-dog.png" alt="Strong Dog" class="game-image">
+            <button class="game-button" onclick="openGame('EzClasswork', 'https://ezclasswork.com/')">
+                <img src="games/ez.png" alt="EzClasswork" class="game-image">
                 <div class="game-info">
-                    <h3>🐕Strong Dog</h3>
+                    <h3>📚 EzClasswork</h3>
                     <p>Game portal</p>
-                </div>
-            </button>
-
-
-            <button class="game-button" onclick="openGame('Geometry', 'https://arcadrome.com/embed/geometry-dash-lite/')">
-                <img src="games/geometry.png" alt="Geometry Dash" class="game-image">
-                <div class="game-info">
-                    <h3>Geometry Dash Lite</h3>
-                    <p></p>
                 </div>
             </button>
 
@@ -873,13 +864,19 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Session management
-        let isAuthenticated = sessionStorage.getItem('auth') === 'true';
+        let isAuthenticated = false;
 
-        // Initialize page
+        // Initialize page - consolidated all load events into one
         window.addEventListener('load', function() {
+            // Check authentication status
+            isAuthenticated = sessionStorage.getItem('auth') === 'true';
+            
             if (isAuthenticated) {
                 document.getElementById('passwordOverlay').classList.add('hidden');
+                disableSecurityProtection();
             } else {
+                // Keep overlay visible
+                document.getElementById('passwordOverlay').classList.remove('hidden');
                 enableSecurityProtection();
             }
             
@@ -892,6 +889,12 @@
                         checkPassword();
                     }
                 });
+            }
+            
+            // Add search event listener
+            const searchBar = document.querySelector('.search-bar');
+            if (searchBar) {
+                searchBar.addEventListener('input', searchGames);
             }
         });
 
@@ -1131,14 +1134,6 @@
                 noResults.classList.remove('show');
             }
         }
-
-        // Add search event listener
-        window.addEventListener('load', function() {
-            const searchBar = document.querySelector('.search-bar');
-            if (searchBar) {
-                searchBar.addEventListener('input', searchGames);
-            }
-        });
 
         // Update fullscreen button text when entering/exiting fullscreen
         document.addEventListener('fullscreenchange', function() {
