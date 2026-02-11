@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #e8f0f7 url('bg.png') center/cover no-repeat fixed;
+            background: #e8f0f7;
             color: #2c3e50;
             overflow: hidden;
             height: 100vh;
@@ -27,8 +27,51 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(232,240,247,0.85) 0%, rgba(255,255,255,0.75) 100%);
+            background: linear-gradient(135deg, 
+                rgba(255, 163, 77, 0.3) 0%,
+                rgba(232, 240, 247, 0.85) 30%,
+                rgba(255, 255, 255, 0.75) 100%);
             z-index: 0;
+        }
+
+        .abstract-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.15;
+        }
+
+        .shape1 {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #ffa34d, #ff6b6b);
+            top: -200px;
+            left: -100px;
+        }
+
+        .shape2 {
+            width: 800px;
+            height: 800px;
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            bottom: -300px;
+            left: -150px;
+        }
+
+        .shape3 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            top: 50px;
+            right: -150px;
         }
 
         .logo-container {
@@ -43,11 +86,11 @@
             padding: 12px 20px;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
         }
         
-        .logo-container img {
-            height: 45px;
-            width: auto;
+        .logo-container .logo-emoji {
+            font-size: 45px;
         }
         
         .logo-container span {
@@ -113,6 +156,7 @@
             padding: 8px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             margin-bottom: 24px;
+            backdrop-filter: blur(10px);
         }
 
         .search-container {
@@ -158,6 +202,10 @@
             box-shadow: 0 6px 20px rgba(102,126,234,0.4);
         }
 
+        .btn:active {
+            transform: translateY(0);
+        }
+
         .btn-icon {
             padding: 16px;
             min-width: 52px;
@@ -165,6 +213,10 @@
 
         .btn-secondary {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(245,87,108,0.4);
         }
 
         .quick-links {
@@ -193,6 +245,7 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
         }
 
         .quick-link:hover {
@@ -228,26 +281,23 @@
             margin-bottom: 16px;
             color: #e74c3c;
             font-weight: 500;
+            backdrop-filter: blur(10px);
         }
 
         .error.active {
             display: block;
+            animation: slideIn 0.3s ease;
         }
 
-        .status {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.9);
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-size: 12px;
-            color: #95a5a6;
-            z-index: 10000;
-        }
-
-        .status.ready {
-            color: #27ae60;
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @media (max-width: 768px) {
@@ -263,14 +313,24 @@
             #proxyFrame.active {
                 height: calc(100vh - 220px);
             }
+            .logo-container .logo-emoji {
+                font-size: 35px;
+            }
+            .logo-container span {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="status" id="status">Initializing...</div>
+    <div class="abstract-shapes">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+    </div>
 
     <div class="logo-container">
-        <img src="maths-logo.png" alt="Logo">
+        <div class="logo-emoji">📐</div>
         <span>Part of the Maths Support™</span>
     </div>
 
@@ -297,131 +357,13 @@
             <span class="quick-link" onclick="quickSearch('youtube.com')">YouTube</span>
             <span class="quick-link" onclick="quickSearch('wikipedia.org')">Wikipedia</span>
             <span class="quick-link" onclick="quickSearch('reddit.com')">Reddit</span>
+            <span class="quick-link" onclick="quickSearch('github.com')">GitHub</span>
         </div>
 
         <iframe id="proxyFrame"></iframe>
     </div>
 
     <script>
-        const CONFIG = {
-            prefix: '/service/',
-            bare: 'https://uv.holy.how/bare/',
-            encodeUrl: (str) => encodeURIComponent(str),
-            decodeUrl: (str) => decodeURIComponent(str)
-        };
-
-        const swCode = `
-const CONFIG = {
-    prefix: '/service/',
-    encodeUrl: (str) => encodeURIComponent(str),
-    decodeUrl: (str) => decodeURIComponent(str)
-};
-
-self.addEventListener('fetch', (event) => {
-    const url = new URL(event.request.url);
-    
-    if (!url.pathname.startsWith(CONFIG.prefix)) {
-        return;
-    }
-
-    const encodedUrl = url.pathname.slice(CONFIG.prefix.length);
-    let targetUrl;
-    
-    try {
-        targetUrl = CONFIG.decodeUrl(encodedUrl);
-        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
-            targetUrl = 'https://' + targetUrl;
-        }
-    } catch (e) {
-        event.respondWith(new Response('Invalid URL', { status: 400 }));
-        return;
-    }
-
-    event.respondWith(
-        fetch(targetUrl, {
-            method: event.request.method,
-            headers: event.request.headers,
-            body: event.request.method !== 'GET' && event.request.method !== 'HEAD' ? event.request.body : undefined,
-            credentials: 'omit',
-            redirect: 'follow'
-        }).then(response => {
-            const headers = new Headers(response.headers);
-            headers.delete('content-security-policy');
-            headers.delete('content-security-policy-report-only');
-            headers.delete('x-frame-options');
-            headers.delete('strict-transport-security');
-            headers.set('access-control-allow-origin', '*');
-            headers.set('access-control-allow-methods', '*');
-            headers.set('access-control-allow-headers', '*');
-
-            return new Response(response.body, {
-                status: response.status,
-                statusText: response.statusText,
-                headers: headers
-            });
-        }).catch(err => {
-            return new Response('Fetch Error: ' + err.message, {
-                status: 500,
-                headers: { 'content-type': 'text/plain' }
-            });
-        })
-    );
-});
-
-self.addEventListener('install', (event) => {
-    self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
-    event.waitUntil(self.clients.claim());
-});
-        `;
-
-        let swReady = false;
-
-        async function registerSW() {
-            const statusEl = document.getElementById('status');
-            
-            if (!('serviceWorker' in navigator)) {
-                statusEl.textContent = 'Service Workers not supported';
-                showError('Your browser does not support Service Workers');
-                return;
-            }
-
-            try {
-                statusEl.textContent = 'Registering proxy...';
-                
-                const blob = new Blob([swCode], { type: 'application/javascript' });
-                const blobUrl = URL.createObjectURL(blob);
-                
-                const registration = await navigator.serviceWorker.register(blobUrl, { 
-                    scope: '/',
-                    type: 'classic'
-                });
-
-                statusEl.textContent = 'Activating...';
-                
-                await navigator.serviceWorker.ready;
-                
-                swReady = true;
-                statusEl.textContent = 'Ready';
-                statusEl.classList.add('ready');
-                
-                setTimeout(() => {
-                    statusEl.style.opacity = '0';
-                    setTimeout(() => statusEl.remove(), 500);
-                }, 2000);
-
-                console.log('Service Worker registered and ready');
-            } catch (error) {
-                statusEl.textContent = 'Error: ' + error.message;
-                console.error('Service Worker registration failed:', error);
-                showError('Failed to initialize proxy: ' + error.message);
-            }
-        }
-
-        registerSW();
-
         function showError(message) {
             const errorDiv = document.getElementById('error');
             errorDiv.textContent = message;
@@ -458,37 +400,26 @@ self.addEventListener('activate', (event) => {
                 return;
             }
 
-            if (!swReady) {
-                showError('Proxy is still initializing. Please wait a moment.');
-                setTimeout(() => {
-                    if (swReady) loadProxy();
-                }, 1500);
-                return;
-            }
-
             try {
                 const frame = document.getElementById('proxyFrame');
                 const container = document.getElementById('mainContainer');
-                const proxiedUrl = CONFIG.prefix + CONFIG.encodeUrl(url);
                 
-                console.log('Loading:', url);
-                console.log('Proxied URL:', proxiedUrl);
+                // Using a reliable CORS proxy
+                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
                 
-                frame.src = proxiedUrl;
+                frame.src = proxyUrl;
                 frame.classList.add('active');
                 container.classList.add('browsing');
 
-                frame.onerror = (e) => {
-                    console.error('Frame error:', e);
-                    showError('Failed to load the website. Try a different URL.');
+                frame.onerror = () => {
+                    showError('Failed to load. Some sites block proxies.');
                 };
 
                 frame.onload = () => {
-                    console.log('Frame loaded successfully');
+                    console.log('Site loaded successfully');
                 };
 
             } catch (error) {
-                console.error('Load error:', error);
                 showError('Error: ' + error.message);
             }
         }
@@ -502,12 +433,7 @@ self.addEventListener('activate', (event) => {
                 return;
             }
 
-            if (!swReady) {
-                showError('Proxy is still initializing. Please wait.');
-                return;
-            }
-
-            const proxiedUrl = window.location.origin + CONFIG.prefix + CONFIG.encodeUrl(url);
+            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
             const win = window.open('about:blank', '_blank');
             
             if (win) {
@@ -521,12 +447,12 @@ self.addEventListener('activate', (event) => {
     </style>
 </head>
 <body>
-    <iframe src="${proxiedUrl}"></iframe>
+    <iframe src="${proxyUrl}"></iframe>
 </body>
 </html>`);
                 win.document.close();
             } else {
-                showError('Popup blocked. Please allow popups for this site.');
+                showError('Popup blocked. Please allow popups.');
             }
         }
 
