@@ -8,20 +8,19 @@
 <style>
     body {
         margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
+        font-family: Arial, sans-serif;
         background: #0b0f1a;
         color: white;
+        height: 100vh;
         display: flex;
         flex-direction: column;
-        height: 100vh;
     }
 
-    /* Top bar */
     .top-bar {
-        padding: 10px;
-        background: #11162a;
         display: flex;
         gap: 10px;
+        padding: 10px;
+        background: #11162a;
     }
 
     input {
@@ -42,45 +41,52 @@
         font-weight: bold;
     }
 
-    /* Iframe */
-    iframe {
+    iframe#viewer {
         flex: 1;
         border: none;
         background: white;
     }
 
-    /* Access error overlay */
-    .access-box {
+    /* Access modal */
+    .access-overlay {
         position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 420px;
-        max-width: 90%;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+    }
+
+    .access-box {
+        width: 520px;
+        max-width: 95%;
         background: #11162a;
         border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 0 30px rgba(0,0,0,0.6);
-        display: none;
-        z-index: 10;
+        overflow: hidden;
+        box-shadow: 0 0 40px rgba(0,0,0,0.7);
+        position: relative;
     }
 
-    .access-box h3 {
-        margin-top: 0;
-        color: #ff6b6b;
-    }
-
-    .access-box p {
+    .access-header {
+        padding: 10px 14px;
+        background: #0d1224;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         font-size: 14px;
-        opacity: 0.9;
     }
 
     .close-btn {
-        position: absolute;
-        top: 10px;
-        right: 14px;
         cursor: pointer;
         font-size: 18px;
+    }
+
+    .access-box iframe {
+        width: 100%;
+        height: 320px;
+        border: none;
+        background: white;
     }
 
     /* Bottom banner */
@@ -89,8 +95,8 @@
         background: #11162a;
         display: flex;
         align-items: center;
-        padding: 0 15px;
         gap: 10px;
+        padding: 0 15px;
     }
 
     .banner img {
@@ -117,20 +123,15 @@
 
 <iframe id="viewer"></iframe>
 
-<!-- Access error box -->
-<div class="access-box" id="accessBox">
-    <div class="close-btn" onclick="closeAccess()">✖</div>
-    <h3>Access to this server is restricted</h3>
-    <p>
-        This proxy requires temporary access permission.<br><br>
-        Visit:
-        <br>
-        <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" style="color:#4f7cff">
-            cors-anywhere.herokuapp.com/corsdemo
-        </a>
-        <br><br>
-        Then return and reload the website.
-    </p>
+<!-- Access overlay with iframe -->
+<div class="access-overlay" id="accessOverlay">
+    <div class="access-box">
+        <div class="access-header">
+            <span>Temporary access required</span>
+            <span class="close-btn" onclick="closeAccess()">✖</span>
+        </div>
+        <iframe src="https://cors-anywhere.herokuapp.com/corsdemo"></iframe>
+    </div>
 </div>
 
 <!-- Bottom banner -->
@@ -153,12 +154,12 @@ function loadSite() {
     document.getElementById("viewer").src =
         "https://cors-anywhere.herokuapp.com/" + url;
 
-    // show access warning (like cors-anywhere)
-    document.getElementById("accessBox").style.display = "block";
+    // show cors-anywhere access iframe
+    document.getElementById("accessOverlay").style.display = "flex";
 }
 
 function closeAccess() {
-    document.getElementById("accessBox").style.display = "none";
+    document.getElementById("accessOverlay").style.display = "none";
 }
 </script>
 
