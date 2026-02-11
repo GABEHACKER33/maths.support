@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,10 +13,22 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #e8f0f7;
+            background: #e8f0f7 url('bg.png') center/cover no-repeat fixed;
             color: #2c3e50;
             overflow: hidden;
             height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(232,240,247,0.85) 0%, rgba(255,255,255,0.75) 100%);
+            z-index: 0;
         }
 
         .logo-container {
@@ -46,6 +57,8 @@
         }
 
         .main-container {
+            position: relative;
+            z-index: 1;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -239,8 +252,8 @@
 </head>
 <body>
     <div class="logo-container">
-        <span>🧮</span>
-        <span>Maths Browser</span>
+        <img src="maths-logo.png" alt="Logo">
+        <span>Part of the Maths Support™</span>
     </div>
 
     <div class="main-container" id="mainContainer">
@@ -276,11 +289,18 @@
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     
-    if (!url.pathname.startsWith('/p/')) {
+    if (!url.pathname.startsWith('/uv/')) {
         return;
     }
 
-    const targetUrl = decodeURIComponent(url.pathname.slice(3));
+    const encodedUrl = url.pathname.slice(4);
+    let targetUrl;
+    
+    try {
+        targetUrl = decodeURIComponent(encodedUrl);
+    } catch {
+        return;
+    }
 
     event.respondWith(
         fetch(targetUrl, {
@@ -291,6 +311,7 @@ self.addEventListener('fetch', (event) => {
         }).then(response => {
             const headers = new Headers(response.headers);
             headers.delete('content-security-policy');
+            headers.delete('content-security-policy-report-only');
             headers.delete('x-frame-options');
             headers.set('access-control-allow-origin', '*');
 
@@ -300,7 +321,7 @@ self.addEventListener('fetch', (event) => {
                 headers: headers
             });
         }).catch(error => {
-            return new Response('Error: ' + error.message, {
+            return new Response('Proxy Error: ' + error.message, {
                 status: 500,
                 headers: { 'content-type': 'text/plain' }
             });
@@ -308,8 +329,13 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-self.addEventListener('install', () => self.skipWaiting());
-self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+self.addEventListener('install', (e) => {
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', (e) => {
+    e.waitUntil(self.clients.claim());
+});
         `;
 
         let swRegistered = false;
@@ -318,12 +344,13 @@ self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
             if ('serviceWorker' in navigator && !swRegistered) {
                 try {
                     const blob = new Blob([swCode], { type: 'application/javascript' });
-                    const url = URL.createObjectURL(blob);
-                    await navigator.serviceWorker.register(url, { scope: '/' });
+                    const blobUrl = URL.createObjectURL(blob);
+                    const registration = await navigator.serviceWorker.register(blobUrl, { scope: '/' });
                     await navigator.serviceWorker.ready;
                     swRegistered = true;
+                    console.log('Service Worker ready');
                 } catch (error) {
-                    console.error('SW error:', error);
+                    console.error('SW registration failed:', error);
                 }
             }
         }
@@ -337,39 +364,54 @@ self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
             setTimeout(() => errorDiv.classList.remove('active'), 5000);
         }
 
-        function loadProxy() {
-            const input = document.getElementById('urlInput').value.trim();
+        function normalizeUrl(input) {
+            input = input.trim();
+            
             if (!input) {
+                return null;
+            }
+
+            if (input.startsWith('http://') || input.startsWith('https://')) {
+                return input;
+            }
+
+            if (input.includes('.') && !input.includes(' ') && input.indexOf('.') < input.length - 1) {
+                return 'https://' + input;
+            }
+
+            return 'https://www.google.com/search?q=' + encodeURIComponent(input);
+        }
+
+        function loadProxy() {
+            const input = document.getElementById('urlInput').value;
+            const url = normalizeUrl(input);
+
+            if (!url) {
                 showError('Please enter a URL or search term');
                 return;
             }
 
-            let url = input;
-            
-            if (!url.match(/^https?:\\/\\//i)) {
-                if (url.includes('.') && !url.includes(' ')) {
-                    url = 'https://' + url;
-                } else {
-                    url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
-                }
-            }
-
             if (!swRegistered) {
-                showError('Proxy not ready. Please wait a moment and try again.');
-                setTimeout(registerSW, 500);
+                showError('Loading proxy... please wait a moment');
+                setTimeout(() => {
+                    if (swRegistered) {
+                        loadProxy();
+                    }
+                }, 1000);
                 return;
             }
 
             try {
                 const frame = document.getElementById('proxyFrame');
                 const container = document.getElementById('mainContainer');
-                const proxiedUrl = '/p/' + encodeURIComponent(url);
+                const proxiedUrl = '/uv/' + encodeURIComponent(url);
+                
                 frame.src = proxiedUrl;
                 frame.classList.add('active');
                 container.classList.add('browsing');
 
                 frame.onerror = () => {
-                    showError('Failed to load. Try again.');
+                    showError('Failed to load the website');
                 };
             } catch (error) {
                 showError('Error: ' + error.message);
@@ -377,27 +419,38 @@ self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
         }
 
         function openBlank() {
-            const input = document.getElementById('urlInput').value.trim();
-            if (!input) {
-                showError('Please enter a URL first');
+            const input = document.getElementById('urlInput').value;
+            const url = normalizeUrl(input);
+
+            if (!url) {
+                showError('Please enter a URL or search term');
                 return;
             }
 
-            let url = input;
-            if (!url.match(/^https?:\\/\\//i)) {
-                if (url.includes('.') && !url.includes(' ')) {
-                    url = 'https://' + url;
-                } else {
-                    url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
-                }
+            if (!swRegistered) {
+                showError('Loading proxy... please wait');
+                return;
             }
 
-            const proxiedUrl = window.location.origin + '/p/' + encodeURIComponent(url);
+            const proxiedUrl = window.location.origin + '/uv/' + encodeURIComponent(url);
             const win = window.open('about:blank');
+            
             if (win) {
-                win.document.write(\`<!DOCTYPE html><html><head><title>Browser</title><style>body{margin:0;overflow:hidden}iframe{width:100vw;height:100vh;border:none}</style></head><body><iframe src="\${proxiedUrl}"></iframe></body></html>\`);
+                win.document.write(\`<!DOCTYPE html>
+<html>
+<head>
+    <title>Maths Browser</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        iframe { width: 100vw; height: 100vh; border: none; }
+    </style>
+</head>
+<body>
+    <iframe src="\${proxiedUrl}"></iframe>
+</body>
+</html>\`);
             } else {
-                showError('Popup blocked');
+                showError('Popup blocked. Please allow popups.');
             }
         }
 
@@ -407,9 +460,10 @@ self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
         }
 
         document.getElementById('urlInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') loadProxy();
+            if (e.key === 'Enter') {
+                loadProxy();
+            }
         });
     </script>
 </body>
 </html>
-```
