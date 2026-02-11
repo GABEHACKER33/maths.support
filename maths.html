@@ -497,35 +497,46 @@
             background: #f5f5f5;
         }
 
-        /* Under Construction Page */
-        .construction-page {
+        /* Apps Page Styles */
+        .apps-page {
             display: none;
-            max-width: 800px;
+            max-width: 1400px;
             margin: 0 auto;
-            text-align: center;
-            padding: 60px 20px;
         }
 
-        .construction-page.active {
+        .apps-page.active {
             display: block;
         }
 
-        .construction-page h2 {
-            color: white;
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin: 0 auto 40px;
         }
 
-        .construction-page p {
-            color: white;
-            font-size: 1.3em;
-            opacity: 0.9;
+        @media (max-width: 1400px) {
+            .apps-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
 
-        .construction-icon {
-            font-size: 8em;
-            margin-bottom: 30px;
+        @media (max-width: 1100px) {
+            .apps-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .apps-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .game-container:fullscreen {
@@ -611,7 +622,7 @@
         <div class="top-nav" id="topNav">
             <div class="site-name">Maths Support</div>
             <div class="search-container">
-                <input type="text" class="search-bar" placeholder="Search for games...">
+                <input type="text" class="search-bar" id="searchBar" placeholder="Search for games...">
             </div>
             <button class="ai-helper-btn" onclick="openAIHelper()">
                 <span>🤖</span>
@@ -817,10 +828,10 @@
                 </div>
             </button>
 
-            <button class="game-button" onclick="openGame('EzClasswork', 'https://ezclasswork.com/')">
-                <img src=" img/ez.png" alt="EzClasswork" class="game-image">
+            <button class="game-button" onclick="openGame('Strong Dog', 'https://strongdog.com/')">
+                <img src=" img/strong-dog.png" alt="Strong Dog" class="game-image">
                 <div class="game-info">
-                    <h3>📚 EzClasswork</h3>
+                    <h3>🐕 Strong Dog</h3>
                     <p>Game portal</p>
                 </div>
             </button>
@@ -834,6 +845,43 @@
             </button>
         </div>
 
+        <!-- Apps Page -->
+        <div class="apps-page" id="appsPage">
+            <div class="apps-grid">
+                <button class="game-button" onclick="openGame('Strong Dog', 'https://strongdog.com/')">
+                    <img src=" img/strong-dog.png" alt="Strong Dog" class="game-image">
+                    <div class="game-info">
+                        <h3>🐕 Strong Dog</h3>
+                        <p>Game portal</p>
+                    </div>
+                </button>
+
+                <button class="game-button" onclick="openGame('Rtve Play', 'https://rtve.es/play/')">
+                    <img src=" img/rt-ve.png" alt="Rtve Play" class="game-image">
+                    <div class="game-info">
+                        <h3>📺 Rtve Play</h3>
+                        <p>Video streaming</p>
+                    </div>
+                </button>
+
+                <button class="game-button" onclick="openGame('ROYALEDLE', 'https://clash.gabriel-oli-ren-micro.workers.dev/')">
+                    <img src=" img/royaledle.png" alt="ROYALEDLE" class="game-image">
+                    <div class="game-info">
+                        <h3>👑 ROYALEDLE</h3>
+                        <p>Puzzle guessing game</p>
+                    </div>
+                </button>
+
+                <button class="game-button" onclick="openGame('Sound Buttons', 'https://myinstants.online/')">
+                    <img src=" img/my-instants.png" alt="Sound Buttons" class="game-image">
+                    <div class="game-info">
+                        <h3>🔊 Sound Buttons</h3>
+                        <p>Fun sound effects</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+
         <!-- Game Container (Hidden by default) -->
         <div class="game-container" id="gameContainer">
             <div class="game-header">
@@ -844,13 +892,6 @@
                 </div>
             </div>
             <iframe id="gameFrame" class="game-frame" src=""></iframe>
-        </div>
-
-        <!-- Under Construction Page -->
-        <div class="construction-page" id="constructionPage">
-            <div class="construction-icon">🚧</div>
-            <h2>Under Construction</h2>
-            <p>This section is coming soon! Stay tuned for exciting new features.</p>
         </div>
     </div>
 
@@ -900,7 +941,7 @@
             }
             
             // Add search event listener
-            const searchBar = document.querySelector('.search-bar');
+            const searchBar = document.getElementById('searchBar');
             if (searchBar) {
                 searchBar.addEventListener('input', searchGames);
             }
@@ -1026,12 +1067,14 @@
             const gameFrame = document.getElementById('gameFrame');
             const gameTitle = document.getElementById('gameTitle');
             const gamesGrid = document.getElementById('gamesGrid');
+            const appsPage = document.getElementById('appsPage');
             const topNav = document.getElementById('topNav');
 
             gameTitle.textContent = gameName;
             gameFrame.src = gameUrl;
             
             gamesGrid.style.display = 'none';
+            appsPage.classList.remove('active');
             gameContainer.classList.add('active');
             topNav.classList.add('minimal');
             
@@ -1042,7 +1085,10 @@
             const gameContainer = document.getElementById('gameContainer');
             const gameFrame = document.getElementById('gameFrame');
             const gamesGrid = document.getElementById('gamesGrid');
+            const appsPage = document.getElementById('appsPage');
             const topNav = document.getElementById('topNav');
+            const homeBtn = document.getElementById('homeBtn');
+            const appsBtn = document.getElementById('appsBtn');
 
             // Exit fullscreen if active
             if (document.fullscreenElement) {
@@ -1051,8 +1097,14 @@
 
             gameFrame.src = '';
             gameContainer.classList.remove('active');
-            gamesGrid.style.display = 'grid';
             topNav.classList.remove('minimal');
+            
+            // Return to the previously active section
+            if (homeBtn.classList.contains('active')) {
+                gamesGrid.style.display = 'grid';
+            } else if (appsBtn.classList.contains('active')) {
+                appsPage.classList.add('active');
+            }
         }
 
         function toggleFullscreen() {
@@ -1070,8 +1122,9 @@
         function showSection(section) {
             const gamesGrid = document.getElementById('gamesGrid');
             const gameContainer = document.getElementById('gameContainer');
-            const constructionPage = document.getElementById('constructionPage');
+            const appsPage = document.getElementById('appsPage');
             const topNav = document.getElementById('topNav');
+            const searchBar = document.getElementById('searchBar');
             const homeBtn = document.getElementById('homeBtn');
             const appsBtn = document.getElementById('appsBtn');
 
@@ -1086,13 +1139,15 @@
 
             if (section === 'home') {
                 gamesGrid.style.display = 'grid';
-                constructionPage.classList.remove('active');
+                appsPage.classList.remove('active');
                 topNav.classList.remove('minimal');
+                searchBar.placeholder = 'Search for games...';
                 homeBtn.classList.add('active');
             } else if (section === 'apps') {
                 gamesGrid.style.display = 'none';
-                constructionPage.classList.add('active');
+                appsPage.classList.add('active');
                 topNav.classList.remove('minimal');
+                searchBar.placeholder = 'Search for apps...';
                 appsBtn.classList.add('active');
             }
 
@@ -1117,29 +1172,50 @@
 
         // Search functionality
         function searchGames() {
-            const searchInput = document.querySelector('.search-bar');
+            const searchInput = document.getElementById('searchBar');
             const searchTerm = searchInput.value.toLowerCase();
-            const gameButtons = document.querySelectorAll('.game-button');
-            const noResults = document.getElementById('noResults');
-            let visibleCount = 0;
+            const homeBtn = document.getElementById('homeBtn');
+            const appsBtn = document.getElementById('appsBtn');
+            
+            // Determine which section is active and search accordingly
+            if (homeBtn.classList.contains('active')) {
+                // Search in games grid
+                const gameButtons = document.querySelectorAll('#gamesGrid .game-button');
+                const noResults = document.getElementById('noResults');
+                let visibleCount = 0;
 
-            gameButtons.forEach(button => {
-                const gameName = button.querySelector('h3').textContent.toLowerCase();
-                const gameDescription = button.querySelector('p').textContent.toLowerCase();
-                
-                if (gameName.includes(searchTerm) || gameDescription.includes(searchTerm)) {
-                    button.style.display = 'block';
-                    visibleCount++;
+                gameButtons.forEach(button => {
+                    const gameName = button.querySelector('h3').textContent.toLowerCase();
+                    const gameDescription = button.querySelector('p').textContent.toLowerCase();
+                    
+                    if (gameName.includes(searchTerm) || gameDescription.includes(searchTerm)) {
+                        button.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        button.style.display = 'none';
+                    }
+                });
+
+                // Show/hide no results message
+                if (visibleCount === 0 && searchTerm !== '') {
+                    noResults.classList.add('show');
                 } else {
-                    button.style.display = 'none';
+                    noResults.classList.remove('show');
                 }
-            });
-
-            // Show/hide no results message
-            if (visibleCount === 0 && searchTerm !== '') {
-                noResults.classList.add('show');
-            } else {
-                noResults.classList.remove('show');
+            } else if (appsBtn.classList.contains('active')) {
+                // Search in apps grid
+                const appButtons = document.querySelectorAll('#appsPage .game-button');
+                
+                appButtons.forEach(button => {
+                    const appName = button.querySelector('h3').textContent.toLowerCase();
+                    const appDescription = button.querySelector('p').textContent.toLowerCase();
+                    
+                    if (appName.includes(searchTerm) || appDescription.includes(searchTerm)) {
+                        button.style.display = 'block';
+                    } else {
+                        button.style.display = 'none';
+                    }
+                });
             }
         }
 
