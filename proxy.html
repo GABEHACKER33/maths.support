@@ -1,635 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maths Browser</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #e8f0f7 url('bg.png') center/cover no-repeat fixed;
-            color: #2c3e50;
-            overflow: hidden;
-            height: 100vh;
-            position: relative;
-        }
+<meta charset="UTF-8">
+<title>Maths Browser</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(232,240,247,0.92) 0%, rgba(255,255,255,0.85) 100%);
-            z-index: 0;
-        }
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #0b0f1a;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
 
-        .logo-container {
-            position: fixed;
-            bottom: 24px;
-            left: 24px;
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(255,255,255,0.95);
-            padding: 14px 24px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        
-        .logo-container img {
-            height: 50px;
-            width: auto;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-        }
-        
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
+    /* Top bar */
+    .top-bar {
+        padding: 10px;
+        background: #11162a;
+        display: flex;
+        gap: 10px;
+    }
 
-        .logo-text .brand-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: #2c3e50;
-            letter-spacing: -0.5px;
-        }
+    input {
+        flex: 1;
+        padding: 10px;
+        border-radius: 6px;
+        border: none;
+        outline: none;
+    }
 
-        .logo-text .tagline {
-            font-size: 11px;
-            color: #7f8c8d;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
+    button {
+        padding: 10px 16px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        background: #4f7cff;
+        color: white;
+        font-weight: bold;
+    }
 
-        .status-indicator {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 10000;
-            background: rgba(255,255,255,0.95);
-            padding: 12px 20px;
-            border-radius: 16px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #95a5a6;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            backdrop-filter: blur(20px);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    /* Iframe */
+    iframe {
+        flex: 1;
+        border: none;
+        background: white;
+    }
 
-        .status-indicator.ready {
-            background: linear-gradient(135deg, rgba(39,174,96,0.15), rgba(46,204,113,0.15));
-            color: #27ae60;
-            border: 1px solid rgba(39,174,96,0.3);
-        }
+    /* Access error overlay */
+    .access-box {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 420px;
+        max-width: 90%;
+        background: #11162a;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 0 30px rgba(0,0,0,0.6);
+        display: none;
+        z-index: 10;
+    }
 
-        .status-indicator.loading {
-            background: linear-gradient(135deg, rgba(52,152,219,0.15), rgba(41,128,185,0.15));
-            color: #3498db;
-            border: 1px solid rgba(52,152,219,0.3);
-        }
+    .access-box h3 {
+        margin-top: 0;
+        color: #ff6b6b;
+    }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: currentColor;
-            animation: pulse 2s ease-in-out infinite;
-        }
+    .access-box p {
+        font-size: 14px;
+        opacity: 0.9;
+    }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-        }
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        cursor: pointer;
+        font-size: 18px;
+    }
 
-        .main-container {
-            position: relative;
-            z-index: 1;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    /* Bottom banner */
+    .banner {
+        height: 60px;
+        background: #11162a;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        gap: 10px;
+    }
 
-        .main-container.browsing {
-            justify-content: flex-start;
-            padding-top: 24px;
-        }
+    .banner img {
+        height: 36px;
+    }
 
-        .header {
-            text-align: center;
-            margin-bottom: 56px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    .banner-text {
+        font-size: 14px;
+        line-height: 1.2;
+    }
 
-        .main-container.browsing .header {
-            margin-bottom: 24px;
-        }
-
-        .brand {
-            font-size: 64px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
-            letter-spacing: -2px;
-        }
-
-        .subtitle {
-            font-size: 18px;
-            color: #7f8c8d;
-            font-weight: 500;
-            opacity: 1;
-            transition: all 0.4s ease;
-            letter-spacing: 0.5px;
-        }
-
-        .main-container.browsing .subtitle {
-            opacity: 0;
-            height: 0;
-            margin: 0;
-        }
-
-        .search-wrapper {
-            width: 100%;
-            max-width: 760px;
-            background: rgba(255,255,255,0.98);
-            border-radius: 28px;
-            padding: 10px;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.15);
-            margin-bottom: 32px;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.5);
-        }
-
-        .search-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        #urlInput {
-            flex: 1;
-            padding: 20px 28px;
-            font-size: 16px;
-            background: transparent;
-            border: none;
-            color: #2c3e50;
-            outline: none;
-            font-weight: 500;
-        }
-
-        #urlInput::placeholder {
-            color: #95a5a6;
-            font-weight: 400;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 18px 28px;
-            font-size: 15px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 18px;
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-            box-shadow: 0 6px 20px rgba(102,126,234,0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(102,126,234,0.5);
-        }
-
-        .btn:active {
-            transform: translateY(-1px);
-        }
-
-        .btn-icon {
-            padding: 18px;
-            min-width: 56px;
-            font-size: 18px;
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            box-shadow: 0 6px 20px rgba(245,87,108,0.3);
-        }
-
-        .btn-secondary:hover {
-            box-shadow: 0 10px 30px rgba(245,87,108,0.5);
-        }
-
-        .quick-links {
-            display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 760px;
-            opacity: 1;
-            transition: all 0.4s ease;
-            margin-bottom: 20px;
-        }
-
-        .main-container.browsing .quick-links {
-            opacity: 0;
-            height: 0;
-            overflow: hidden;
-            margin: 0;
-        }
-
-        .quick-link {
-            padding: 12px 24px;
-            background: rgba(255,255,255,0.95);
-            border: 2px solid rgba(102,126,234,0.2);
-            border-radius: 16px;
-            color: #667eea;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-        }
-
-        .quick-link:hover {
-            background: rgba(102,126,234,0.15);
-            border-color: rgba(102,126,234,0.5);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(102,126,234,0.2);
-        }
-
-        #proxyFrame {
-            width: 100%;
-            max-width: 1400px;
-            height: 0;
-            border: none;
-            border-radius: 24px;
-            background: #fff;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.15);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        #proxyFrame.active {
-            height: calc(100vh - 200px);
-            opacity: 1;
-        }
-
-        .error {
-            background: linear-gradient(135deg, rgba(245,87,108,0.2), rgba(231,76,60,0.15));
-            border: 2px solid rgba(245,87,108,0.5);
-            padding: 18px 28px;
-            border-radius: 18px;
-            display: none;
-            max-width: 760px;
-            width: 100%;
-            margin-bottom: 20px;
-            color: #c0392b;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 6px 20px rgba(245,87,108,0.2);
-        }
-
-        .error.active {
-            display: block;
-            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .powered-by {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            font-size: 11px;
-            color: #95a5a6;
-            background: rgba(255,255,255,0.8);
-            padding: 8px 16px;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            z-index: 9999;
-        }
-
-        .powered-by strong {
-            color: #667eea;
-            font-weight: 700;
-        }
-
-        @media (max-width: 768px) {
-            .brand {
-                font-size: 44px;
-            }
-            .subtitle {
-                font-size: 15px;
-            }
-            .btn-group {
-                flex-direction: column;
-                width: 100%;
-            }
-            .btn {
-                width: 100%;
-            }
-            #proxyFrame.active {
-                height: calc(100vh - 240px);
-            }
-            .logo-container img {
-                height: 40px;
-            }
-            .logo-text .brand-name {
-                font-size: 16px;
-            }
-            .logo-text .tagline {
-                font-size: 9px;
-            }
-        }
-    </style>
+    .banner-text strong {
+        font-size: 15px;
+    }
+</style>
 </head>
+
 <body>
-    <div class="status-indicator loading" id="status">
-        <div class="status-dot"></div>
-        <span>Initializing Ultraviolet...</span>
+
+<div class="top-bar">
+    <input id="urlInput" placeholder="https://example.com">
+    <button onclick="loadSite()">Go</button>
+</div>
+
+<iframe id="viewer"></iframe>
+
+<!-- Access error box -->
+<div class="access-box" id="accessBox">
+    <div class="close-btn" onclick="closeAccess()">✖</div>
+    <h3>Access to this server is restricted</h3>
+    <p>
+        This proxy requires temporary access permission.<br><br>
+        Visit:
+        <br>
+        <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" style="color:#4f7cff">
+            cors-anywhere.herokuapp.com/corsdemo
+        </a>
+        <br><br>
+        Then return and reload the website.
+    </p>
+</div>
+
+<!-- Bottom banner -->
+<div class="banner">
+    <img src="maths-logo.png" alt="Maths Logo">
+    <div class="banner-text">
+        <strong>Maths Browser</strong><br>
+        Part of the Maths Support™
     </div>
+</div>
 
-    <div class="logo-container">
-        <img src="maths-logo.png" alt="Maths Support Logo">
-        <div class="logo-text">
-            <div class="brand-name">Maths Browser</div>
-            <div class="tagline">Part of the Maths Support™</div>
-        </div>
-    </div>
+<script>
+function loadSite() {
+    let url = document.getElementById("urlInput").value.trim();
 
-    <div class="powered-by">
-        Powered by <strong>Ultraviolet</strong>
-    </div>
+    if (!url.startsWith("http")) {
+        url = "https://" + url;
+    }
 
-    <div class="main-container" id="mainContainer">
-        <div class="header">
-            <div class="brand">Maths Browser</div>
-            <div class="subtitle">Advanced Web Proxy • Ultraviolet Technology</div>
-        </div>
+    document.getElementById("viewer").src =
+        "https://cors-anywhere.herokuapp.com/" + url;
 
-        <div class="error" id="error"></div>
+    // show access warning (like cors-anywhere)
+    document.getElementById("accessBox").style.display = "block";
+}
 
-        <div class="search-wrapper">
-            <div class="search-container">
-                <input type="text" id="urlInput" placeholder="Enter URL or search query..." autocomplete="off" spellcheck="false">
-                <div class="btn-group">
-                    <button class="btn btn-icon" onclick="loadProxy()" title="Load URL">→</button>
-                    <button class="btn btn-secondary btn-icon" onclick="openBlank()" title="Open in about:blank">⧉</button>
-                </div>
-            </div>
-        </div>
+function closeAccess() {
+    document.getElementById("accessBox").style.display = "none";
+}
+</script>
 
-        <div class="quick-links">
-            <span class="quick-link" onclick="quickSearch('google.com')">🔍 Google</span>
-            <span class="quick-link" onclick="quickSearch('youtube.com')">📺 YouTube</span>
-            <span class="quick-link" onclick="quickSearch('wikipedia.org')">📚 Wikipedia</span>
-            <span class="quick-link" onclick="quickSearch('reddit.com')">💬 Reddit</span>
-            <span class="quick-link" onclick="quickSearch('github.com')">💻 GitHub</span>
-        </div>
-
-        <iframe id="proxyFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
-    </div>
-
-    <script>
-        const UV_CONFIG = {
-            prefix: '/uv/service/',
-            encodeUrl: (url) => encodeURIComponent(url),
-            decodeUrl: (url) => decodeURIComponent(url)
-        };
-
-        let swReady = false;
-        let statusEl = document.getElementById('status');
-
-        async function registerSW() {
-            if (!('serviceWorker' in navigator)) {
-                updateStatus('Service Workers not supported', false);
-                showError('Your browser does not support Service Workers. Try Chrome or Firefox.');
-                return;
-            }
-
-            try {
-                updateStatus('Registering Service Worker...', true);
-
-                await navigator.serviceWorker.register('/sw.js', {
-                    scope: '/',
-                    updateViaCache: 'none'
-                });
-
-                updateStatus('Activating Ultraviolet...', true);
-
-                await navigator.serviceWorker.ready;
-
-                swReady = true;
-                updateStatus('Ready', false);
-
-                setTimeout(() => {
-                    statusEl.style.opacity = '0';
-                    setTimeout(() => statusEl.remove(), 300);
-                }, 2000);
-
-                console.log('%c✓ Ultraviolet Service Worker Ready', 'color: #27ae60; font-weight: bold; font-size: 14px;');
-            } catch (error) {
-                console.error('Service Worker registration failed:', error);
-                updateStatus('Failed to initialize', false);
-                showError('Failed to initialize proxy. Reload the page to try again.');
-            }
-        }
-
-        function updateStatus(message, loading) {
-            if (!statusEl) return;
-            statusEl.querySelector('span').textContent = message;
-            statusEl.className = 'status-indicator ' + (loading ? 'loading' : 'ready');
-        }
-
-        registerSW();
-
-        function showError(message) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.textContent = '⚠️ ' + message;
-            errorDiv.classList.add('active');
-            setTimeout(() => errorDiv.classList.remove('active'), 6000);
-        }
-
-        function normalizeUrl(input) {
-            input = input.trim();
-            
-            if (!input) return null;
-
-            if (input.startsWith('http://') || input.startsWith('https://')) {
-                return input;
-            }
-
-            const hasSpaces = input.includes(' ');
-            const hasDot = input.includes('.');
-            const dotIndex = input.indexOf('.');
-            
-            if (!hasSpaces && hasDot && dotIndex > 0 && dotIndex < input.length - 1) {
-                return 'https://' + input;
-            }
-
-            return 'https://www.google.com/search?q=' + encodeURIComponent(input);
-        }
-
-        function loadProxy() {
-            const input = document.getElementById('urlInput').value;
-            const url = normalizeUrl(input);
-
-            if (!url) {
-                showError('Please enter a valid URL or search query');
-                return;
-            }
-
-            if (!swReady) {
-                showError('Ultraviolet is still initializing. Please wait a moment...');
-                setTimeout(() => {
-                    if (swReady) loadProxy();
-                }, 2000);
-                return;
-            }
-
-            try {
-                const frame = document.getElementById('proxyFrame');
-                const container = document.getElementById('mainContainer');
-                const proxiedUrl = UV_CONFIG.prefix + UV_CONFIG.encodeUrl(url);
-                
-                console.log('%c→ Loading: ' + url, 'color: #3498db; font-weight: bold;');
-                console.log('%c→ Proxied: ' + proxiedUrl, 'color: #9b59b6;');
-                
-                frame.src = proxiedUrl;
-                frame.classList.add('active');
-                container.classList.add('browsing');
-
-                frame.onerror = (e) => {
-                    console.error('Frame load error:', e);
-                    showError('Failed to load the website. The site may be blocking proxies.');
-                };
-
-                frame.onload = () => {
-                    console.log('%c✓ Site loaded successfully', 'color: #27ae60; font-weight: bold;');
-                };
-
-            } catch (error) {
-                console.error('Load error:', error);
-                showError('Error: ' + error.message);
-            }
-        }
-
-        function openBlank() {
-            const input = document.getElementById('urlInput').value;
-            const url = normalizeUrl(input);
-
-            if (!url) {
-                showError('Please enter a valid URL or search query');
-                return;
-            }
-
-            if (!swReady) {
-                showError('Ultraviolet is still initializing. Please wait...');
-                return;
-            }
-
-            const proxiedUrl = window.location.origin + UV_CONFIG.prefix + UV_CONFIG.encodeUrl(url);
-            const win = window.open('about:blank', '_blank');
-            
-            if (win) {
-                win.document.write(`<!DOCTYPE html>
-<html>
-<head>
-    <title>Maths Browser</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📐</text></svg>">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { overflow: hidden; background: #000; }
-        iframe { width: 100vw; height: 100vh; border: none; }
-    </style>
-</head>
-<body>
-    <iframe src="${proxiedUrl}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
-</body>
-</html>`);
-                win.document.close();
-                console.log('%c✓ Opened in about:blank', 'color: #27ae60; font-weight: bold;');
-            } else {
-                showError('Popup blocked! Please allow popups for this site.');
-            }
-        }
-
-        function quickSearch(url) {
-            document.getElementById('urlInput').value = url;
-            loadProxy();
-        }
-
-        document.getElementById('urlInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                loadProxy();
-            }
-        });
-
-        document.getElementById('urlInput').focus();
-
-        console.log('%c╔════════════════════════════════════════╗', 'color: #667eea; font-weight: bold;');
-        console.log('%c║      Maths Browser - Ultraviolet      ║', 'color: #667eea; font-weight: bold;');
-        console.log('%c║    Part of the Maths Support™         ║', 'color: #667eea; font-weight: bold;');
-        console.log('%c╚════════════════════════════════════════╝', 'color: #667eea; font-weight: bold;');
-    </script>
 </body>
 </html>
