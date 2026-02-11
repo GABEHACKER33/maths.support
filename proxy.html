@@ -234,6 +234,22 @@
             display: block;
         }
 
+        .status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #95a5a6;
+            z-index: 10000;
+        }
+
+        .status.ready {
+            color: #27ae60;
+        }
+
         @media (max-width: 768px) {
             .brand {
                 font-size: 40px;
@@ -251,6 +267,8 @@
     </style>
 </head>
 <body>
+    <div class="status" id="status">Initializing...</div>
+
     <div class="logo-container">
         <img src="maths-logo.png" alt="Logo">
         <span>Part of the Maths Support™</span>
@@ -285,20 +303,37 @@
     </div>
 
     <script>
+        const CONFIG = {
+            prefix: '/service/',
+            bare: 'https://uv.holy.how/bare/',
+            encodeUrl: (str) => encodeURIComponent(str),
+            decodeUrl: (str) => decodeURIComponent(str)
+        };
+
         const swCode = `
+const CONFIG = {
+    prefix: '/service/',
+    encodeUrl: (str) => encodeURIComponent(str),
+    decodeUrl: (str) => decodeURIComponent(str)
+};
+
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     
-    if (!url.pathname.startsWith('/uv/')) {
+    if (!url.pathname.startsWith(CONFIG.prefix)) {
         return;
     }
 
-    const encodedUrl = url.pathname.slice(4);
+    const encodedUrl = url.pathname.slice(CONFIG.prefix.length);
     let targetUrl;
     
     try {
-        targetUrl = decodeURIComponent(encodedUrl);
-    } catch {
+        targetUrl = CONFIG.decodeUrl(encodedUrl);
+        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+            targetUrl = 'https://' + targetUrl;
+        }
+    } catch (e) {
+        event.respondWith(new Response('Invalid URL', { status: 400 }));
         return;
     }
 
@@ -306,6 +341,7 @@ self.addEventListener('fetch', (event) => {
         fetch(targetUrl, {
             method: event.request.method,
             headers: event.request.headers,
+            body: event.request.method !== 'GET' && event.request.method !== 'HEAD' ? event.request.body : undefined,
             credentials: 'omit',
             redirect: 'follow'
         }).then(response => {
@@ -313,15 +349,18 @@ self.addEventListener('fetch', (event) => {
             headers.delete('content-security-policy');
             headers.delete('content-security-policy-report-only');
             headers.delete('x-frame-options');
+            headers.delete('strict-transport-security');
             headers.set('access-control-allow-origin', '*');
+            headers.set('access-control-allow-methods', '*');
+            headers.set('access-control-allow-headers', '*');
 
             return new Response(response.body, {
                 status: response.status,
                 statusText: response.statusText,
                 headers: headers
             });
-        }).catch(error => {
-            return new Response('Proxy Error: ' + error.message, {
+        }).catch(err => {
+            return new Response('Fetch Error: ' + err.message, {
                 status: 500,
                 headers: { 'content-type': 'text/plain' }
             });
@@ -329,29 +368,55 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-self.addEventListener('install', (e) => {
+self.addEventListener('install', (event) => {
     self.skipWaiting();
 });
 
-self.addEventListener('activate', (e) => {
-    e.waitUntil(self.clients.claim());
+self.addEventListener('activate', (event) => {
+    event.waitUntil(self.clients.claim());
 });
         `;
 
-        let swRegistered = false;
+        let swReady = false;
 
         async function registerSW() {
-            if ('serviceWorker' in navigator && !swRegistered) {
-                try {
-                    const blob = new Blob([swCode], { type: 'application/javascript' });
-                    const blobUrl = URL.createObjectURL(blob);
-                    const registration = await navigator.serviceWorker.register(blobUrl, { scope: '/' });
-                    await navigator.serviceWorker.ready;
-                    swRegistered = true;
-                    console.log('Service Worker ready');
-                } catch (error) {
-                    console.error('SW registration failed:', error);
-                }
+            const statusEl = document.getElementById('status');
+            
+            if (!('serviceWorker' in navigator)) {
+                statusEl.textContent = 'Service Workers not supported';
+                showError('Your browser does not support Service Workers');
+                return;
+            }
+
+            try {
+                statusEl.textContent = 'Registering proxy...';
+                
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const blobUrl = URL.createObjectURL(blob);
+                
+                const registration = await navigator.serviceWorker.register(blobUrl, { 
+                    scope: '/',
+                    type: 'classic'
+                });
+
+                statusEl.textContent = 'Activating...';
+                
+                await navigator.serviceWorker.ready;
+                
+                swReady = true;
+                statusEl.textContent = 'Ready';
+                statusEl.classList.add('ready');
+                
+                setTimeout(() => {
+                    statusEl.style.opacity = '0';
+                    setTimeout(() => statusEl.remove(), 500);
+                }, 2000);
+
+                console.log('Service Worker registered and ready');
+            } catch (error) {
+                statusEl.textContent = 'Error: ' + error.message;
+                console.error('Service Worker registration failed:', error);
+                showError('Failed to initialize proxy: ' + error.message);
             }
         }
 
@@ -367,15 +432,17 @@ self.addEventListener('activate', (e) => {
         function normalizeUrl(input) {
             input = input.trim();
             
-            if (!input) {
-                return null;
-            }
+            if (!input) return null;
 
             if (input.startsWith('http://') || input.startsWith('https://')) {
                 return input;
             }
 
-            if (input.includes('.') && !input.includes(' ') && input.indexOf('.') < input.length - 1) {
+            const hasSpaces = input.includes(' ');
+            const hasDot = input.includes('.');
+            const dotIndex = input.indexOf('.');
+            
+            if (!hasSpaces && hasDot && dotIndex > 0 && dotIndex < input.length - 1) {
                 return 'https://' + input;
             }
 
@@ -391,29 +458,37 @@ self.addEventListener('activate', (e) => {
                 return;
             }
 
-            if (!swRegistered) {
-                showError('Loading proxy... please wait a moment');
+            if (!swReady) {
+                showError('Proxy is still initializing. Please wait a moment.');
                 setTimeout(() => {
-                    if (swRegistered) {
-                        loadProxy();
-                    }
-                }, 1000);
+                    if (swReady) loadProxy();
+                }, 1500);
                 return;
             }
 
             try {
                 const frame = document.getElementById('proxyFrame');
                 const container = document.getElementById('mainContainer');
-                const proxiedUrl = '/uv/' + encodeURIComponent(url);
+                const proxiedUrl = CONFIG.prefix + CONFIG.encodeUrl(url);
+                
+                console.log('Loading:', url);
+                console.log('Proxied URL:', proxiedUrl);
                 
                 frame.src = proxiedUrl;
                 frame.classList.add('active');
                 container.classList.add('browsing');
 
-                frame.onerror = () => {
-                    showError('Failed to load the website');
+                frame.onerror = (e) => {
+                    console.error('Frame error:', e);
+                    showError('Failed to load the website. Try a different URL.');
                 };
+
+                frame.onload = () => {
+                    console.log('Frame loaded successfully');
+                };
+
             } catch (error) {
+                console.error('Load error:', error);
                 showError('Error: ' + error.message);
             }
         }
@@ -427,30 +502,31 @@ self.addEventListener('activate', (e) => {
                 return;
             }
 
-            if (!swRegistered) {
-                showError('Loading proxy... please wait');
+            if (!swReady) {
+                showError('Proxy is still initializing. Please wait.');
                 return;
             }
 
-            const proxiedUrl = window.location.origin + '/uv/' + encodeURIComponent(url);
-            const win = window.open('about:blank');
+            const proxiedUrl = window.location.origin + CONFIG.prefix + CONFIG.encodeUrl(url);
+            const win = window.open('about:blank', '_blank');
             
             if (win) {
-                win.document.write(\`<!DOCTYPE html>
+                win.document.write(`<!DOCTYPE html>
 <html>
 <head>
     <title>Maths Browser</title>
     <style>
-        body { margin: 0; overflow: hidden; }
+        body { margin: 0; overflow: hidden; background: #000; }
         iframe { width: 100vw; height: 100vh; border: none; }
     </style>
 </head>
 <body>
-    <iframe src="\${proxiedUrl}"></iframe>
+    <iframe src="${proxiedUrl}"></iframe>
 </body>
-</html>\`);
+</html>`);
+                win.document.close();
             } else {
-                showError('Popup blocked. Please allow popups.');
+                showError('Popup blocked. Please allow popups for this site.');
             }
         }
 
@@ -461,9 +537,12 @@ self.addEventListener('activate', (e) => {
 
         document.getElementById('urlInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
+                e.preventDefault();
                 loadProxy();
             }
         });
+
+        document.getElementById('urlInput').focus();
     </script>
 </body>
 </html>
