@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maths Support - Gaming Hub</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bubbls/granny@212c543a85b243c4a0b92211f557e760d83d2292/TemplateData/style.css">
+    <script src="https://cdn.jsdelivr.net/gh/bubbls/granny@212c543a85b243c4a0b92211f557e760d83d2292/sdk.js"></script>
     <style>
         * {
             margin: 0;
@@ -551,6 +553,94 @@
             display: none;
         }
 
+        /* Granny Game Styles */
+        #granny-unity-container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            z-index: 99998;
+            display: none;
+            background: url('https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/background.png') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        #granny-unity-container.active {
+            display: block;
+        }
+
+        #unity-canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        #unity-loading-bar {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            display: block;
+        }
+
+        #unity-progress-bar-empty {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #unity-progress-bar-full {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            background: #4caf50;
+            border-radius: 8px;
+            transition: width 0.3s ease;
+        }
+
+        #unity-warning {
+            position: absolute;
+            left: 50%;
+            top: 5%;
+            transform: translate(-50%);
+            background: white;
+            padding: 10px;
+            display: none;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .granny-close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff4444;
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 99999;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .granny-close-btn:hover {
+            background: #cc0000;
+            transform: scale(1.1);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header h1 {
@@ -580,6 +670,34 @@
             }
         }
     </style>
+    <script type="text/javascript">
+        window.SDK_OPTIONS = {
+            gameId: "jp112o3o4hzgrnc7zaewjkrfk282pul8",
+            onEvent: function (a) {
+                switch (a.name) {
+                    case "SDK_GAME_PAUSE":
+                        console.log("Game paused, muting audio...");
+                        if (typeof myGameInstance !== 'undefined' && myGameInstance) {
+                            myGameInstance.SendMessage('AudioManager', 'MuteAudio');
+                        }
+                        break;
+                    case "SDK_GAME_START":
+                        console.log("Ad ended, resuming game...");
+                        if (typeof myGameInstance !== 'undefined' && myGameInstance) {
+                            myGameInstance.SendMessage('AudioManager', 'UnmuteAudio');
+                        }
+                        break;
+                    case "SDK_READY":
+                        console.log("SDK ready.");
+                        break;
+                }
+            }
+        };
+        (function (a, b, c) {
+            var d = a.getElementsByTagName(b)[0];
+            a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://cdn.jsdelivr.net/gh/testamalame/sef@main/sedk.js", d.parentNode.insertBefore(a, d));
+        })(document, "script", "gamemonetize-sdk");
+    </script>
 </head>
 <body>
     <!-- Password Protection Overlay -->
@@ -602,7 +720,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-logo">
-            <img src="maths-logo.png" alt="Maths Support Logo">
+            <img src="https://via.placeholder.com/80/667eea/FFFFFF?text=MS" alt="Maths Support Logo">
         </div>
         <div class="sidebar-menu">
             <div class="sidebar-item active" id="homeBtn" onclick="showSection('home')">
@@ -637,7 +755,7 @@
             </div>
             
             <button class="game-button" onclick="openGame('Drive Mad', 'https://games.playtropolis.com/drive-mad-v2/')">
-                <img src=" img/drive-mad.png" alt="Drive Mad" class="game-image">
+                <img src="https://via.placeholder.com/300/4A90E2/FFFFFF?text=Drive+Mad" alt="Drive Mad" class="game-image">
                 <div class="game-info">
                     <h3>🏎️ Drive Mad</h3>
                     <p>Racing car vehicle game</p>
@@ -645,23 +763,23 @@
             </button>
 
             <button class="game-button" onclick="openGame('Poly Track', 'https://arcadrome.com/embed/polytrack')">
-                <img src=" img/polytrack.png" alt="Poly Track" class="game-image">
+                <img src="https://via.placeholder.com/300/FF6B6B/FFFFFF?text=Poly+Track" alt="Poly Track" class="game-image">
                 <div class="game-info">
                     <h3>🏁 Poly Track</h3>
                     <p>Racing car vehicle game</p>
                 </div>
             </button>
 
-            <button class="game-button" onclick="openGame('Odd Bot Out', 'https://games.playtropolis.com/odd-bot-out/')">
-                <img src=" img/odd-bot-out.png" alt="Odd Bot Out" class="game-image">
+            <button class="game-button" onclick="openGrannyGame()">
+                <img src="https://via.placeholder.com/300/8B0000/FFFFFF?text=Granny" alt="Granny" class="game-image">
                 <div class="game-info">
-                    <h3>🤖 Odd Bot Out</h3>
-                    <p>Robot puzzle game</p>
+                    <h3>👵 Granny</h3>
+                    <p>Horror survival escape game</p>
                 </div>
             </button>
 
             <button class="game-button" onclick="openGame('Stunt Bike Extreme', 'https://games.playtropolis.com/stunt-bike-extreme/')">
-                <img src=" img/stunt-bike-extreme.png" alt="Stunt Bike Extreme" class="game-image">
+                <img src="https://via.placeholder.com/300/51CF66/FFFFFF?text=Stunt+Bike" alt="Stunt Bike Extreme" class="game-image">
                 <div class="game-info">
                     <h3>🏍️ Stunt Bike Extreme</h3>
                     <p>Motorcycle tricks and stunts</p>
@@ -669,7 +787,7 @@
             </button>
 
             <button class="game-button" onclick="openGame('Subway Surfers', 'https://arcadrome.com/embed/subway-surfers')">
-                <img src=" img/subway-surfers.png" alt="Subway Surfers" class="game-image">
+                <img src="https://via.placeholder.com/300/FFA500/FFFFFF?text=Subway" alt="Subway Surfers" class="game-image">
                 <div class="game-info">
                     <h3>🚇 Subway Surfers</h3>
                     <p>Endless running game</p>
@@ -677,7 +795,7 @@
             </button>
 
             <button class="game-button" onclick="openGame('Monkey Mart', 'https://games.playtropolis.com/monkey-mart/')">
-                <img src=" img/monkey-markt.png" alt="Monkey Mart" class="game-image">
+                <img src="https://via.placeholder.com/300/FFD700/000000?text=Monkey+Mart" alt="Monkey Mart" class="game-image">
                 <div class="game-info">
                     <h3>🐵 Monkey Mart</h3>
                     <p>Store management game</p>
@@ -685,7 +803,7 @@
             </button>
 
             <button class="game-button" onclick="openGame('House Of Hazards', 'https://games.playtropolis.com/house-of-hazards/')">
-                <img src=" img/house-of-hazards.png" alt="House Of Hazards" class="game-image">
+                <img src="https://via.placeholder.com/300/FF69B4/FFFFFF?text=Hazards" alt="House Of Hazards" class="game-image">
                 <div class="game-info">
                     <h3>🏠 House Of Hazards</h3>
                     <p>Obstacle fun game</p>
@@ -693,7 +811,7 @@
             </button>
 
             <button class="game-button" onclick="openGame('Tiny Fishing', 'https://games.playtropolis.com/tiny-fishing/')">
-                <img src=" img/tiny-fishing.png" alt="Tiny Fishing" class="game-image">
+                <img src="https://via.placeholder.com/300/00BFFF/FFFFFF?text=Fishing" alt="Tiny Fishing" class="game-image">
                 <div class="game-info">
                     <h3>🎣 Tiny Fishing</h3>
                     <p>Fish in the ocean</p>
@@ -701,124 +819,20 @@
             </button>
 
             <button class="game-button" onclick="openGame('Basketball Legends', 'https://games.playtropolis.com/basketball-stars/')">
-                <img src=" img/basketball-legends.png" alt="Basketball Legends" class="game-image">
+                <img src="https://via.placeholder.com/300/FF8C00/FFFFFF?text=Basketball" alt="Basketball Legends" class="game-image">
                 <div class="game-info">
                     <h3>🏀 Basketball Legends</h3>
                     <p>Sports basketball game</p>
                 </div>
             </button>
 
-            <button class="game-button" onclick="openGame('Short Life', 'https://games.playtropolis.com/short-life/')">
-                <img src=" img/short-life.png" alt="Short Life" class="game-image">
-                <div class="game-info">
-                    <h3>💀 Short Life</h3>
-                    <p>Fun obstacle game</p>
-                </div>
-            </button>
-
-            <button class="game-button" onclick="openGame('My Super Tiny Market', 'https://games.playtropolis.com/my-super-tiny-market/')">
-                <img src=" img/my-super-tiny-market.png" alt="My Super Tiny Market" class="game-image">
-                <div class="game-info">
-                    <h3>🛒 My Super Tiny Market</h3>
-                    <p>Management game</p>
-                </div>
-            </button>
-
-            <button class="game-button" onclick="openGame('Car Chase', 'https://idev.games/embed/car-chase-')">
-                <img src=" img/car-chase.png" alt="Car Chase" class="game-image">
-                <div class="game-info">
-                    <h3>🚗 Car Chase</h3>
-                    <p>Action racing game</p>
-                </div>
-            </button>
-
             <button class="game-button" onclick="openGame('Minecraft', 'https://x.mess.eu.org/ninja-wasm/')">
-                <img src=" img/minecraft.png" alt="Minecraft" class="game-image">
+                <img src="https://via.placeholder.com/300/8B4513/FFFFFF?text=Minecraft" alt="Minecraft" class="game-image">
                 <div class="game-info">
                     <h3>⛏️ Minecraft</h3>
                     <p>Block building game</p>
                 </div>
             </button>
-
-            <button class="game-button" onclick="openGame('Amazing Rope Police', 'https://ezclasswork.com/science/amazing-rope-police/')">
-                <img src=" img/amazing-rope-police.png" alt="Amazing Rope Police" class="game-image">
-                <div class="game-info">
-                    <h3>🦸 Amazing Rope Police</h3>
-                    <p>Action superhero game</p>
-                </div>
-            </button>
-
-            <button class="game-button" onclick="openGame('Shell Shockers', 'https://geometry.pw/')">
-                <img src=" img/shell-shockers.png" alt="Shell Shockers" class="game-image">
-                <div class="game-info">
-                    <h3>🥚 Shell Shockers</h3>
-                    <p>Egg shooter game</p>
-                </div>
-            </button>
-
-            <button class="game-button" onclick="openGame('Recoil', 'https://games.playtropolis.com/recoil/')">
-                <img src=" img/recoil.png" alt="Recoil" class="game-image">
-                <div class="game-info">
-                    <h3>🔫 Recoil</h3>
-                    <p>Action shooter game</p>
-                </div>
-            </button>
-
-            <button class="game-button" onclick="openGame('Smash Karts', 'https://geometrykarts.com/')">
-                <img src=" img/smash-karts.png" alt="Smash Karts" class="game-image">
-                <div class="game-info">
-                    <h3>🛒 Smash Karts</h3>
-                    <p>Kart racing battle</p>
-                </div>
-            </button>
-
-            <button class="game-button" onclick="openGame('Rocket Bot Royale', 'https://rocket-bot-royale.gabriel-oli-ren-micro.workers.dev/')">
-                <img src=" img/rocket-bot-royale.png" alt="Rocket Bot Royale" class="game-image">
-                <div class="game-info">
-                    <h3>🚀 Rocket Bot Royale</h3>
-                    <p>Battle royale game</p>
-                </div>
-            </button>
-
-            <button class="game-button" onclick="openGame('Goober Dash', 'https://goober-dash.gabriel-oli-ren-micro.workers.dev/')">
-                <img src=" img/goober-dash.png" alt="Goober Dash" class="game-image">
-                <div class="game-info">
-                    <h3>👾 Goober Dash</h3>
-                    <p>Fun racing game</p>
-                </div>
-            </button>
-
-            <button class="game-button" onclick="openGame('Rooftop Snipers', 'https://ezclasswork.com/science/rooftop-snipers-2/')">
-                <img src=" img/rooftop-snipers.png" alt="Rooftop Snipers" class="game-image">
-                <div class="game-info">
-                    <h3>🎯 Rooftop Snipers</h3>
-                    <p>Shooter duel game</p>
-                </div>
-            </button>
-
-            <button class="game-button" onclick="openGame('Masked Special Forces', 'https://ezclasswork.com/science/maskedforces/')">
-                <img src=" img/masked-forces.png" alt="Masked Special Forces" class="game-image">
-                <div class="game-info">
-                    <h3>🎖️ Masked Special Forces</h3>
-                    <p>Action FPS game</p>
-                </div>
-            </button>
-
-            <button class="game-button" onclick="openGame('Geometry Dash Lite', 'https://arcadrome.com/embed/geometry-dash-lite/')">
-                <img src="img/geometry-dash.png" alt="Geometry Dash" class="game-image">
-                <div class="game-info">
-                    <h3>📐 Geometry Dash Lite</h3>
-                    <p>Rhythm platformer game</p>
-                </div>
-            </button>
-
-            <button class="game-button" onclick="openGame('5 nights at epstein', 'https://ig.gabriel-oli-ren-micro.workers.dev/')">
-                <img src="img/epstein.png" alt="5 nights at epstein" class="game-image">
-                <div class="game-info">
-                    <h3>5 nights at epstein</h3>
-                    <p>escape epstein</p>
-                </div>
-            </button>            
 
         </div>
 
@@ -826,39 +840,23 @@
         <div class="apps-page" id="appsPage">
             <div class="apps-grid">
                 <button class="game-button" onclick="openGame('Strong Dog', 'https://colute.net/')">
-                    <img src=" img/favicon.png" alt="Strong Dog" class="game-image">
+                    <img src="https://via.placeholder.com/300/667eea/FFFFFF?text=Strong+Dog" alt="Strong Dog" class="game-image">
                     <div class="game-info">
                         <h3>🐕 Strong Dog</h3>
                         <p>Game portal</p>
                     </div>
                 </button>
 
-                <button class="game-button" onclick="openGame('Rtve Play', 'https://rtve.es/play/')">
-                    <img src=" img/rt-ve.png" alt="Rtve Play" class="game-image">
-                    <div class="game-info">
-                        <h3>📺 Rtve Play</h3>
-                        <p>Video streaming</p>
-                    </div>
-                </button>
-
                 <button class="game-button" onclick="openGame('ROYALEDLE', 'https://clash.gabriel-oli-ren-micro.workers.dev/')">
-                    <img src=" img/royaledle.png" alt="ROYALEDLE" class="game-image">
+                    <img src="https://via.placeholder.com/300/9013FE/FFFFFF?text=ROYALEDLE" alt="ROYALEDLE" class="game-image">
                     <div class="game-info">
                         <h3>👑 ROYALEDLE</h3>
                         <p>Puzzle guessing game</p>
                     </div>
                 </button>
 
-                <button class="game-button" onclick="openGame('Sound Buttons', 'https://myinstants.online/')">
-                    <img src=" img/my-instants.png" alt="Sound Buttons" class="game-image">
-                    <div class="game-info">
-                        <h3>🔊 Sound Buttons</h3>
-                        <p>Fun sound effects</p>
-                    </div>
-                </button>
-
                 <button class="game-button" onclick="openGame('Browser LOL', 'https://browserlol.gabriel-oli-ren-micro.workers.dev/')">
-                    <img src=" img/injex.png" alt="Injex Browser" class="game-image">
+                    <img src="https://via.placeholder.com/300/1DB954/FFFFFF?text=Browser" alt="Injex Browser" class="game-image">
                     <div class="game-info">
                         <h3>Browser LOL</h3>
                         <p>Search online Unblocked</p>
@@ -888,6 +886,18 @@
         <iframe id="aiFrame" class="ai-frame" src=""></iframe>
     </div>
 
+    <!-- Granny Unity Game Container -->
+    <div id="granny-unity-container">
+        <button class="granny-close-btn" onclick="closeGrannyGame()">✕</button>
+        <canvas id="unity-canvas"></canvas>
+        <div id="unity-loading-bar">
+            <div id="unity-progress-bar-empty">
+                <div id="unity-progress-bar-full"></div>
+            </div>
+        </div>
+        <div id="unity-warning"></div>
+    </div>
+
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -902,7 +912,12 @@
         // Session management
         let isAuthenticated = false;
 
-        // Initialize page - consolidated all load events into one
+        // Granny game variables
+        let myGameInstance = null;
+        let isAdShown = false;
+        let grannyGameLoaded = false;
+
+        // Initialize page
         window.addEventListener('load', function() {
             // Check authentication status
             isAuthenticated = sessionStorage.getItem('auth') === 'true';
@@ -911,7 +926,6 @@
                 document.getElementById('passwordOverlay').classList.add('hidden');
                 disableSecurityProtection();
             } else {
-                // Keep overlay visible
                 document.getElementById('passwordOverlay').classList.remove('hidden');
                 enableSecurityProtection();
             }
@@ -947,7 +961,6 @@
             }
 
             try {
-                // Query Supabase to check if password exists
                 const { data, error: supabaseError } = await supabaseClient
                     .from('passwords')
                     .select('*')
@@ -955,18 +968,15 @@
                     .single();
 
                 if (supabaseError || !data) {
-                    // Wrong password
                     error.classList.add('show');
                     error.textContent = 'Incorrect password. Please try again.';
                     input.value = '';
                     
-                    // Add shake animation
                     input.style.animation = 'shake 0.5s';
                     setTimeout(() => {
                         input.style.animation = '';
                     }, 500);
                 } else {
-                    // Correct password
                     sessionStorage.setItem('auth', 'true');
                     isAuthenticated = true;
                     document.getElementById('passwordOverlay').classList.add('hidden');
@@ -983,13 +993,8 @@
 
         // Security protection functions
         function enableSecurityProtection() {
-            // Disable right-click
             document.addEventListener('contextmenu', preventAction);
-            
-            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
             document.addEventListener('keydown', preventDevTools);
-            
-            // Detect DevTools opening
             detectDevTools();
         }
 
@@ -1007,17 +1012,14 @@
 
         function preventDevTools(e) {
             if (!isAuthenticated) {
-                // F12
                 if (e.keyCode === 123) {
                     e.preventDefault();
                     return false;
                 }
-                // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
                 if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
                     e.preventDefault();
                     return false;
                 }
-                // Ctrl+U (view source)
                 if (e.ctrlKey && e.keyCode === 85) {
                     e.preventDefault();
                     return false;
@@ -1040,15 +1042,7 @@
             }, 1000);
         }
 
-        // Protect against inspect element
-        if (!isAuthenticated) {
-            setInterval(() => {
-                if (!isAuthenticated) {
-                    debugger;
-                }
-            }, 100);
-        }
-
+        // Open regular game
         function openGame(gameName, gameUrl) {
             const gameContainer = document.getElementById('gameContainer');
             const gameFrame = document.getElementById('gameFrame');
@@ -1068,6 +1062,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // Close regular game
         function closeGame() {
             const gameContainer = document.getElementById('gameContainer');
             const gameFrame = document.getElementById('gameFrame');
@@ -1077,7 +1072,6 @@
             const homeBtn = document.getElementById('homeBtn');
             const appsBtn = document.getElementById('appsBtn');
 
-            // Exit fullscreen if active
             if (document.fullscreenElement) {
                 document.exitFullscreen();
             }
@@ -1086,7 +1080,6 @@
             gameContainer.classList.remove('active');
             topNav.classList.remove('minimal');
             
-            // Return to the previously active section
             if (homeBtn.classList.contains('active')) {
                 gamesGrid.style.display = 'grid';
             } else if (appsBtn.classList.contains('active')) {
@@ -1094,6 +1087,7 @@
             }
         }
 
+        // Toggle fullscreen
         function toggleFullscreen() {
             const gameContainer = document.getElementById('gameContainer');
             
@@ -1106,6 +1100,126 @@
             }
         }
 
+        // Granny game functions
+        async function openGrannyGame() {
+            const grannyContainer = document.getElementById('granny-unity-container');
+            grannyContainer.classList.add('active');
+            
+            if (!grannyGameLoaded) {
+                await initializeGrannyGame();
+                grannyGameLoaded = true;
+            }
+        }
+
+        function closeGrannyGame() {
+            const grannyContainer = document.getElementById('granny-unity-container');
+            grannyContainer.classList.remove('active');
+        }
+
+        async function mergeUnityWebFiles(baseUrl, filePrefix, totalParts, extension) {
+            const partUrls = [];
+            for (let i = 1; i <= totalParts; i++) {
+                partUrls.push(`${baseUrl}/${filePrefix}_part${i}.${extension}`);
+            }
+
+            const buffers = [];
+            for (let i = 0; i < totalParts; i++) {
+                const response = await fetch(partUrls[i]);
+                if (!response.ok) {
+                    throw new Error(`Failed to load part: ${partUrls[i]}`);
+                }
+                const buffer = await response.arrayBuffer();
+                buffers.push(buffer);
+
+                const progress = ((i + 1) / totalParts) * 100;
+                document.querySelector("#unity-progress-bar-full").style.width = `${progress}%`;
+            }
+
+            const totalLength = buffers.reduce((acc, buffer) => acc + buffer.byteLength, 0);
+            const combinedBuffer = new Uint8Array(totalLength);
+            let offset = 0;
+
+            buffers.forEach((buffer) => {
+                combinedBuffer.set(new Uint8Array(buffer), offset);
+                offset += buffer.byteLength;
+            });
+
+            return combinedBuffer;
+        }
+
+        function unityShowBanner(msg, type) {
+            const warningBanner = document.querySelector("#unity-warning");
+            function updateBannerVisibility() {
+                warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+            }
+            var div = document.createElement('div');
+            div.innerHTML = msg;
+            warningBanner.appendChild(div);
+            if (type == 'error') div.style = 'background: red; padding: 10px;';
+            else {
+                if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+                setTimeout(function() {
+                    warningBanner.removeChild(div);
+                    updateBannerVisibility();
+                }, 5000);
+            }
+            updateBannerVisibility();
+        }
+
+        function showAdOnClick() {
+            if (!isAdShown && typeof sdk !== 'undefined' && typeof sdk.showBanner !== 'undefined') {
+                sdk.showBanner();
+                isAdShown = true;
+            }
+        }
+
+        async function initializeGrannyGame() {
+            var canvas = document.querySelector("#unity-canvas");
+            var loadingBar = document.querySelector("#unity-loading-bar");
+            var progressBarFull = document.querySelector("#unity-progress-bar-full");
+            var buildUrl = "https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/Build";
+            var loaderUrl = buildUrl + "/Granny.loader.js";
+
+            try {
+                const dataBuffer = await mergeUnityWebFiles(buildUrl, "Granny", 2, "data");
+                const wasmBuffer = await mergeUnityWebFiles(buildUrl, "Granny", 2, "wasm");
+
+                const dataBlobUrl = URL.createObjectURL(new Blob([dataBuffer], { type: "application/octet-stream" }));
+                const wasmBlobUrl = URL.createObjectURL(new Blob([wasmBuffer], { type: "application/octet-stream" }));
+
+                var config = {
+                    dataUrl: dataBlobUrl,
+                    frameworkUrl: buildUrl + "/Granny.framework.js",
+                    codeUrl: wasmBlobUrl,
+                    streamingAssetsUrl: "https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/StreamingAssets",
+                    companyName: "Anastasia Kazantseva",
+                    productName: "Granny",
+                    productVersion: "1.0",
+                    showBanner: unityShowBanner,
+                };
+
+                var script = document.createElement("script");
+                script.src = loaderUrl;
+                script.onload = () => {
+                    createUnityInstance(canvas, config, (progress) => {
+                        progressBarFull.style.width = 100 * progress + "%";
+                    }).then((unityInstance) => {
+                        myGameInstance = unityInstance;
+                        loadingBar.style.display = "none";
+                        canvas.addEventListener('pointerdown', showAdOnClick);
+                        canvas.addEventListener('touchstart', showAdOnClick);
+                    }).catch((message) => {
+                        alert(message);
+                    });
+                };
+
+                document.body.appendChild(script);
+            } catch (error) {
+                console.error("Game initialization failed:", error);
+            }
+        }
+
+        // Show section
         function showSection(section) {
             const gamesGrid = document.getElementById('gamesGrid');
             const gameContainer = document.getElementById('gameContainer');
@@ -1115,12 +1229,10 @@
             const homeBtn = document.getElementById('homeBtn');
             const appsBtn = document.getElementById('appsBtn');
 
-            // Close any open game
             if (gameContainer.classList.contains('active')) {
                 closeGame();
             }
 
-            // Remove active class from all menu items
             homeBtn.classList.remove('active');
             appsBtn.classList.remove('active');
 
@@ -1141,6 +1253,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // AI Helper
         function openAIHelper() {
             const aiOverlay = document.getElementById('aiOverlay');
             const aiFrame = document.getElementById('aiFrame');
@@ -1164,9 +1277,7 @@
             const homeBtn = document.getElementById('homeBtn');
             const appsBtn = document.getElementById('appsBtn');
             
-            // Determine which section is active and search accordingly
             if (homeBtn.classList.contains('active')) {
-                // Search in games grid
                 const gameButtons = document.querySelectorAll('#gamesGrid .game-button');
                 const noResults = document.getElementById('noResults');
                 let visibleCount = 0;
@@ -1183,14 +1294,12 @@
                     }
                 });
 
-                // Show/hide no results message
                 if (visibleCount === 0 && searchTerm !== '') {
                     noResults.classList.add('show');
                 } else {
                     noResults.classList.remove('show');
                 }
             } else if (appsBtn.classList.contains('active')) {
-                // Search in apps grid
                 const appButtons = document.querySelectorAll('#appsPage .game-button');
                 
                 appButtons.forEach(button => {
@@ -1206,13 +1315,15 @@
             }
         }
 
-        // Update fullscreen button text when entering/exiting fullscreen
+        // Update fullscreen button text
         document.addEventListener('fullscreenchange', function() {
             const fullscreenButton = document.querySelector('.fullscreen-button');
-            if (document.fullscreenElement) {
-                fullscreenButton.textContent = '⛶ Exit Fullscreen';
-            } else {
-                fullscreenButton.textContent = '⛶ Fullscreen';
+            if (fullscreenButton) {
+                if (document.fullscreenElement) {
+                    fullscreenButton.textContent = '⛶ Exit Fullscreen';
+                } else {
+                    fullscreenButton.textContent = '⛶ Fullscreen';
+                }
             }
         });
     </script>
