@@ -1017,12 +1017,15 @@
                 <p>Loading questionnaire...</p>
             </div>
 
-           <!-- Form state (filled dynamically) -->
+            <!-- ============================================ -->
+            <!-- Form state (filled dynamically)              -->
+            <!-- REPLACED with the new "Game Suggestions"     -->
+            <!-- ============================================ -->
             <div id="qFormContent" style="display:none;">
                 <div class="q-header">
                     <div class="q-badge">🎮 Game Suggestions</div>
-                    <h2 id="qTitle">Help us grow the platform!</h2>
-                    <p id="qDescription">Got a game in mind? Let us know what you'd like to see added!</p>
+                    <h2 id="qTitle">Before you enter...</h2>
+                    <p id="qDescription">Take 1 minute to help us improve Maths Support!</p>
                 </div>
                 <div class="q-progress-wrap" id="qProgressWrap">
                     <div class="q-progress-label">
@@ -1033,13 +1036,17 @@
                         <div class="q-progress-fill" id="qProgressFill" style="width:0%"></div>
                     </div>
                 </div>
-                <div id="qQuestionsContainer"></div>
+                <div id="qQuestionsContainer">
+                    <!-- Questions will be dynamically injected here based on DB config -->
+                </div>
                 <button class="q-submit-btn" id="qSubmitBtn" onclick="submitQuestionnaire()">
                     🎮 Submit & Enter
                 </button>
             </div>
 
-            <!-- Thank you state -->
+            <!-- ============================================ -->
+            <!-- Thank you state (first one is kept)          -->
+            <!-- ============================================ -->
             <div class="q-thankyou" id="qThankyou">
                 <div class="q-thankyou-icon">🎮</div>
                 <h3>Thanks for the suggestion!</h3>
@@ -1047,13 +1054,7 @@
                 <button class="q-enter-btn" onclick="closeQuestionnaire()">Enter Site →</button>
             </div>
 
-            <!-- Thank you state -->
-            <div class="q-thankyou" id="qThankyou">
-                <div class="q-thankyou-icon">🎉</div>
-                <h3>Thank you!</h3>
-                <p>Your responses have been recorded. Enjoy the games!</p>
-                <button class="q-enter-btn" onclick="closeQuestionnaire()">Enter Site →</button>
-            </div>
+            <!-- Removed the duplicate thank you div that was here -->
 
         </div>
     </div>
@@ -1523,7 +1524,7 @@
             document.getElementById('qFormContent').style.display = 'block';
 
             document.getElementById('qTitle').textContent = config.title || 'Before you enter...';
-            document.getElementById('qDescription').textContent = config.description || 'Please answer a few quick questions!';
+            document.getElementById('qDescription').textContent = config.description || 'Take 1 minute to help us improve Maths Support!';
 
             const container = document.getElementById('qQuestionsContainer');
             container.innerHTML = '';
@@ -1707,7 +1708,7 @@
 
             } catch (err) {
                 btn.disabled = false;
-                btn.textContent = '✅ Submit & Enter';
+                btn.textContent = '🎮 Submit & Enter';
                 console.error('Submit error:', err);
                 alert('There was an error submitting. Please try again.');
             }
