@@ -102,6 +102,384 @@
             20%, 40%, 60%, 80% { transform: translateX(10px); }
         }
 
+        /* ============================================
+           QUESTIONNAIRE OVERLAY
+        ============================================ */
+        .questionnaire-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            z-index: 999999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .questionnaire-overlay.active {
+            display: flex;
+        }
+
+        /* Animated background blobs */
+        .q-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: blobFloat 8s ease-in-out infinite;
+        }
+        .q-blob-1 { width: 400px; height: 400px; background: #667eea; top: -100px; left: -100px; animation-delay: 0s; }
+        .q-blob-2 { width: 300px; height: 300px; background: #764ba2; bottom: -80px; right: -80px; animation-delay: 2s; }
+        .q-blob-3 { width: 250px; height: 250px; background: #f64f59; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: 4s; }
+
+        @keyframes blobFloat {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.1) translateY(-20px); }
+        }
+
+        .questionnaire-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 50px 60px;
+            max-width: 680px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .questionnaire-card::-webkit-scrollbar { width: 6px; }
+        .questionnaire-card::-webkit-scrollbar-track { background: transparent; }
+        .questionnaire-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+        .q-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .q-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 0.75em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        .q-header h2 {
+            color: white;
+            font-size: 1.9em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .q-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        /* Progress bar */
+        .q-progress-wrap {
+            margin-bottom: 36px;
+        }
+
+        .q-progress-label {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8em;
+            margin-bottom: 8px;
+        }
+
+        .q-progress-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .q-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        /* Questions */
+        .q-question-block {
+            margin-bottom: 28px;
+            animation: fadeQuestion 0.3s ease;
+        }
+
+        @keyframes fadeQuestion {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .q-question-label {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.95em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .q-question-num {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* Radio options */
+        .q-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .q-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9em;
+        }
+
+        .q-option:hover {
+            background: rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .q-option input[type="radio"] {
+            accent-color: #667eea;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .q-option.selected {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            color: white;
+        }
+
+        /* Text / Textarea inputs */
+        .q-input, .q-textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.07);
+            border: 1.5px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            color: white;
+            font-size: 0.9em;
+            outline: none;
+            transition: border-color 0.2s ease;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .q-input::placeholder, .q-textarea::placeholder {
+            color: rgba(255,255,255,0.35);
+        }
+
+        .q-input:focus, .q-textarea:focus {
+            border-color: #667eea;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .q-textarea { min-height: 100px; }
+
+        /* Scale / rating */
+        .q-scale {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .q-scale-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .q-scale-btn:hover {
+            background: rgba(102,126,234,0.2);
+            border-color: rgba(102,126,234,0.5);
+            color: white;
+        }
+
+        .q-scale-btn.selected {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: transparent;
+            color: white;
+        }
+
+        .q-scale-labels {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.75em;
+            margin-top: 6px;
+        }
+
+        /* Required mark */
+        .q-required { color: #f64f59; margin-left: 3px; }
+
+        /* Submit button */
+        .q-submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 1.05em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .q-submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .q-submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Validation error */
+        .q-field-error {
+            color: #f64f59;
+            font-size: 0.8em;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .q-field-error.show { display: block; }
+
+        /* Thank you screen */
+        .q-thankyou {
+            text-align: center;
+            padding: 40px 0;
+            display: none;
+        }
+
+        .q-thankyou.active { display: block; }
+
+        .q-thankyou-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .q-thankyou h3 {
+            color: white;
+            font-size: 1.8em;
+            margin-bottom: 12px;
+        }
+
+        .q-thankyou p {
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 30px;
+        }
+
+        .q-enter-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .q-enter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+        }
+
+        /* Loading spinner inside questionnaire */
+        .q-loading {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .q-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .q-loading p { color: rgba(255,255,255,0.5); }
+
+        /* ============================================ */
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: url('https://i.postimg.cc/BQsspvpv/maths-bg.png');
@@ -150,7 +528,6 @@
             height: 80px;
         }
 
-        /* Sidebar Menu */
         .sidebar-menu {
             padding: 20px 0;
         }
@@ -194,14 +571,12 @@
             opacity: 1;
         }
 
-        /* Main Content Area */
         .main-content {
             margin-left: 60px;
             padding: 40px;
             transition: margin-left 0.3s ease;
         }
 
-        /* Top Navigation Bar */
         .top-nav {
             display: flex;
             align-items: center;
@@ -279,7 +654,6 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
-        /* AI Helper Overlay */
         .ai-overlay {
             position: fixed;
             top: 0;
@@ -341,7 +715,6 @@
             opacity: 0.9;
         }
 
-        /* Game Grid */
         .games-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -364,29 +737,10 @@
             display: block;
         }
 
-        @media (max-width: 1400px) {
-            .games-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        @media (max-width: 1100px) {
-            .games-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .games-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 500px) {
-            .games-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        @media (max-width: 1400px) { .games-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 1100px) { .games-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .games-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px) { .games-grid { grid-template-columns: 1fr; } }
 
         .game-button {
             background: white;
@@ -443,7 +797,6 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
 
-        /* Game Container */
         .game-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -467,9 +820,7 @@
             align-items: center;
         }
 
-        .game-header h2 {
-            font-size: 1.5em;
-        }
+        .game-header h2 { font-size: 1.5em; }
 
         .close-button, .fullscreen-button {
             background: rgba(255, 255, 255, 0.2);
@@ -487,10 +838,7 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        .game-controls {
-            display: flex;
-            gap: 10px;
-        }
+        .game-controls { display: flex; gap: 10px; }
 
         .game-frame {
             width: 100%;
@@ -499,16 +847,13 @@
             background: #f5f5f5;
         }
 
-        /* Apps Page Styles */
         .apps-page {
             display: none;
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        .apps-page.active {
-            display: block;
-        }
+        .apps-page.active { display: block; }
 
         .apps-grid {
             display: grid;
@@ -517,43 +862,15 @@
             margin: 0 auto 40px;
         }
 
-        @media (max-width: 1400px) {
-            .apps-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
+        @media (max-width: 1400px) { .apps-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 1100px) { .apps-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .apps-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px) { .apps-grid { grid-template-columns: 1fr; } }
 
-        @media (max-width: 1100px) {
-            .apps-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
+        .game-container:fullscreen { background: black; }
+        .game-container:fullscreen .game-frame { height: 100vh; }
+        .game-container:fullscreen .game-header { display: none; }
 
-        @media (max-width: 768px) {
-            .apps-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 500px) {
-            .apps-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .game-container:fullscreen {
-            background: black;
-        }
-
-        .game-container:fullscreen .game-frame {
-            height: 100vh;
-        }
-
-        .game-container:fullscreen .game-header {
-            display: none;
-        }
-
-        /* Granny Game Styles */
         #granny-unity-container {
             position: fixed;
             width: 100%;
@@ -566,15 +883,8 @@
             background-size: cover;
         }
 
-        #granny-unity-container.active {
-            display: block;
-        }
-
-        #unity-canvas {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
+        #granny-unity-container.active { display: block; }
+        #unity-canvas { position: absolute; width: 100%; height: 100%; }
 
         #unity-loading-bar {
             position: absolute;
@@ -589,11 +899,7 @@
             display: block;
         }
 
-        #unity-progress-bar-empty {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
+        #unity-progress-bar-empty { width: 100%; height: 100%; position: relative; }
 
         #unity-progress-bar-full {
             position: absolute;
@@ -641,33 +947,14 @@
             transform: scale(1.1);
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .main-content {
-                padding: 20px;
-            }
-
-            .top-nav {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .site-name {
-                font-size: 1.5em;
-            }
-
-            .search-container {
-                max-width: 100%;
-            }
-
-            .ai-helper-btn {
-                width: 100%;
-                justify-content: center;
-            }
+            .header h1 { font-size: 2em; }
+            .main-content { padding: 20px; }
+            .top-nav { flex-direction: column; gap: 15px; }
+            .site-name { font-size: 1.5em; }
+            .search-container { max-width: 100%; }
+            .ai-helper-btn { width: 100%; justify-content: center; }
+            .questionnaire-card { padding: 30px 24px; }
         }
     </style>
     <script type="text/javascript">
@@ -676,19 +963,14 @@
             onEvent: function (a) {
                 switch (a.name) {
                     case "SDK_GAME_PAUSE":
-                        console.log("Game paused, muting audio...");
                         if (typeof myGameInstance !== 'undefined' && myGameInstance) {
                             myGameInstance.SendMessage('AudioManager', 'MuteAudio');
                         }
                         break;
                     case "SDK_GAME_START":
-                        console.log("Ad ended, resuming game...");
                         if (typeof myGameInstance !== 'undefined' && myGameInstance) {
                             myGameInstance.SendMessage('AudioManager', 'UnmuteAudio');
                         }
-                        break;
-                    case "SDK_READY":
-                        console.log("SDK ready.");
                         break;
                 }
             }
@@ -717,6 +999,60 @@
         </div>
     </div>
 
+    <!-- ============================================
+         QUESTIONNAIRE OVERLAY
+         Blocks everything. No close button.
+    ============================================ -->
+    <div class="questionnaire-overlay" id="questionnaireOverlay">
+        <!-- Animated background -->
+        <div class="q-blob q-blob-1"></div>
+        <div class="q-blob q-blob-2"></div>
+        <div class="q-blob q-blob-3"></div>
+
+        <div class="questionnaire-card" id="questionnaireCard">
+
+            <!-- Loading state -->
+            <div class="q-loading" id="qLoading">
+                <div class="q-spinner"></div>
+                <p>Loading questionnaire...</p>
+            </div>
+
+            <!-- Form state (filled dynamically) -->
+            <div id="qFormContent" style="display:none;">
+                <div class="q-header">
+                    <div class="q-badge">📋 Quick Survey</div>
+                    <h2 id="qTitle">Before you enter...</h2>
+                    <p id="qDescription">Please take a moment to answer a few questions. Your feedback helps us improve!</p>
+                </div>
+
+                <div class="q-progress-wrap" id="qProgressWrap">
+                    <div class="q-progress-label">
+                        <span>Progress</span>
+                        <span id="qProgressText">0%</span>
+                    </div>
+                    <div class="q-progress-bar">
+                        <div class="q-progress-fill" id="qProgressFill" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <div id="qQuestionsContainer"></div>
+
+                <button class="q-submit-btn" id="qSubmitBtn" onclick="submitQuestionnaire()">
+                    ✅ Submit & Enter
+                </button>
+            </div>
+
+            <!-- Thank you state -->
+            <div class="q-thankyou" id="qThankyou">
+                <div class="q-thankyou-icon">🎉</div>
+                <h3>Thank you!</h3>
+                <p>Your responses have been recorded. Enjoy the games!</p>
+                <button class="q-enter-btn" onclick="closeQuestionnaire()">Enter Site →</button>
+            </div>
+
+        </div>
+    </div>
+
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-logo">
@@ -736,7 +1072,6 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Top Navigation Bar -->
         <div class="top-nav" id="topNav">
             <div class="site-name">Maths Support</div>
             <div class="search-container">
@@ -945,7 +1280,6 @@
                     <p>Horror survival escape game</p>
                 </div>
             </button>
-
         </div>
 
         <!-- Apps Page -->
@@ -990,12 +1324,10 @@
                         <p>Search online Unblocked</p>
                     </div>
                 </button>
-                
-                
             </div>
         </div>
 
-        <!-- Game Container (Hidden by default) -->
+        <!-- Game Container -->
         <div class="game-container" id="gameContainer">
             <div class="game-header">
                 <h2 id="gameTitle">Game</h2>
@@ -1030,53 +1362,55 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
-        // Supabase Configuration
+        // ============================================================
+        // SUPABASE CONFIG
+        // ============================================================
         const SUPABASE_URL = 'https://hsmfjpetvcsgkpkwpdjr.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzbWZqcGV0dmNzZ2twa3dwZGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3NDc0MzEsImV4cCI6MjA3OTMyMzQzMX0.IBiJtUJBPyjNwGowfgnlfrbHpb46C43NmYY3O9rEFqQ';
-        
-        // Initialize Supabase client
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Session management
+        // ============================================================
+        // STATE
+        // ============================================================
         let isAuthenticated = false;
-
-        // Granny game variables
         let myGameInstance = null;
         let isAdShown = false;
         let grannyGameLoaded = false;
+        let currentQuestionnaireId = null;
+        let questionnaireQuestions = [];
 
-        // Initialize page
-        window.addEventListener('load', function() {
-            // Check authentication status
+        // ============================================================
+        // INIT
+        // ============================================================
+        window.addEventListener('load', function () {
             isAuthenticated = sessionStorage.getItem('auth') === 'true';
-            
+
             if (isAuthenticated) {
                 document.getElementById('passwordOverlay').classList.add('hidden');
                 disableSecurityProtection();
+                // Already authenticated this session — check if questionnaire was already done
+                if (sessionStorage.getItem('questionnaire_done') !== 'true') {
+                    checkAndShowQuestionnaire();
+                }
             } else {
                 document.getElementById('passwordOverlay').classList.remove('hidden');
                 enableSecurityProtection();
             }
-            
-            // Add Enter key listener for password input
+
             const passwordInput = document.getElementById('passwordInput');
             if (passwordInput) {
-                passwordInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        checkPassword();
-                    }
+                passwordInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') { e.preventDefault(); checkPassword(); }
                 });
             }
-            
-            // Add search event listener
+
             const searchBar = document.getElementById('searchBar');
-            if (searchBar) {
-                searchBar.addEventListener('input', searchGames);
-            }
+            if (searchBar) searchBar.addEventListener('input', searchGames);
         });
 
-        // Check password with Supabase
+        // ============================================================
+        // PASSWORD CHECK
+        // ============================================================
         async function checkPassword() {
             const input = document.getElementById('passwordInput');
             const error = document.getElementById('passwordError');
@@ -1099,11 +1433,8 @@
                     error.classList.add('show');
                     error.textContent = 'Incorrect password. Please try again.';
                     input.value = '';
-                    
                     input.style.animation = 'shake 0.5s';
-                    setTimeout(() => {
-                        input.style.animation = '';
-                    }, 500);
+                    setTimeout(() => { input.style.animation = ''; }, 500);
                 } else {
                     sessionStorage.setItem('auth', 'true');
                     isAuthenticated = true;
@@ -1111,6 +1442,11 @@
                     disableSecurityProtection();
                     input.value = '';
                     error.classList.remove('show');
+
+                    // After successful password: check if questionnaire needs showing
+                    if (sessionStorage.getItem('questionnaire_done') !== 'true') {
+                        await checkAndShowQuestionnaire();
+                    }
                 }
             } catch (err) {
                 error.classList.add('show');
@@ -1119,7 +1455,277 @@
             }
         }
 
-        // Security protection functions
+        // ============================================================
+        // QUESTIONNAIRE — CHECK IF ACTIVE IN SUPABASE
+        // ============================================================
+        /*
+         * Expected Supabase tables:
+         *
+         * questionnaire_config
+         *   id          uuid / int (PK)
+         *   active      boolean   ← set to true to show the questionnaire
+         *   title       text
+         *   description text
+         *   questions   jsonb     ← array of question objects (see format below)
+         *
+         * questionnaire_responses
+         *   id              uuid (default: gen_random_uuid())
+         *   questionnaire_id  references questionnaire_config(id)
+         *   responses       jsonb   ← { question_id: answer, ... }
+         *   submitted_at    timestamptz (default: now())
+         *
+         * Question object format in "questions" jsonb array:
+         * {
+         *   "id": "q1",
+         *   "type": "radio" | "text" | "textarea" | "scale",
+         *   "label": "Question text here?",
+         *   "required": true,
+         *   "options": ["Option A", "Option B"],   // only for type: radio
+         *   "scale_min": 1, "scale_max": 5,        // only for type: scale
+         *   "scale_label_min": "Very bad",
+         *   "scale_label_max": "Very good"
+         * }
+         */
+        async function checkAndShowQuestionnaire() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('questionnaire_config')
+                    .select('*')
+                    .eq('active', true)
+                    .order('id', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (error) { console.warn('Questionnaire config error:', error); return; }
+                if (!data) return; // No active questionnaire
+
+                currentQuestionnaireId = data.id;
+                questionnaireQuestions = data.questions || [];
+
+                renderQuestionnaire(data);
+                document.getElementById('questionnaireOverlay').classList.add('active');
+                preventBodyScroll(true);
+            } catch (err) {
+                console.warn('Could not load questionnaire:', err);
+            }
+        }
+
+        // ============================================================
+        // RENDER QUESTIONNAIRE DYNAMICALLY
+        // ============================================================
+        function renderQuestionnaire(config) {
+            document.getElementById('qLoading').style.display = 'none';
+            document.getElementById('qFormContent').style.display = 'block';
+
+            document.getElementById('qTitle').textContent = config.title || 'Before you enter...';
+            document.getElementById('qDescription').textContent = config.description || 'Please answer a few quick questions!';
+
+            const container = document.getElementById('qQuestionsContainer');
+            container.innerHTML = '';
+
+            questionnaireQuestions.forEach((q, index) => {
+                const block = document.createElement('div');
+                block.className = 'q-question-block';
+                block.dataset.questionId = q.id;
+
+                const label = document.createElement('div');
+                label.className = 'q-question-label';
+                label.innerHTML = `
+                    <span class="q-question-num">${index + 1}</span>
+                    <span>${q.label}${q.required ? '<span class="q-required">*</span>' : ''}</span>
+                `;
+                block.appendChild(label);
+
+                // Render input based on type
+                if (q.type === 'radio') {
+                    const optionsDiv = document.createElement('div');
+                    optionsDiv.className = 'q-options';
+                    (q.options || []).forEach(opt => {
+                        const optLabel = document.createElement('label');
+                        optLabel.className = 'q-option';
+                        optLabel.innerHTML = `<input type="radio" name="${q.id}" value="${opt}"> ${opt}`;
+                        optLabel.addEventListener('click', () => {
+                            optionsDiv.querySelectorAll('.q-option').forEach(el => el.classList.remove('selected'));
+                            optLabel.classList.add('selected');
+                            updateProgress();
+                        });
+                        optionsDiv.appendChild(optLabel);
+                    });
+                    block.appendChild(optionsDiv);
+
+                } else if (q.type === 'text') {
+                    const inp = document.createElement('input');
+                    inp.type = 'text';
+                    inp.className = 'q-input';
+                    inp.placeholder = q.placeholder || 'Your answer...';
+                    inp.dataset.qid = q.id;
+                    inp.addEventListener('input', updateProgress);
+                    block.appendChild(inp);
+
+                } else if (q.type === 'textarea') {
+                    const ta = document.createElement('textarea');
+                    ta.className = 'q-textarea';
+                    ta.placeholder = q.placeholder || 'Your answer...';
+                    ta.dataset.qid = q.id;
+                    ta.addEventListener('input', updateProgress);
+                    block.appendChild(ta);
+
+                } else if (q.type === 'scale') {
+                    const min = q.scale_min || 1;
+                    const max = q.scale_max || 5;
+                    const scaleDiv = document.createElement('div');
+                    scaleDiv.className = 'q-scale';
+                    for (let i = min; i <= max; i++) {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'q-scale-btn';
+                        btn.textContent = i;
+                        btn.dataset.val = i;
+                        btn.dataset.qid = q.id;
+                        btn.addEventListener('click', () => {
+                            scaleDiv.querySelectorAll('.q-scale-btn').forEach(b => b.classList.remove('selected'));
+                            btn.classList.add('selected');
+                            updateProgress();
+                        });
+                        scaleDiv.appendChild(btn);
+                    }
+                    block.appendChild(scaleDiv);
+                    if (q.scale_label_min || q.scale_label_max) {
+                        const labelsDiv = document.createElement('div');
+                        labelsDiv.className = 'q-scale-labels';
+                        labelsDiv.innerHTML = `<span>${q.scale_label_min || ''}</span><span>${q.scale_label_max || ''}</span>`;
+                        block.appendChild(labelsDiv);
+                    }
+                }
+
+                // Error placeholder
+                const errDiv = document.createElement('div');
+                errDiv.className = 'q-field-error';
+                errDiv.id = `err-${q.id}`;
+                errDiv.textContent = 'This field is required.';
+                block.appendChild(errDiv);
+
+                container.appendChild(block);
+            });
+
+            updateProgress();
+        }
+
+        // ============================================================
+        // PROGRESS TRACKING
+        // ============================================================
+        function updateProgress() {
+            const required = questionnaireQuestions.filter(q => q.required);
+            let answered = 0;
+
+            required.forEach(q => {
+                if (q.type === 'radio') {
+                    if (document.querySelector(`input[name="${q.id}"]:checked`)) answered++;
+                } else if (q.type === 'text' || q.type === 'textarea') {
+                    const el = document.querySelector(`[data-qid="${q.id}"]`);
+                    if (el && el.value.trim()) answered++;
+                } else if (q.type === 'scale') {
+                    if (document.querySelector(`.q-scale-btn.selected[data-qid="${q.id}"]`)) answered++;
+                }
+            });
+
+            const pct = required.length ? Math.round((answered / required.length) * 100) : 100;
+            document.getElementById('qProgressFill').style.width = pct + '%';
+            document.getElementById('qProgressText').textContent = pct + '%';
+        }
+
+        // ============================================================
+        // COLLECT ANSWERS
+        // ============================================================
+        function collectAnswers() {
+            const answers = {};
+            questionnaireQuestions.forEach(q => {
+                if (q.type === 'radio') {
+                    const checked = document.querySelector(`input[name="${q.id}"]:checked`);
+                    answers[q.id] = checked ? checked.value : null;
+                } else if (q.type === 'text' || q.type === 'textarea') {
+                    const el = document.querySelector(`[data-qid="${q.id}"]`);
+                    answers[q.id] = el ? el.value.trim() : null;
+                } else if (q.type === 'scale') {
+                    const sel = document.querySelector(`.q-scale-btn.selected[data-qid="${q.id}"]`);
+                    answers[q.id] = sel ? parseInt(sel.dataset.val) : null;
+                }
+            });
+            return answers;
+        }
+
+        // ============================================================
+        // VALIDATE
+        // ============================================================
+        function validateAnswers(answers) {
+            let valid = true;
+            questionnaireQuestions.forEach(q => {
+                const errEl = document.getElementById(`err-${q.id}`);
+                if (q.required && (answers[q.id] === null || answers[q.id] === '')) {
+                    if (errEl) errEl.classList.add('show');
+                    valid = false;
+                } else {
+                    if (errEl) errEl.classList.remove('show');
+                }
+            });
+            return valid;
+        }
+
+        // ============================================================
+        // SUBMIT QUESTIONNAIRE
+        // ============================================================
+        async function submitQuestionnaire() {
+            const answers = collectAnswers();
+            if (!validateAnswers(answers)) return;
+
+            const btn = document.getElementById('qSubmitBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Submitting...';
+
+            try {
+                const { error } = await supabaseClient
+                    .from('questionnaire_responses')
+                    .insert({
+                        questionnaire_id: currentQuestionnaireId,
+                        responses: answers,
+                        submitted_at: new Date().toISOString()
+                    });
+
+                if (error) throw error;
+
+                // Mark as done for this session
+                sessionStorage.setItem('questionnaire_done', 'true');
+
+                // Show thank you screen
+                document.getElementById('qFormContent').style.display = 'none';
+                document.getElementById('qThankyou').classList.add('active');
+
+            } catch (err) {
+                btn.disabled = false;
+                btn.textContent = '✅ Submit & Enter';
+                console.error('Submit error:', err);
+                alert('There was an error submitting. Please try again.');
+            }
+        }
+
+        // ============================================================
+        // CLOSE QUESTIONNAIRE (only available after submission)
+        // ============================================================
+        function closeQuestionnaire() {
+            document.getElementById('questionnaireOverlay').classList.remove('active');
+            preventBodyScroll(false);
+        }
+
+        // ============================================================
+        // PREVENT BODY SCROLL WHEN QUESTIONNAIRE IS OPEN
+        // ============================================================
+        function preventBodyScroll(prevent) {
+            document.body.style.overflow = prevent ? 'hidden' : '';
+        }
+
+        // ============================================================
+        // SECURITY
+        // ============================================================
         function enableSecurityProtection() {
             document.addEventListener('contextmenu', preventAction);
             document.addEventListener('keydown', preventDevTools);
@@ -1132,26 +1738,14 @@
         }
 
         function preventAction(e) {
-            if (!isAuthenticated) {
-                e.preventDefault();
-                return false;
-            }
+            if (!isAuthenticated) { e.preventDefault(); return false; }
         }
 
         function preventDevTools(e) {
             if (!isAuthenticated) {
-                if (e.keyCode === 123) {
-                    e.preventDefault();
-                    return false;
-                }
-                if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
-                    e.preventDefault();
-                    return false;
-                }
-                if (e.ctrlKey && e.keyCode === 85) {
-                    e.preventDefault();
-                    return false;
-                }
+                if (e.keyCode === 123) { e.preventDefault(); return false; }
+                if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) { e.preventDefault(); return false; }
+                if (e.ctrlKey && e.keyCode === 85) { e.preventDefault(); return false; }
             }
         }
 
@@ -1159,8 +1753,7 @@
             const threshold = 160;
             const check = setInterval(() => {
                 if (!isAuthenticated) {
-                    if (window.outerWidth - window.innerWidth > threshold || 
-                        window.outerHeight - window.innerHeight > threshold) {
+                    if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
                         sessionStorage.clear();
                         window.location.reload();
                     }
@@ -1170,7 +1763,9 @@
             }, 1000);
         }
 
-        // Open regular game
+        // ============================================================
+        // GAME FUNCTIONS
+        // ============================================================
         function openGame(gameName, gameUrl) {
             const gameContainer = document.getElementById('gameContainer');
             const gameFrame = document.getElementById('gameFrame');
@@ -1181,16 +1776,13 @@
 
             gameTitle.textContent = gameName;
             gameFrame.src = gameUrl;
-            
             gamesGrid.style.display = 'none';
             appsPage.classList.remove('active');
             gameContainer.classList.add('active');
             topNav.classList.add('minimal');
-            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Close regular game
         function closeGame() {
             const gameContainer = document.getElementById('gameContainer');
             const gameFrame = document.getElementById('gameFrame');
@@ -1200,14 +1792,11 @@
             const homeBtn = document.getElementById('homeBtn');
             const appsBtn = document.getElementById('appsBtn');
 
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            }
-
+            if (document.fullscreenElement) document.exitFullscreen();
             gameFrame.src = '';
             gameContainer.classList.remove('active');
             topNav.classList.remove('minimal');
-            
+
             if (homeBtn.classList.contains('active')) {
                 gamesGrid.style.display = 'grid';
             } else if (appsBtn.classList.contains('active')) {
@@ -1215,24 +1804,21 @@
             }
         }
 
-        // Toggle fullscreen
         function toggleFullscreen() {
             const gameContainer = document.getElementById('gameContainer');
-            
             if (!document.fullscreenElement) {
-                gameContainer.requestFullscreen().catch(err => {
-                    alert(`Error attempting to enable fullscreen: ${err.message}`);
-                });
+                gameContainer.requestFullscreen().catch(err => alert(`Error: ${err.message}`));
             } else {
                 document.exitFullscreen();
             }
         }
 
-        // Granny game functions
+        // ============================================================
+        // GRANNY GAME
+        // ============================================================
         async function openGrannyGame() {
             const grannyContainer = document.getElementById('granny-unity-container');
             grannyContainer.classList.add('active');
-            
             if (!grannyGameLoaded) {
                 await initializeGrannyGame();
                 grannyGameLoaded = true;
@@ -1240,58 +1826,35 @@
         }
 
         function closeGrannyGame() {
-            const grannyContainer = document.getElementById('granny-unity-container');
-            grannyContainer.classList.remove('active');
+            document.getElementById('granny-unity-container').classList.remove('active');
         }
 
         async function mergeUnityWebFiles(baseUrl, filePrefix, totalParts, extension) {
-            const partUrls = [];
-            for (let i = 1; i <= totalParts; i++) {
-                partUrls.push(`${baseUrl}/${filePrefix}_part${i}.${extension}`);
-            }
-
             const buffers = [];
-            for (let i = 0; i < totalParts; i++) {
-                const response = await fetch(partUrls[i]);
-                if (!response.ok) {
-                    throw new Error(`Failed to load part: ${partUrls[i]}`);
-                }
-                const buffer = await response.arrayBuffer();
-                buffers.push(buffer);
-
-                const progress = ((i + 1) / totalParts) * 100;
-                document.querySelector("#unity-progress-bar-full").style.width = `${progress}%`;
+            for (let i = 1; i <= totalParts; i++) {
+                const response = await fetch(`${baseUrl}/${filePrefix}_part${i}.${extension}`);
+                if (!response.ok) throw new Error(`Failed to load part ${i}`);
+                buffers.push(await response.arrayBuffer());
+                document.querySelector("#unity-progress-bar-full").style.width = `${((i) / totalParts) * 100}%`;
             }
-
-            const totalLength = buffers.reduce((acc, buffer) => acc + buffer.byteLength, 0);
-            const combinedBuffer = new Uint8Array(totalLength);
+            const totalLength = buffers.reduce((acc, b) => acc + b.byteLength, 0);
+            const combined = new Uint8Array(totalLength);
             let offset = 0;
-
-            buffers.forEach((buffer) => {
-                combinedBuffer.set(new Uint8Array(buffer), offset);
-                offset += buffer.byteLength;
-            });
-
-            return combinedBuffer;
+            buffers.forEach(b => { combined.set(new Uint8Array(b), offset); offset += b.byteLength; });
+            return combined;
         }
 
         function unityShowBanner(msg, type) {
-            const warningBanner = document.querySelector("#unity-warning");
-            function updateBannerVisibility() {
-                warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-            }
-            var div = document.createElement('div');
+            const banner = document.querySelector("#unity-warning");
+            const div = document.createElement('div');
             div.innerHTML = msg;
-            warningBanner.appendChild(div);
-            if (type == 'error') div.style = 'background: red; padding: 10px;';
+            banner.appendChild(div);
+            if (type === 'error') div.style = 'background: red; padding: 10px;';
             else {
-                if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-                setTimeout(function() {
-                    warningBanner.removeChild(div);
-                    updateBannerVisibility();
-                }, 5000);
+                if (type === 'warning') div.style = 'background: yellow; padding: 10px;';
+                setTimeout(() => { banner.removeChild(div); banner.style.display = banner.children.length ? 'block' : 'none'; }, 5000);
             }
-            updateBannerVisibility();
+            banner.style.display = 'block';
         }
 
         function showAdOnClick() {
@@ -1302,20 +1865,18 @@
         }
 
         async function initializeGrannyGame() {
-            var canvas = document.querySelector("#unity-canvas");
-            var loadingBar = document.querySelector("#unity-loading-bar");
-            var progressBarFull = document.querySelector("#unity-progress-bar-full");
-            var buildUrl = "https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/Build";
-            var loaderUrl = buildUrl + "/Granny.loader.js";
+            const canvas = document.querySelector("#unity-canvas");
+            const loadingBar = document.querySelector("#unity-loading-bar");
+            const progressBarFull = document.querySelector("#unity-progress-bar-full");
+            const buildUrl = "https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/Build";
 
             try {
                 const dataBuffer = await mergeUnityWebFiles(buildUrl, "Granny", 2, "data");
                 const wasmBuffer = await mergeUnityWebFiles(buildUrl, "Granny", 2, "wasm");
-
                 const dataBlobUrl = URL.createObjectURL(new Blob([dataBuffer], { type: "application/octet-stream" }));
                 const wasmBlobUrl = URL.createObjectURL(new Blob([wasmBuffer], { type: "application/octet-stream" }));
 
-                var config = {
+                const config = {
                     dataUrl: dataBlobUrl,
                     frameworkUrl: buildUrl + "/Granny.framework.js",
                     codeUrl: wasmBlobUrl,
@@ -1326,28 +1887,27 @@
                     showBanner: unityShowBanner,
                 };
 
-                var script = document.createElement("script");
-                script.src = loaderUrl;
+                const script = document.createElement("script");
+                script.src = buildUrl + "/Granny.loader.js";
                 script.onload = () => {
-                    createUnityInstance(canvas, config, (progress) => {
-                        progressBarFull.style.width = 100 * progress + "%";
-                    }).then((unityInstance) => {
-                        myGameInstance = unityInstance;
-                        loadingBar.style.display = "none";
-                        canvas.addEventListener('pointerdown', showAdOnClick);
-                        canvas.addEventListener('touchstart', showAdOnClick);
-                    }).catch((message) => {
-                        alert(message);
-                    });
+                    createUnityInstance(canvas, config, p => { progressBarFull.style.width = 100 * p + "%"; })
+                        .then(instance => {
+                            myGameInstance = instance;
+                            loadingBar.style.display = "none";
+                            canvas.addEventListener('pointerdown', showAdOnClick);
+                            canvas.addEventListener('touchstart', showAdOnClick);
+                        })
+                        .catch(alert);
                 };
-
                 document.body.appendChild(script);
             } catch (error) {
-                console.error("Game initialization failed:", error);
+                console.error("Granny init failed:", error);
             }
         }
 
-        // Show section
+        // ============================================================
+        // SECTION NAVIGATION
+        // ============================================================
         function showSection(section) {
             const gamesGrid = document.getElementById('gamesGrid');
             const gameContainer = document.getElementById('gameContainer');
@@ -1357,9 +1917,7 @@
             const homeBtn = document.getElementById('homeBtn');
             const appsBtn = document.getElementById('appsBtn');
 
-            if (gameContainer.classList.contains('active')) {
-                closeGame();
-            }
+            if (gameContainer.classList.contains('active')) closeGame();
 
             homeBtn.classList.remove('active');
             appsBtn.classList.remove('active');
@@ -1381,78 +1939,52 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // AI Helper
+        // ============================================================
+        // AI HELPER
+        // ============================================================
         function openAIHelper() {
             const aiOverlay = document.getElementById('aiOverlay');
-            const aiFrame = document.getElementById('aiFrame');
-            
-            aiFrame.src = 'https://www.chattide.ai/chat-gpt/';
+            document.getElementById('aiFrame').src = 'https://www.chattide.ai/chat-gpt/';
             aiOverlay.classList.add('active');
         }
 
         function closeAIHelper() {
-            const aiOverlay = document.getElementById('aiOverlay');
-            const aiFrame = document.getElementById('aiFrame');
-            
-            aiFrame.src = '';
-            aiOverlay.classList.remove('active');
+            document.getElementById('aiFrame').src = '';
+            document.getElementById('aiOverlay').classList.remove('active');
         }
 
-        // Search functionality
+        // ============================================================
+        // SEARCH
+        // ============================================================
         function searchGames() {
-            const searchInput = document.getElementById('searchBar');
-            const searchTerm = searchInput.value.toLowerCase();
+            const searchTerm = document.getElementById('searchBar').value.toLowerCase();
             const homeBtn = document.getElementById('homeBtn');
             const appsBtn = document.getElementById('appsBtn');
-            
+
             if (homeBtn.classList.contains('active')) {
-                const gameButtons = document.querySelectorAll('#gamesGrid .game-button');
+                const buttons = document.querySelectorAll('#gamesGrid .game-button');
                 const noResults = document.getElementById('noResults');
-                let visibleCount = 0;
-
-                gameButtons.forEach(button => {
-                    const gameName = button.querySelector('h3').textContent.toLowerCase();
-                    const gameDescription = button.querySelector('p').textContent.toLowerCase();
-                    
-                    if (gameName.includes(searchTerm) || gameDescription.includes(searchTerm)) {
-                        button.style.display = 'block';
-                        visibleCount++;
-                    } else {
-                        button.style.display = 'none';
-                    }
+                let visible = 0;
+                buttons.forEach(btn => {
+                    const name = btn.querySelector('h3').textContent.toLowerCase();
+                    const desc = btn.querySelector('p').textContent.toLowerCase();
+                    const show = name.includes(searchTerm) || desc.includes(searchTerm);
+                    btn.style.display = show ? 'block' : 'none';
+                    if (show) visible++;
                 });
-
-                if (visibleCount === 0 && searchTerm !== '') {
-                    noResults.classList.add('show');
-                } else {
-                    noResults.classList.remove('show');
-                }
+                noResults.classList.toggle('show', visible === 0 && searchTerm !== '');
             } else if (appsBtn.classList.contains('active')) {
-                const appButtons = document.querySelectorAll('#appsPage .game-button');
-                
-                appButtons.forEach(button => {
-                    const appName = button.querySelector('h3').textContent.toLowerCase();
-                    const appDescription = button.querySelector('p').textContent.toLowerCase();
-                    
-                    if (appName.includes(searchTerm) || appDescription.includes(searchTerm)) {
-                        button.style.display = 'block';
-                    } else {
-                        button.style.display = 'none';
-                    }
+                document.querySelectorAll('#appsPage .game-button').forEach(btn => {
+                    const name = btn.querySelector('h3').textContent.toLowerCase();
+                    const desc = btn.querySelector('p').textContent.toLowerCase();
+                    btn.style.display = (name.includes(searchTerm) || desc.includes(searchTerm)) ? 'block' : 'none';
                 });
             }
         }
 
-        // Update fullscreen button text
-        document.addEventListener('fullscreenchange', function() {
-            const fullscreenButton = document.querySelector('.fullscreen-button');
-            if (fullscreenButton) {
-                if (document.fullscreenElement) {
-                    fullscreenButton.textContent = '⛶ Exit Fullscreen';
-                } else {
-                    fullscreenButton.textContent = '⛶ Fullscreen';
-                }
-            }
+        document.addEventListener('fullscreenchange', function () {
+            const btn = document.querySelector('.fullscreen-button');
+            if (btn) btn.textContent = document.fullscreenElement ? '⛶ Exit Fullscreen' : '⛶ Fullscreen';
         });
     </script>
 </body>
