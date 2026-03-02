@@ -1017,14 +1017,13 @@
                 <p>Loading questionnaire...</p>
             </div>
 
-            <!-- Form state (filled dynamically) -->
+           <!-- Form state (filled dynamically) -->
             <div id="qFormContent" style="display:none;">
                 <div class="q-header">
-                    <div class="q-badge">📋 Quick Survey</div>
-                    <h2 id="qTitle">Before you enter...</h2>
-                    <p id="qDescription">Please take a moment to answer a few questions. Your feedback helps us improve!</p>
+                    <div class="q-badge">🎮 Game Suggestions</div>
+                    <h2 id="qTitle">Help us grow the platform!</h2>
+                    <p id="qDescription">Got a game in mind? Let us know what you'd like to see added!</p>
                 </div>
-
                 <div class="q-progress-wrap" id="qProgressWrap">
                     <div class="q-progress-label">
                         <span>Progress</span>
@@ -1034,12 +1033,18 @@
                         <div class="q-progress-fill" id="qProgressFill" style="width:0%"></div>
                     </div>
                 </div>
-
                 <div id="qQuestionsContainer"></div>
-
                 <button class="q-submit-btn" id="qSubmitBtn" onclick="submitQuestionnaire()">
-                    ✅ Submit & Enter
+                    🎮 Submit & Enter
                 </button>
+            </div>
+
+            <!-- Thank you state -->
+            <div class="q-thankyou" id="qThankyou">
+                <div class="q-thankyou-icon">🎮</div>
+                <h3>Thanks for the suggestion!</h3>
+                <p>We'll look into adding your requested games. Enjoy the platform!</p>
+                <button class="q-enter-btn" onclick="closeQuestionnaire()">Enter Site →</button>
             </div>
 
             <!-- Thank you state -->
