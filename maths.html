@@ -7,6 +7,123 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bubbls/granny@212c543a85b243c4a0b92211f557e760d83d2292/TemplateData/style.css">
     <script src="https://cdn.jsdelivr.net/gh/bubbls/granny@212c543a85b243c4a0b92211f557e760d83d2292/sdk.js"></script>
     <style>
+        /* Timetable Clock Styles - Positioned on right */
+.timetable-clock {
+    background: linear-gradient(135deg, #667eea20, #764ba220);
+    border: 1.5px solid #667eea;
+    border-radius: 12px;
+    padding: 6px 16px;
+    min-width: 200px;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-left: auto;  /* Pushes to the right */
+    display: none;  /* Hidden by default */
+}
+
+.timetable-clock.visible {
+    display: block;  /* Show when game is open */
+}
+
+.clock-time {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #667eea;
+    line-height: 1.3;
+}
+
+.clock-period {
+    font-size: 0.8em;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Custom Alert Modal */
+.timetable-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+    z-index: 1000000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.timetable-alert-overlay.active {
+    display: flex;
+}
+
+.timetable-alert-box {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: slideUpAlert 0.4s ease;
+}
+
+.timetable-alert-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+}
+
+.timetable-alert-box h3 {
+    color: #333;
+    font-size: 1.8em;
+    margin-bottom: 10px;
+}
+
+.timetable-alert-box p {
+    color: #666;
+    font-size: 1.1em;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.timetable-alert-close {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+    padding: 14px 30px;
+    border-radius: 12px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.timetable-alert-close:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+}
+
+@keyframes slideUpAlert {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Hide clock when nav is minimal (fullscreen game) */
+.top-nav.minimal .timetable-clock {
+    display: none !important;
+}
         * {
             margin: 0;
             padding: 0;
@@ -1116,7 +1233,7 @@
     </script>
     <script>
         // ============================================================
-// SCHOOL TIMETABLE WITH ALERTS
+// SCHOOL TIMETABLE WITH ALERTS - ONLY SHOWS IN GAMES
 // ============================================================
 
 // Timetable configuration
@@ -1134,22 +1251,23 @@ const timetable = {
     ]
 };
 
-let alertShownForPeriod = null; // Track if alert was shown for current period
-let lastCheckedPeriod = null; // Track last period to reset alert on change
+let alertShownForPeriod = null;
+let lastCheckedPeriod = null;
+let clockInterval = null;
 
-// Convert time string "HH:MM" to minutes since midnight
+// Convert time string to minutes
 function timeToMinutes(timeStr) {
     const [hours, minutes] = timeStr.split(':').map(Number);
     return hours * 60 + minutes;
 }
 
-// Get current day and time
+// Get current period
 function getCurrentPeriod() {
     const now = new Date();
-    const day = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const day = now.getDay();
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
     
-    // Weekend (Saturday = 6, Sunday = 0)
+    // Weekend
     if (day === 0 || day === 6) {
         return {
             name: "Weekend",
@@ -1159,7 +1277,7 @@ function getCurrentPeriod() {
         };
     }
     
-    // Weekday - find current period
+    // Check each period
     for (let i = 0; i < timetable.monday_friday.length; i++) {
         const period = timetable.monday_friday[i];
         const start = timeToMinutes(period.start);
@@ -1177,7 +1295,7 @@ function getCurrentPeriod() {
         }
     }
     
-    // Between periods or after last period
+    // Between periods
     for (let i = 0; i < timetable.monday_friday.length - 1; i++) {
         const currentEnd = timeToMinutes(timetable.monday_friday[i].end);
         const nextStart = timeToMinutes(timetable.monday_friday[i + 1].start);
@@ -1193,7 +1311,7 @@ function getCurrentPeriod() {
         }
     }
     
-    // Before first period
+    // Before school
     if (currentMinutes < timeToMinutes(timetable.monday_friday[0].start)) {
         return {
             name: "Before school",
@@ -1203,7 +1321,7 @@ function getCurrentPeriod() {
         };
     }
     
-    // After last period
+    // After school
     return {
         name: "After school",
         nextPeriod: "School ended",
@@ -1214,8 +1332,16 @@ function getCurrentPeriod() {
 
 // Update clock display
 function updateTimetableClock() {
+    // Only update if clock is visible (game is open)
+    const clock = document.getElementById('timetableClock');
+    const gameContainer = document.getElementById('gameContainer');
+    
+    if (!gameContainer.classList.contains('active')) {
+        return; // Don't update if no game is open
+    }
+    
     const now = new Date();
-    const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute:'2-digit', second:'2-digit' });
     document.getElementById('currentTime').textContent = timeStr;
     
     const period = getCurrentPeriod();
@@ -1224,30 +1350,27 @@ function updateTimetableClock() {
     if (period.isWeekend) {
         periodText = '🏖️ Weekend';
     } else if (period.name === "Before school") {
-        periodText = `⏳ ${period.name} (${period.nextPeriod} starts in ${period.minutesLeft}m)`;
+        periodText = `⏳ ${period.name} (${period.nextPeriod} in ${period.minutesLeft}m)`;
     } else if (period.name === "After school") {
         periodText = '🏠 After school';
     } else if (period.name.includes("Break until")) {
         periodText = `☕ ${period.name}`;
     } else {
-        periodText = `📚 ${period.name}`;
+        periodText = `📚 ${period.name} (ends ${period.endTime})`;
     }
     
     document.getElementById('currentPeriod').textContent = periodText;
     
-    // Check for 3-minute alert (only if a game is open)
-    const gameContainer = document.getElementById('gameContainer');
+    // Check for 3-minute alert (only if game is open)
     if (gameContainer.classList.contains('active') && !period.isWeekend && period.minutesLeft !== null && period.minutesLeft <= 3 && period.minutesLeft > 0) {
         
-        // Check if we already showed alert for this period
         if (alertShownForPeriod !== period.name + period.minutesLeft) {
-            // Show custom alert
             showTimetableAlert(period);
             alertShownForPeriod = period.name + period.minutesLeft;
         }
     }
     
-    // Reset alert when period changes
+    // Reset alert on period change
     if (lastCheckedPeriod !== period.name) {
         alertShownForPeriod = null;
         lastCheckedPeriod = period.name;
@@ -1272,7 +1395,6 @@ function showTimetableAlert(period) {
     
     alertOverlay.classList.add('active');
     
-    // Auto close after 8 seconds
     setTimeout(() => {
         closeTimetableAlert();
     }, 8000);
@@ -1283,8 +1405,44 @@ function closeTimetableAlert() {
     document.getElementById('timetableAlert').classList.remove('active');
 }
 
-// Start clock updates
-setInterval(updateTimetableClock, 1000);
+// Control clock visibility based on game state
+function checkGameState() {
+    const gameContainer = document.getElementById('gameContainer');
+    const clock = document.getElementById('timetableClock');
+    
+    if (gameContainer.classList.contains('active')) {
+        clock.classList.add('visible');
+        // Start clock if not already running
+        if (!clockInterval) {
+            updateTimetableClock(); // Immediate update
+            clockInterval = setInterval(updateTimetableClock, 1000);
+        }
+    } else {
+        clock.classList.remove('visible');
+        // Stop clock when no game
+        if (clockInterval) {
+            clearInterval(clockInterval);
+            clockInterval = null;
+        }
+    }
+}
+
+// Override openGame function to include clock check
+const originalOpenGame = openGame;
+openGame = function(gameName, gameUrl) {
+    originalOpenGame(gameName, gameUrl);
+    checkGameState();
+};
+
+// Override closeGame function to include clock check
+const originalCloseGame = closeGame;
+closeGame = function() {
+    originalCloseGame();
+    checkGameState();
+};
+
+// Start checking
+setInterval(checkGameState, 1000);
     </script>
     <script>
         // ============================================================
@@ -1405,25 +1563,22 @@ function skipQuestionnaire() {
     </div>
 
     <!-- Main Content -->
-    <div class="top-nav" id="topNav">
-    <div style="display: flex; align-items: center; gap: 20px; width: 100%;">
-        <div class="site-name">Maths Support</div>
-        
-        <!-- School Timetable Clock -->
-        <div class="timetable-clock" id="timetableClock">
-            <div class="clock-time" id="currentTime">--:--:--</div>
-            <div class="clock-period" id="currentPeriod">Loading...</div>
-        </div>
-        
-        <div class="search-container">
-            <input type="text" class="search-bar" id="searchBar" placeholder="Search for games...">
-        </div>
-        <button class="ai-helper-btn" onclick="openAIHelper()">
-            <span>🤖</span>
-            <span>AI Helper</span>
-        </button>
+<div class="top-nav" id="topNav">
+    <div class="site-name">Maths Support</div>
+    <div class="search-container">
+        <input type="text" class="search-bar" id="searchBar" placeholder="Search for games...">
     </div>
+    <button class="ai-helper-btn" onclick="openAIHelper()">
+        <span>🤖</span>
+        <span>AI Helper</span>
+    </button>
+    
+    <!-- Timetable Clock - Only visible when game is open -->
+    <div class="timetable-clock" id="timetableClock">
+        <div class="clock-time" id="currentTime">--:--:--</div>
+        <div class="clock-period" id="currentPeriod">Loading...</div>
     </div>
+</div>
 
         <!-- Games Grid -->
         <div class="games-grid" id="gamesGrid">
