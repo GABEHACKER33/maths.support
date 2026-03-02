@@ -1021,28 +1021,34 @@
             <!-- Form state (filled dynamically)              -->
             <!-- REPLACED with the new "Game Suggestions"     -->
             <!-- ============================================ -->
-            <div id="qFormContent" style="display:none;">
-                <div class="q-header">
-                    <div class="q-badge">🎮 Game Suggestions</div>
-                    <h2 id="qTitle">Before you enter...</h2>
-                    <p id="qDescription">Take 1 minute to help us improve Maths Support!</p>
-                </div>
-                <div class="q-progress-wrap" id="qProgressWrap">
-                    <div class="q-progress-label">
-                        <span>Progress</span>
-                        <span id="qProgressText">0%</span>
-                    </div>
-                    <div class="q-progress-bar">
-                        <div class="q-progress-fill" id="qProgressFill" style="width:0%"></div>
-                    </div>
-                </div>
-                <div id="qQuestionsContainer">
-                    <!-- Questions will be dynamically injected here based on DB config -->
-                </div>
-                <button class="q-submit-btn" id="qSubmitBtn" onclick="submitQuestionnaire()">
-                    🎮 Submit & Enter
-                </button>
-            </div>
+            <!-- Form state (filled dynamically) -->
+<div id="qFormContent" style="display:none;">
+    <div class="q-header">
+        <div class="q-badge">🎮 Game Suggestions</div>
+        <h2 id="qTitle">Before you enter...</h2>
+        <p id="qDescription">Take 1 minute to help us improve Maths Support!</p>
+    </div>
+    <div class="q-progress-wrap" id="qProgressWrap">
+        <div class="q-progress-label">
+            <span>Progress</span>
+            <span id="qProgressText">0%</span>
+        </div>
+        <div class="q-progress-bar">
+            <div class="q-progress-fill" id="qProgressFill" style="width:0%"></div>
+        </div>
+    </div>
+    <div id="qQuestionsContainer"></div>
+    
+    <!-- Button container for submit and skip -->
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button class="q-submit-btn" id="qSubmitBtn" onclick="submitQuestionnaire()" style="flex: 2;">
+            🎮 Submit & Enter
+        </button>
+        <button class="q-skip-btn" id="qSkipBtn" onclick="skipQuestionnaire()" style="flex: 1;">
+            ⏭️ Skip
+        </button>
+    </div>
+</div>
 
             <!-- ============================================ -->
             <!-- Thank you state (first one is kept)          -->
