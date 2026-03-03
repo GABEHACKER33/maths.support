@@ -894,8 +894,18 @@ try {
     if(banRes.ok){ const banData=await banRes.json(); userIp=banData.ip||'unknown'; }
 } catch(e){}
 
-const {error}=await supabaseClient.from('questionnaire_responses').insert({questionnaire_id:currentQuestionnaireId,responses:answers,submitted_at:new Date().toISOString(),ip:userIp});        if(error) throw error;
-        // Log IP via Edge Function — server reads real IP from headers
+let userIp='unknown';
+try{
+    const r=await fetch(EDGE_BASE+'/check-ban',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    if(r.ok){const d=await r.json();userIp=d.ip||'unknown';}
+}catch(e){}
+if(userIp==='unknown'){
+    try{
+        const r2=await fetch('https://api.ipify.org?format=json');
+        if(r2.ok){const d2=await r2.json();userIp=d2.ip||'unknown';}
+    }catch(e){}
+}
+const {error}=await supabaseClient.from('questionnaire_responses').insert({questionnaire_id:currentQuestionnaireId,responses:answers,submitted_at:new Date().toISOString(),ip:userIp});        // Log IP via Edge Function — server reads real IP from headers
         await fetch(EDGE_BASE+'/log-ip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questionnaire_id:currentQuestionnaireId,responses:answers})});
         sessionStorage.setItem('questionnaire_done','true');
         document.getElementById('qFormContent').style.display='none';document.getElementById('qThankyou').classList.add('active');
