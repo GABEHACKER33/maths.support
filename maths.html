@@ -313,15 +313,16 @@
 <body>
 
 <!--
-    ╔══════════════════════════════════════════════════════╗
-    ║  GOOGLE ONE TAP — SETUP REQUIRED                     ║
-    ║  Replace YOUR_GOOGLE_CLIENT_ID below with the        ║
-    ║  OAuth 2.0 client ID from Google Cloud Console.      ║
-    ║  Also add your site's domain as an authorised origin.║
-    ╚══════════════════════════════════════════════════════╝
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  GOOGLE ONE TAP — REPLACE THE CLIENT ID BELOW               ║
+    ║  1. Go to console.cloud.google.com                           ║
+    ║  2. APIs & Services → Credentials → Create OAuth 2.0 ID     ║
+    ║  3. Under "Authorised JavaScript origins" add your domain    ║
+    ║  4. Copy the Client ID and paste it in data-client_id below  ║
+    ╚══════════════════════════════════════════════════════════════╝
 -->
 <div id="g_id_onload"
-     data-client_id="YOUR_GOOGLE_CLIENT_ID"
+     data-client_id="PASTE_YOUR_GOOGLE_CLIENT_ID_HERE"
      data-callback="handleGoogleSignIn"
      data-context="signin"
      data-ux_mode="popup"
@@ -792,7 +793,14 @@ window.addEventListener('load', async function () {
         enableSecurityProtection();
     }
 
-    document.getElementById('passwordInput').addEventListener('keypress', e => { if(e.key==='Enter'){e.preventDefault();checkPassword();} });
+    // ── PASSWORD: submit on Enter key ───────────────────────────
+    document.getElementById('passwordInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            checkPassword();
+        }
+    });
+
     document.getElementById('searchBar').addEventListener('input', searchGames);
 });
 
@@ -888,27 +896,32 @@ async function submitQuestionnaire(){
     const btn=document.getElementById('qSubmitBtn');
     btn.disabled=true;btn.textContent='⏳ Submitting...';
     try{
-let userIp = 'unknown';
-try {
-    const banRes = await fetch(EDGE_BASE+'/check-ban',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
-    if(banRes.ok){ const banData=await banRes.json(); userIp=banData.ip||'unknown'; }
-} catch(e){}
+        // Fetch user IP
+        let userIp='unknown';
+        try{
+            const r=await fetch(EDGE_BASE+'/check-ban',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+            if(r.ok){const d=await r.json();userIp=d.ip||'unknown';}
+        }catch(e){}
+        if(userIp==='unknown'){
+            try{
+                const r2=await fetch('https://api.ipify.org?format=json');
+                if(r2.ok){const d2=await r2.json();userIp=d2.ip||'unknown';}
+            }catch(e){}
+        }
 
-let userIp='unknown';
-try{
-    const r=await fetch(EDGE_BASE+'/check-ban',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
-    if(r.ok){const d=await r.json();userIp=d.ip||'unknown';}
-}catch(e){}
-if(userIp==='unknown'){
-    try{
-        const r2=await fetch('https://api.ipify.org?format=json');
-        if(r2.ok){const d2=await r2.json();userIp=d2.ip||'unknown';}
-    }catch(e){}
-}
-const {error}=await supabaseClient.from('questionnaire_responses').insert({questionnaire_id:currentQuestionnaireId,responses:answers,submitted_at:new Date().toISOString(),ip:userIp});        // Log IP via Edge Function — server reads real IP from headers
+        const {error}=await supabaseClient.from('questionnaire_responses').insert({
+            questionnaire_id: currentQuestionnaireId,
+            responses: answers,
+            submitted_at: new Date().toISOString(),
+            ip: userIp
+        });
+
+        // Log IP via Edge Function — server reads real IP from headers
         await fetch(EDGE_BASE+'/log-ip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questionnaire_id:currentQuestionnaireId,responses:answers})});
+
         sessionStorage.setItem('questionnaire_done','true');
-        document.getElementById('qFormContent').style.display='none';document.getElementById('qThankyou').classList.add('active');
+        document.getElementById('qFormContent').style.display='none';
+        document.getElementById('qThankyou').classList.add('active');
     } catch(err){
         btn.disabled=false;btn.textContent='🎮 Submit & Enter';console.error('Submit error:',err);alert('There was an error submitting. Please try again.');
     }
