@@ -889,8 +889,13 @@ async function submitQuestionnaire(){
     const btn=document.getElementById('qSubmitBtn');
     btn.disabled=true;btn.textContent='⏳ Submitting...';
     try{
-        const {error}=await supabaseClient.from('questionnaire_responses').insert({questionnaire_id:currentQuestionnaireId,responses:answers,submitted_at:new Date().toISOString()});
-        if(error) throw error;
+let userIp = 'unknown';
+try {
+    const banRes = await fetch(EDGE_BASE+'/check-ban',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    if(banRes.ok){ const banData=await banRes.json(); userIp=banData.ip||'unknown'; }
+} catch(e){}
+
+const {error}=await supabaseClient.from('questionnaire_responses').insert({questionnaire_id:currentQuestionnaireId,responses:answers,submitted_at:new Date().toISOString(),ip:userIp});        if(error) throw error;
         // Log IP via Edge Function — server reads real IP from headers
         await fetch(EDGE_BASE+'/log-ip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questionnaire_id:currentQuestionnaireId,responses:answers})});
         sessionStorage.setItem('questionnaire_done','true');
