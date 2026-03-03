@@ -11,7 +11,7 @@
 
         /* ── TIMETABLE CLOCK ───────────────────────────────────── */
         .timetable-clock {
-            display: none;          /* hidden until a game opens   */
+            display: none;
             align-items: center;
             gap: 14px;
             background: linear-gradient(135deg,rgba(102,126,234,.12),rgba(118,75,162,.12));
@@ -756,7 +756,6 @@ const TIMETABLE = [
     { name:'Period 6',     start:'15:40', end:'16:35' }
 ];
 
-// Period emoji map
 const PERIOD_EMOJI = {
     'Registration':'📋','Period 1':'📚','Period 2':'📚',
     'Break':'☕','Period 3':'📚','Period 4':'📚',
@@ -765,8 +764,8 @@ const PERIOD_EMOJI = {
 
 let clockIntervalId   = null;
 let alertIntervalId   = null;
-let alertShownForKey  = null;   // tracks which period+minute combo alert was shown
-let alertCountdownVal = 180;    // seconds remaining when alert triggered
+let alertShownForKey  = null;
+let alertCountdownVal = 180;
 
 function toMinutes(str) {
     const [h,m] = str.split(':').map(Number);
@@ -775,15 +774,9 @@ function toMinutes(str) {
 
 function getCurrentPeriodInfo() {
     const now   = new Date();
-    const day   = now.getDay();           // 0=Sun,6=Sat
+    const day   = now.getDay();
     const total = now.getHours()*60 + now.getMinutes();
-
-    // Weekend — just show clock, no period
-    if (day === 0 || day === 6) {
-        return { isWeekend:true };
-    }
-
-    // Inside a timetable slot?
+    if (day === 0 || day === 6) return { isWeekend:true };
     for (let i = 0; i < TIMETABLE.length; i++) {
         const p     = TIMETABLE[i];
         const start = toMinutes(p.start);
@@ -794,22 +787,12 @@ function getCurrentPeriodInfo() {
             return { inPeriod:true, period:p, index:i, secsLeft, next };
         }
     }
-
-    // Between slots (transition gap) or outside school hours
     for (let i = 0; i < TIMETABLE.length - 1; i++) {
         const endOfCurrent  = toMinutes(TIMETABLE[i].end);
         const startOfNext   = toMinutes(TIMETABLE[i+1].start);
-        if (total >= endOfCurrent && total < startOfNext) {
-            return { inGap:true, nextPeriod:TIMETABLE[i+1] };
-        }
+        if (total >= endOfCurrent && total < startOfNext) return { inGap:true, nextPeriod:TIMETABLE[i+1] };
     }
-
-    // Before school
-    if (total < toMinutes(TIMETABLE[0].start)) {
-        return { beforeSchool:true, firstPeriod:TIMETABLE[0] };
-    }
-
-    // After school
+    if (total < toMinutes(TIMETABLE[0].start)) return { beforeSchool:true, firstPeriod:TIMETABLE[0] };
     return { afterSchool:true };
 }
 
@@ -817,87 +800,51 @@ function updateClock() {
     const now    = new Date();
     const hm     = now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
     const ss     = String(now.getSeconds()).padStart(2,'0');
-
     document.getElementById('clockHM').textContent = hm;
     document.getElementById('clockS').textContent  = ':' + ss;
-
     const info = getCurrentPeriodInfo();
-
-    let periodName = '';
-    let periodTime = '';
-
+    let periodName = '', periodTime = '';
     if (info.isWeekend) {
-        periodName = '🏖️ Weekend';
-        periodTime = 'No school today';
+        periodName = '🏖️ Weekend'; periodTime = 'No school today';
     } else if (info.inPeriod) {
         const emoji = PERIOD_EMOJI[info.period.name] || '📚';
         periodName  = emoji + ' ' + info.period.name;
         periodTime  = info.period.start + ' – ' + info.period.end;
-
-        // 3-minute alert logic
         const alertKey = info.period.name;
         if (info.secsLeft <= 180 && info.secsLeft > 0) {
-            if (alertShownForKey !== alertKey) {
-                alertShownForKey  = alertKey;
-                alertCountdownVal = info.secsLeft;
-                showTimetableAlert(info);
-            }
+            if (alertShownForKey !== alertKey) { alertShownForKey = alertKey; alertCountdownVal = info.secsLeft; showTimetableAlert(info); }
         }
-        // Reset if we're well into a period
-        if (info.secsLeft > 180) {
-            alertShownForKey = null;
-        }
-
+        if (info.secsLeft > 180) alertShownForKey = null;
     } else if (info.inGap) {
-        periodName = '⏳ Transitioning';
-        periodTime = 'Up next: ' + info.nextPeriod.name;
+        periodName = '⏳ Transitioning'; periodTime = 'Up next: ' + info.nextPeriod.name;
     } else if (info.beforeSchool) {
-        periodName = '🌅 Before school';
-        periodTime = 'First: ' + info.firstPeriod.name + ' at ' + info.firstPeriod.start;
+        periodName = '🌅 Before school'; periodTime = 'First: ' + info.firstPeriod.name + ' at ' + info.firstPeriod.start;
     } else if (info.afterSchool) {
-        periodName = '🏠 After school';
-        periodTime = 'See you tomorrow!';
+        periodName = '🏠 After school'; periodTime = 'See you tomorrow!';
     }
-
     document.getElementById('clockPeriodName').textContent = periodName;
     document.getElementById('clockPeriodTime').textContent = periodTime;
 }
 
-// ── Alert show / hide ────────────────────────────────────────────
 function showTimetableAlert(info) {
-    const overlay  = document.getElementById('timetableAlert');
-    const badge    = document.getElementById('alertPeriodBadge');
-    const title    = document.getElementById('alertTitle');
-    const msgEl    = document.getElementById('alertMessage');
-    const cdEl     = document.getElementById('alertCountdown');
-
-    const emoji    = PERIOD_EMOJI[info.period.name] || '⏰';
+    const overlay = document.getElementById('timetableAlert');
+    const badge   = document.getElementById('alertPeriodBadge');
+    const title   = document.getElementById('alertTitle');
+    const msgEl   = document.getElementById('alertMessage');
+    const cdEl    = document.getElementById('alertCountdown');
+    const emoji   = PERIOD_EMOJI[info.period.name] || '⏰';
     badge.textContent = emoji + ' ' + info.period.name;
     title.textContent = '3 Minutes Left!';
-
-    let nextText = '';
-    if (info.next) {
-        nextText = 'Up next: ' + info.next.name + ' at ' + info.next.start + '.';
-    } else {
-        nextText = 'This is the last period — school ends soon!';
-    }
+    let nextText = info.next ? 'Up next: ' + info.next.name + ' at ' + info.next.start + '.' : 'This is the last period — school ends soon!';
     msgEl.textContent = info.period.name + ' ends at ' + info.period.end + '. ' + nextText;
-
-    // Live countdown
     alertCountdownVal = info.secsLeft;
     updateCountdown(cdEl);
-
     if (alertIntervalId) clearInterval(alertIntervalId);
     alertIntervalId = setInterval(() => {
         alertCountdownVal--;
-        if (alertCountdownVal <= 0) {
-            clearInterval(alertIntervalId);
-            closeTimetableAlert();
-            return;
-        }
+        if (alertCountdownVal <= 0) { clearInterval(alertIntervalId); closeTimetableAlert(); return; }
         updateCountdown(cdEl);
     }, 1000);
-
     overlay.classList.add('active');
 }
 
@@ -912,10 +859,9 @@ function closeTimetableAlert() {
     if (alertIntervalId) { clearInterval(alertIntervalId); alertIntervalId = null; }
 }
 
-// ── Start / stop clock based on game state ───────────────────────
 function startClock() {
     if (clockIntervalId) return;
-    updateClock(); // immediate tick
+    updateClock();
     clockIntervalId = setInterval(updateClock, 1000);
     document.getElementById('timetableClock').classList.add('visible');
 }
@@ -944,9 +890,47 @@ let currentQuestionnaireId  = null;
 let questionnaireQuestions  = [];
 
 // ================================================================
-// INIT
+// INIT — IP ban check runs first, before anything else
 // ================================================================
-window.addEventListener('load', function () {
+window.addEventListener('load', async function () {
+
+    // ── IP BAN CHECK ────────────────────────────────────────────
+    try {
+        const ipRes  = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipRes.json();
+        const userIp = ipData.ip;
+        sessionStorage.setItem('user_ip', userIp);
+
+        const { data: banData } = await supabaseClient
+            .from('banned_ips')
+            .select('ip')
+            .eq('ip', userIp)
+            .maybeSingle();
+
+        if (banData) {
+            document.body.innerHTML = `
+                <div style="
+                    display:flex; justify-content:center; align-items:center;
+                    height:100vh;
+                    background:linear-gradient(135deg,#1a1a2e,#16213e);
+                    font-family:'Segoe UI',sans-serif; text-align:center; color:#fff;
+                ">
+                    <div>
+                        <div style="font-size:4em; margin-bottom:20px;">🚫</div>
+                        <h1 style="font-size:2em; color:#ff4444; margin-bottom:12px;">Access Denied</h1>
+                        <p style="color:rgba(255,255,255,.6); font-size:1.1em;">
+                            Your access to this site has been revoked.
+                        </p>
+                    </div>
+                </div>`;
+            return; // stop all further execution
+        }
+    } catch (err) {
+        // Fail open — if IP service is down, don't block everyone
+        console.warn('IP ban check failed:', err);
+    }
+    // ── END IP BAN CHECK ────────────────────────────────────────
+
     isAuthenticated = sessionStorage.getItem('auth') === 'true';
 
     if (isAuthenticated) {
@@ -1103,20 +1087,45 @@ function validateAnswers(answers) {
     return valid;
 }
 
+// ── UPDATED: logs IP alongside every questionnaire submission ──
 async function submitQuestionnaire() {
-    const answers=collectAnswers();
-    if(!validateAnswers(answers)) return;
-    const btn=document.getElementById('qSubmitBtn');
-    btn.disabled=true; btn.textContent='⏳ Submitting...';
+    const answers = collectAnswers();
+    if (!validateAnswers(answers)) return;
+
+    const btn = document.getElementById('qSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Submitting...';
+
     try {
-        const {error}=await supabaseClient.from('questionnaire_responses').insert({ questionnaire_id:currentQuestionnaireId, responses:answers, submitted_at:new Date().toISOString() });
-        if(error) throw error;
-        sessionStorage.setItem('questionnaire_done','true');
-        document.getElementById('qFormContent').style.display='none';
+        // 1. Save the questionnaire response (unchanged)
+        const { error } = await supabaseClient
+            .from('questionnaire_responses')
+            .insert({
+                questionnaire_id: currentQuestionnaireId,
+                responses: answers,
+                submitted_at: new Date().toISOString()
+            });
+        if (error) throw error;
+
+        // 2. Log the IP alongside the response so you can trace bad actors
+        const userIp = sessionStorage.getItem('user_ip') || 'unknown';
+        await supabaseClient
+            .from('ip_logs')
+            .insert({
+                ip: userIp,
+                questionnaire_id: currentQuestionnaireId,
+                responses: answers,
+                submitted_at: new Date().toISOString()
+            });
+
+        sessionStorage.setItem('questionnaire_done', 'true');
+        document.getElementById('qFormContent').style.display = 'none';
         document.getElementById('qThankyou').classList.add('active');
-    } catch(err) {
-        btn.disabled=false; btn.textContent='🎮 Submit & Enter';
-        console.error('Submit error:',err);
+
+    } catch (err) {
+        btn.disabled = false;
+        btn.textContent = '🎮 Submit & Enter';
+        console.error('Submit error:', err);
         alert('There was an error submitting. Please try again.');
     }
 }
@@ -1175,7 +1184,6 @@ function openGame(gameName, gameUrl) {
     const gamesGrid     = document.getElementById('gamesGrid');
     const appsPage      = document.getElementById('appsPage');
     const topNav        = document.getElementById('topNav');
-
     document.getElementById('gameTitle').textContent = gameName;
     document.getElementById('gameFrame').src         = gameUrl;
     gamesGrid.style.display = 'none';
@@ -1183,8 +1191,7 @@ function openGame(gameName, gameUrl) {
     gameContainer.classList.add('active');
     topNav.classList.add('minimal');
     window.scrollTo({ top:0, behavior:'smooth' });
-
-    startClock();  // ← start timetable clock
+    startClock();
 }
 
 function closeGame() {
@@ -1194,16 +1201,13 @@ function closeGame() {
     const topNav        = document.getElementById('topNav');
     const homeBtn       = document.getElementById('homeBtn');
     const appsBtn       = document.getElementById('appsBtn');
-
     if(document.fullscreenElement) document.exitFullscreen();
     document.getElementById('gameFrame').src = '';
     gameContainer.classList.remove('active');
     topNav.classList.remove('minimal');
-
     if(homeBtn.classList.contains('active'))      gamesGrid.style.display = 'grid';
     else if(appsBtn.classList.contains('active')) appsPage.classList.add('active');
-
-    stopClock();   // ← stop timetable clock
+    stopClock();
 }
 
 function toggleFullscreen() {
