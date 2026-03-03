@@ -896,11 +896,20 @@ window.addEventListener('load', async function () {
 
     // ── IP BAN CHECK ────────────────────────────────────────────
     try {
-        const ipRes  = await fetch('https://api.ipify.org?format=json');
-        const ipData = await ipRes.json();
-        const userIp = ipData.ip;
-        sessionStorage.setItem('user_ip', userIp);
-
+        let userIp = 'unknown';
+const ipServices = [
+    () => fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => d.ip),
+    () => fetch('https://api64.ipify.org?format=json').then(r => r.json()).then(d => d.ip),
+    () => fetch('https://api.my-ip.io/ip.json').then(r => r.json()).then(d => d.ip),
+    () => fetch('https://ipapi.co/json/').then(r => r.json()).then(d => d.ip),
+];
+for (const service of ipServices) {
+    try {
+        const ip = await service();
+        if (ip && ip !== 'unknown' && ip.length > 3) { userIp = ip; break; }
+    } catch (e) { /* try next */ }
+}
+sessionStorage.setItem('user_ip', userIp);
         const { data: banData } = await supabaseClient
             .from('banned_ips')
             .select('ip')
