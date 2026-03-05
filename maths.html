@@ -204,6 +204,8 @@
 .q-submit-btn{width:100%;padding:18px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border:none;border-radius:14px;color:#fff;font-size:1.05em;font-weight:700;cursor:pointer;transition:all .3s;margin-top:10px;letter-spacing:.5px}
 .q-submit-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 25px rgba(102,126,234,.4)}
 .q-submit-btn:disabled{opacity:.6;cursor:not-allowed}
+.q-skip-btn{width:100%;padding:12px;margin-top:10px;background:none;border:1.5px solid rgba(255,255,255,.15);border-radius:14px;color:rgba(255,255,255,.4);font-size:.88em;font-weight:600;cursor:pointer;transition:all .25s;letter-spacing:.3px}
+.q-skip-btn:hover{border-color:rgba(255,255,255,.35);color:rgba(255,255,255,.7)}
 .q-field-error{color:#f64f59;font-size:.8em;margin-top:6px;display:none}
 .q-field-error.show{display:block}
 .q-thankyou{text-align:center;padding:40px 0;display:none}
@@ -483,6 +485,7 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
       <div class="q-progress-wrap"><div class="q-progress-label"><span>Progress</span><span id="qProgressText">0%</span></div><div class="q-progress-bar"><div class="q-progress-fill" id="qProgressFill" style="width:0%"></div></div></div>
       <div id="qQuestionsContainer"></div>
       <button class="q-submit-btn" id="qSubmitBtn" onclick="submitQuestionnaire()">🎮 Submit &amp; Enter</button>
+      <button class="q-skip-btn" onclick="skipQuestionnaire()">Skip &rarr;</button>
     </div>
     <div class="q-thankyou" id="qThankyou"><div class="q-thankyou-icon">🎮</div><h3>Thanks for the suggestion!</h3><p>We'll look into adding your requested games. Enjoy the platform!</p><button class="q-enter-btn" onclick="closeQuestionnaire()">Enter Site →</button></div>
   </div>
@@ -1222,6 +1225,7 @@ function collectAnswers(){const ans={};questionnaireQuestions.forEach(q=>{if(q.t
 function validateAnswers(ans){let ok=true;questionnaireQuestions.forEach(q=>{const e=document.getElementById('err-'+q.id);if(q.required&&(ans[q.id]===null||ans[q.id]==='')){{if(e)e.classList.add('show');ok=false;}}else{if(e)e.classList.remove('show');}});return ok;}
 async function submitQuestionnaire(){const ans=collectAnswers();if(!validateAnswers(ans))return;const btn=document.getElementById('qSubmitBtn');btn.disabled=true;btn.textContent='⏳ Submitting...';try{await sb.from('questionnaire_responses').insert({questionnaire_id:currentQuestionnaireId,responses:ans,submitted_at:new Date().toISOString(),user_id:currentUser?.id||null});sessionStorage.setItem('questionnaire_done','true');document.getElementById('qFormContent').style.display='none';document.getElementById('qThankyou').classList.add('active');}catch(err){btn.disabled=false;btn.textContent='🎮 Submit & Enter';alert('Error submitting. Please try again.');}}
 function closeQuestionnaire(){document.getElementById('questionnaireOverlay').classList.remove('active');document.body.style.overflow='';}
+function skipQuestionnaire(){sessionStorage.setItem('questionnaire_done','true');closeQuestionnaire();}
 
 // ══════════════════════════════════════════════════════════════════
 // SECURITY
