@@ -1273,28 +1273,11 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
 
     <!-- ── GITHUB EDITOR ── -->
     <div class="dev-tab-panel active" id="devPanel-github">
-      <!-- Token gate screen -->
-      <div id="ghTokenGate" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;padding:40px">
-        <div style="font-size:3em">🐙</div>
-        <div style="text-align:center">
-          <div style="color:#fff;font-size:1.1em;font-weight:800;margin-bottom:6px">Connect to GitHub</div>
-          <div style="color:rgba(255,255,255,.4);font-size:.85em;max-width:340px;line-height:1.6">
-            Paste your GitHub Personal Access Token to browse and edit<br>
-            <strong style="color:rgba(102,126,234,.9)">GABEHACKER33/maths.support</strong>
-          </div>
-        </div>
-        <div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px">
-          <input type="password" class="gh-input" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" style="font-size:.95em;padding:13px 16px;text-align:center;letter-spacing:2px">
-          <button class="gh-load-btn" onclick="ghConnect()" style="padding:13px;font-size:.95em">🔗 Connect &amp; Browse Files</button>
-          <div id="ghConnectError" style="display:none;color:#f87171;font-size:.8em;text-align:center;padding:8px 12px;background:rgba(246,79,89,.1);border-radius:8px;border:1px solid rgba(246,79,89,.3)"></div>
-        </div>
-        <div style="color:rgba(255,255,255,.2);font-size:.75em;text-align:center;max-width:340px;line-height:1.6">
-          Token needs <strong>repo</strong> scope. Generate one at<br>github.com → Settings → Developer settings → Personal access tokens
-        </div>
-      </div>
+      <!-- Auto-connecting splash (hidden immediately) -->
+      <div id="ghTokenGate" style="display:none"></div>
 
       <!-- Editor (shown after connect) -->
-      <div id="ghEditorShell" style="display:none;flex:1;overflow:hidden" class="gh-layout">
+      <div id="ghEditorShell" style="display:flex;flex:1;overflow:hidden" class="gh-layout">
         <!-- Sidebar -->
         <div class="gh-sidebar">
           <div class="gh-sidebar-header" style="justify-content:space-between">
@@ -2451,7 +2434,7 @@ let ghOriginalContent = '';
 // ── GitHub constants ──
 const GH_REPO = 'GABEHACKER33/maths.support';
 const GH_BRANCH = 'main';
-let ghToken = '';
+let ghToken = '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';
 
 function ghGetHeaders(){
   return { 'Authorization':'token '+ghToken, 'Accept':'application/vnd.github.v3+json', 'Content-Type':'application/json' };
@@ -2459,50 +2442,20 @@ function ghGetHeaders(){
 function ghGetRepo(){ return GH_REPO; }
 function ghGetBranch(){ return GH_BRANCH; }
 
-async function ghConnect(){
-  const input = document.getElementById('ghToken');
-  const tok = input.value.trim();
-  const errEl = document.getElementById('ghConnectError');
-  if(!tok){ errEl.textContent='Please paste your GitHub token.'; errEl.style.display='block'; return; }
-  errEl.style.display='none';
-  // Test the token against the repo
-  try{
-    const res = await fetch(`https://api.github.com/repos/${GH_REPO}`,{headers:{'Authorization':'token '+tok,'Accept':'application/vnd.github.v3+json'}});
-    if(!res.ok){ const e=await res.json(); throw new Error(e.message||'Auth failed: '+res.status); }
-    ghToken = tok;
-    try{ localStorage.setItem('gh_token_ms', tok); }catch(e){}
-    // Show editor shell
-    document.getElementById('ghTokenGate').style.display='none';
-    const shell=document.getElementById('ghEditorShell');shell.style.display='flex';
-    ghLoadFiles();
-  }catch(e){
-    errEl.textContent='❌ '+e.message;errEl.style.display='block';
-  }
-}
+// ghConnect is no longer needed (token is hardcoded), kept as no-op
+async function ghConnect(){ ghLoadFiles(); }
 
 function ghDisconnect(){
-  ghToken='';
-  try{ localStorage.removeItem('gh_token_ms'); }catch(e){}
-  document.getElementById('ghEditorShell').style.display='none';
-  document.getElementById('ghTokenGate').style.display='flex';
-  document.getElementById('ghToken').value='';
+  // Token is hardcoded — just reset the editor view
   document.getElementById('ghEditorMain').style.display='none';
   document.getElementById('ghEmptyEditor').style.display='flex';
   ghCurrentFile=null;
+  ghLoadFiles();
 }
 
-// Restore saved token on panel open
+// Token is hardcoded — just load files directly
 function ghRestoreSavedToken(){
-  try{
-    const saved=localStorage.getItem('gh_token_ms');
-    if(saved){
-      document.getElementById('ghToken').value=saved;
-      ghToken=saved;
-      document.getElementById('ghTokenGate').style.display='none';
-      const shell=document.getElementById('ghEditorShell');shell.style.display='flex';
-      ghLoadFiles();
-    }
-  }catch(e){}
+  ghLoadFiles();
 }
 
 async function ghLoadFiles(path=''){
