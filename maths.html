@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bubbls/granny@212c543a85b243c4a0b92211f557e760d83d2292/TemplateData/style.css">
 <script src="https://cdn.jsdelivr.net/gh/bubbls/granny@212c543a85b243c4a0b92211f557e760d83d2292/sdk.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.puter.com/v2/"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -746,72 +747,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .gh-empty-editor span:first-child{font-size:3em;opacity:.5}
 .gh-empty-editor p{font-size:.9em;max-width:260px;text-align:center;line-height:1.6}
 
-/* ── VERCEL TAB ── */
-.vc-layout{flex:1;display:flex;flex-direction:column;padding:24px;overflow-y:auto;gap:20px}
-.vc-layout::-webkit-scrollbar{width:5px}
-.vc-layout::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
-.vc-config-row{display:flex;gap:12px;align-items:flex-end}
-.vc-input{
-  flex:1;padding:11px 14px;
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:10px;color:#fff;font-size:.88em;
-  outline:none;font-family:inherit;transition:border-color .2s;
-}
-.vc-input:focus{border-color:rgba(102,126,234,.5)}
-.vc-input::placeholder{color:rgba(255,255,255,.25)}
-.vc-load-btn{
-  padding:11px 22px;
-  background:linear-gradient(135deg,#667eea,#764ba2);
-  border:none;border-radius:10px;color:#fff;
-  font-size:.88em;font-weight:700;cursor:pointer;
-  font-family:inherit;transition:all .2s;white-space:nowrap;
-}
-.vc-load-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(102,126,234,.4)}
-.vc-section-title{
-  font-size:.75em;font-weight:800;color:rgba(255,255,255,.3);
-  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;
-}
-.vc-deployments-grid{display:flex;flex-direction:column;gap:10px}
-.vc-deploy-card{
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:14px;padding:16px 20px;
-  display:flex;align-items:center;gap:16px;
-  transition:all .2s;cursor:default;
-}
-.vc-deploy-card:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12)}
-.vc-deploy-status{
-  width:10px;height:10px;border-radius:50%;flex-shrink:0;
-}
-.vc-deploy-status.ready{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.5)}
-.vc-deploy-status.building{background:#facc15;box-shadow:0 0 8px rgba(250,204,21,.5);animation:vcPulse 1s infinite}
-.vc-deploy-status.error{background:#f64f59;box-shadow:0 0 8px rgba(246,79,89,.5)}
-.vc-deploy-status.canceled{background:#6b7280}
-@keyframes vcPulse{0%,100%{opacity:1}50%{opacity:.4}}
-.vc-deploy-info{flex:1;min-width:0}
-.vc-deploy-name{font-size:.9em;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vc-deploy-meta{font-size:.75em;color:rgba(255,255,255,.35);margin-top:3px;display:flex;gap:12px}
-.vc-deploy-badge{
-  padding:3px 10px;border-radius:6px;font-size:.72em;font-weight:800;flex-shrink:0;
-}
-.vc-deploy-badge.ready{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25)}
-.vc-deploy-badge.building{background:rgba(250,204,21,.15);color:#facc15;border:1px solid rgba(250,204,21,.25)}
-.vc-deploy-badge.error{background:rgba(246,79,89,.15);color:#f87171;border:1px solid rgba(246,79,89,.25)}
-.vc-deploy-badge.canceled{background:rgba(107,114,128,.15);color:#9ca3af;border:1px solid rgba(107,114,128,.25)}
-.vc-deploy-link{
-  padding:6px 14px;background:rgba(102,126,234,.15);
-  border:1px solid rgba(102,126,234,.3);border-radius:8px;
-  color:#a5b4fc;font-size:.78em;font-weight:700;
-  text-decoration:none;flex-shrink:0;transition:all .2s;
-}
-.vc-deploy-link:hover{background:rgba(102,126,234,.28);color:#fff}
-.vc-empty{
-  text-align:center;padding:60px 20px;
-  color:rgba(255,255,255,.2);font-size:.9em;line-height:1.7;
-}
-.vc-empty-icon{font-size:3em;display:block;margin-bottom:14px;opacity:.4}
-
 /* ── AI CHAT TAB ── */
 .ai-chat-layout{
   flex:1;display:flex;flex-direction:column;overflow:hidden;
@@ -879,6 +814,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .ai-send-btn:hover{transform:scale(1.1);box-shadow:0 6px 22px rgba(102,126,234,.55)}
 .ai-send-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
 .ai-hint{font-size:.75em;color:rgba(255,255,255,.2);margin-top:8px;text-align:center}
+@keyframes aiCursor{0%,100%{opacity:1}50%{opacity:0}}
 .ai-welcome{
   flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:center;color:rgba(255,255,255,.3);
@@ -1260,9 +1196,7 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
     <button class="dev-tab active" id="devTab-github" onclick="switchDevTab('github')">
       <span class="dev-tab-icon">🐙</span> GitHub Editor
     </button>
-    <button class="dev-tab" id="devTab-vercel" onclick="switchDevTab('vercel')">
-      <span class="dev-tab-icon">▲</span> Vercel Deployments
-    </button>
+
     <button class="dev-tab" id="devTab-ai" onclick="switchDevTab('ai')">
       <span class="dev-tab-icon">🤖</span> Claude AI
     </button>
@@ -1273,11 +1207,27 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
 
     <!-- ── GITHUB EDITOR ── -->
     <div class="dev-tab-panel active" id="devPanel-github">
-      <!-- Auto-connecting splash (hidden immediately) -->
-      <div id="ghTokenGate" style="display:none"></div>
+      <!-- Token gate: shown until token is loaded from Supabase -->
+      <div id="ghTokenGate" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;padding:40px">
+        <div style="font-size:3em">🐙</div>
+        <div style="text-align:center">
+          <div style="color:#fff;font-size:1.1em;font-weight:800;margin-bottom:6px">Connect to GitHub</div>
+          <div style="color:rgba(255,255,255,.4);font-size:.85em;max-width:340px;line-height:1.6">
+            Paste your GitHub Personal Access Token once.<br>
+            It will be saved securely and auto-loaded next time.<br>
+            <strong style="color:rgba(102,126,234,.9)">GABEHACKER33/maths.support</strong>
+          </div>
+        </div>
+        <div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px">
+          <input type="password" class="gh-input" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" style="font-size:.95em;padding:13px 16px;text-align:center;letter-spacing:2px">
+          <button class="gh-load-btn" onclick="ghConnect()" style="padding:13px;font-size:.95em">🔗 Save &amp; Connect</button>
+          <div id="ghConnectError" style="display:none;color:#f87171;font-size:.8em;text-align:center;padding:8px 12px;background:rgba(246,79,89,.1);border-radius:8px;border:1px solid rgba(246,79,89,.3)"></div>
+          <div id="ghConnectStatus" style="display:none;color:#4ade80;font-size:.8em;text-align:center;padding:8px 12px;background:rgba(34,197,94,.08);border-radius:8px;border:1px solid rgba(34,197,94,.2)"></div>
+        </div>
+      </div>
 
       <!-- Editor (shown after connect) -->
-      <div id="ghEditorShell" style="display:flex;flex:1;overflow:hidden" class="gh-layout">
+      <div id="ghEditorShell" style="display:none;flex:1;overflow:hidden" class="gh-layout">
         <!-- Sidebar -->
         <div class="gh-sidebar">
           <div class="gh-sidebar-header" style="justify-content:space-between">
@@ -1308,37 +1258,14 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
       </div>
     </div>
 
-    <!-- ── VERCEL DEPLOYMENTS ── -->
-    <div class="dev-tab-panel" id="devPanel-vercel">
-      <div class="vc-layout">
-        <div class="vc-config-row">
-          <input type="text" class="vc-input" id="vcToken" placeholder="Vercel API Token" autocomplete="off">
-          <input type="text" class="vc-input" id="vcProjectId" value="maths-support" readonly style="opacity:.5;cursor:not-allowed">
-          <button class="vc-load-btn" onclick="vcLoadDeployments()">▲ Load Deployments</button>
-        </div>
-        <div>
-          <div class="vc-section-title" style="display:flex;align-items:center;justify-content:space-between">
-            <span>▲ maths-support · gabehacker33s-projects</span>
-            <a href="https://vercel.com/gabehacker33s-projects/maths-support" target="_blank" style="color:rgba(102,126,234,.8);text-decoration:none;font-size:.85em;font-weight:700;letter-spacing:0;text-transform:none">↗ Open Dashboard</a>
-          </div>
-          <div class="vc-deployments-grid" id="vcDeployList">
-            <div class="vc-empty">
-              <span class="vc-empty-icon">▲</span>
-              Enter your Vercel API token above to see deployments
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── CLAUDE AI CHAT ── -->
+        <!-- ── CLAUDE AI CHAT ── -->
     <div class="dev-tab-panel" id="devPanel-ai">
       <div class="ai-chat-layout">
         <div class="ai-chat-messages" id="aiChatMessages">
           <div class="ai-welcome" id="aiWelcome">
             <div class="ai-welcome-icon">🤖</div>
             <div>
-              <strong style="color:rgba(255,255,255,.7);font-size:1.05em;display:block;margin-bottom:8px">Claude AI — Developer Assistant</strong>
+              <strong style="color:rgba(255,255,255,.7);font-size:1.05em;display:block;margin-bottom:8px">Claude Sonnet 4.6 — Developer Assistant</strong>
               <p style="font-size:.9em;line-height:1.7;max-width:340px">Ask me anything about your codebase, HTML, CSS, JavaScript, GitHub, Vercel — or just brainstorm ideas for the platform.</p>
             </div>
           </div>
@@ -1348,7 +1275,7 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
             <textarea class="ai-chat-input" id="aiChatInput" placeholder="Ask Claude anything…" rows="1"></textarea>
             <button class="ai-send-btn" id="aiSendBtn" onclick="sendAiMessage()">➤</button>
           </div>
-          <div class="ai-hint">Powered by Claude claude-sonnet-4-20250514 · Shift+Enter for new line · Enter to send</div>
+          <div class="ai-hint">Powered by Claude Sonnet 4.6 via Puter.js · Free &amp; unlimited · Shift+Enter for new line</div>
         </div>
       </div>
     </div>
@@ -2413,7 +2340,6 @@ function switchDevTab(tab){
   document.getElementById('devPanel-'+tab).classList.add('active');
   // Auto-load Vercel if token is set; GitHub uses its own restore
   if(tab==='github') ghRestoreSavedToken();
-  if(tab==='vercel'&&document.getElementById('vcToken').value.trim()) vcLoadDeployments();
 }
 
 // ── Keep dev panel left edge in sync with sidebar ──
@@ -2434,28 +2360,65 @@ let ghOriginalContent = '';
 // ── GitHub constants ──
 const GH_REPO = 'GABEHACKER33/maths.support';
 const GH_BRANCH = 'main';
-let ghToken = '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';
+let ghToken = ''; // loaded from Supabase admin_settings table
 
 function ghGetHeaders(){
   return { 'Authorization':'token '+ghToken, 'Accept':'application/vnd.github.v3+json', 'Content-Type':'application/json' };
 }
-function ghGetRepo(){ return GH_REPO; }
-function ghGetBranch(){ return GH_BRANCH; }
 
-// ghConnect is no longer needed (token is hardcoded), kept as no-op
-async function ghConnect(){ ghLoadFiles(); }
+// ── Load token from Supabase admin_settings, then open editor ──
+async function ghRestoreSavedToken(){
+  if(!currentUser) return;
+  try{
+    const{data}=await sb.from('admin_settings').select('value').eq('key','github_token').maybeSingle();
+    if(data?.value){
+      ghToken=data.value;
+      ghShowEditor();
+      ghLoadFiles();
+    }
+    // else show token gate so admin can enter it
+  }catch(e){ console.warn('ghRestoreSavedToken:',e); }
+}
+
+// ── Admin enters token once → validate → save to Supabase ──
+async function ghConnect(){
+  const input=document.getElementById('ghTokenInput');
+  const tok=(input?.value||'').trim();
+  const errEl=document.getElementById('ghConnectError');
+  const statusEl=document.getElementById('ghConnectStatus');
+  if(errEl) errEl.style.display='none';
+  if(!tok){if(errEl){errEl.textContent='Please paste your GitHub token.';errEl.style.display='block';}return;}
+  if(statusEl){statusEl.textContent='⏳ Validating token...';statusEl.style.display='block';}
+  try{
+    // Test token against the repo
+    const res=await fetch(`https://api.github.com/repos/${GH_REPO}`,{headers:{'Authorization':'token '+tok,'Accept':'application/vnd.github.v3+json'}});
+    if(!res.ok){const e=await res.json();throw new Error(e.message||'Auth failed '+res.status);}
+    // Save to Supabase admin_settings
+    if(statusEl) statusEl.textContent='✅ Token valid! Saving to Supabase...';
+    const{error}=await sb.from('admin_settings').upsert({key:'github_token',value:tok,updated_by:currentUser.id},{onConflict:'key'});
+    if(error) throw new Error('Supabase save failed: '+error.message);
+    ghToken=tok;
+    if(statusEl) statusEl.textContent='✅ Connected! Loading files...';
+    setTimeout(()=>{ ghShowEditor(); ghLoadFiles(); },600);
+  }catch(e){
+    if(statusEl) statusEl.style.display='none';
+    if(errEl){errEl.textContent='❌ '+e.message;errEl.style.display='block';}
+  }
+}
+
+function ghShowEditor(){
+  document.getElementById('ghTokenGate').style.display='none';
+  const shell=document.getElementById('ghEditorShell');
+  shell.style.display='flex';
+}
 
 function ghDisconnect(){
-  // Token is hardcoded — just reset the editor view
+  document.getElementById('ghEditorShell').style.display='none';
+  document.getElementById('ghTokenGate').style.display='flex';
   document.getElementById('ghEditorMain').style.display='none';
   document.getElementById('ghEmptyEditor').style.display='flex';
   ghCurrentFile=null;
-  ghLoadFiles();
-}
-
-// Token is hardcoded — just load files directly
-function ghRestoreSavedToken(){
-  ghLoadFiles();
+  ghToken='';
 }
 
 async function ghLoadFiles(path=''){
@@ -2561,129 +2524,109 @@ async function ghSaveFile(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// VERCEL DEPLOYMENTS
+// CLAUDE AI CHAT — powered by Puter.js (free, unlimited, no API key)
 // ══════════════════════════════════════════════════════════════════
-async function vcLoadDeployments(){
-  const token=document.getElementById('vcToken').value.trim();
-  const projectId=document.getElementById('vcProjectId').value.trim();
-  if(!token){ alert('Please enter a Vercel API token'); return; }
-  const listEl=document.getElementById('vcDeployList');
-  listEl.innerHTML='<div class="vc-empty"><span class="vc-empty-icon" style="font-size:2em">⏳</span>Loading deployments...</div>';
-  try{
-    let url='https://api.vercel.com/v6/deployments?limit=20&teamId=gabehacker33s-projects';
-    if(projectId) url+=`&projectId=${encodeURIComponent(projectId)}`;
-    const res=await fetch(url,{headers:{'Authorization':'Bearer '+token}});
-    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Vercel API error '+res.status);}
-    const data=await res.json();
-    const deploys=data.deployments||[];
-    if(!deploys.length){listEl.innerHTML='<div class="vc-empty"><span class="vc-empty-icon">▲</span>No deployments found for this project.</div>';return;}
-    listEl.innerHTML='';
-    deploys.forEach(d=>{
-      const state=(d.state||d.readyState||'').toLowerCase();
-      const stateLabel={'ready':'Ready','building':'Building','error':'Error','canceled':'Canceled','queued':'Queued'}[state]||state;
-      const created=d.created?new Date(d.created).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Unknown';
-      const branch=d.meta?.githubCommitRef||d.gitBranch||'—';
-      const commitMsg=d.meta?.githubCommitMessage||d.name||'—';
-      const url=d.url?`https://${d.url}`:'';
-      const card=document.createElement('div');card.className='vc-deploy-card';
-      card.innerHTML=`
-        <div class="vc-deploy-status ${state}"></div>
-        <div class="vc-deploy-info">
-          <div class="vc-deploy-name" title="${commitMsg}">${commitMsg.substring(0,72)}${commitMsg.length>72?'…':''}</div>
-          <div class="vc-deploy-meta">
-            <span>🕐 ${created}</span>
-            <span>🌿 ${branch}</span>
-          </div>
-        </div>
-        <span class="vc-deploy-badge ${state}">${stateLabel}</span>
-        ${url?`<a href="${url}" target="_blank" class="vc-deploy-link">Open ↗</a>`:''}
-      `;
-      listEl.appendChild(card);
-    });
-  }catch(e){listEl.innerHTML=`<div class="vc-empty"><span class="vc-empty-icon">⚠️</span>${e.message}</div>`;}
-}
-
-// ══════════════════════════════════════════════════════════════════
-// CLAUDE AI CHAT (Developer Panel)
-// Uses Anthropic API via fetch — needs CORS proxy or same-origin
-// ══════════════════════════════════════════════════════════════════
-let aiMessages = []; // conversation history
+let aiMessages = []; // full conversation history
 let aiIsThinking = false;
 
-function aiAppendMessage(role, content, isThinking=false){
+const AI_SYSTEM = `You are a helpful developer assistant for "Maths Support" — a student gaming and study hub built as a single HTML file, deployed on Vercel, with Supabase as the backend. The GitHub repo is GABEHACKER33/maths.support. Help with HTML, CSS, JavaScript, Supabase queries, and platform features. Be concise and practical. Use code examples when helpful.`;
+
+function aiRenderContent(text){
+  return escapeHtml(text)
+    .replace(/```(\w*\n?)([\s\S]*?)```/g,(_,lang,code)=>`<pre style="background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 16px;margin:8px 0;overflow-x:auto;font-family:'Courier New',monospace;font-size:.83em;line-height:1.6;white-space:pre-wrap">${code}</pre>`)
+    .replace(/`([^`\n]+)`/g,'<code style="background:rgba(255,255,255,.12);padding:2px 7px;border-radius:5px;font-family:monospace;font-size:.88em">$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n/g,'<br>');
+}
+
+function aiAppendMessage(role, content=''){
   const welcome=document.getElementById('aiWelcome');
-  if(welcome)welcome.style.display='none';
+  if(welcome) welcome.style.display='none';
   const container=document.getElementById('aiChatMessages');
   const div=document.createElement('div');
   div.className='ai-msg '+(role==='user'?'user':'assistant');
-  const avatarEmoji=role==='user'?(initials(currentProfile?.display_name||'U')):'🤖';
-  if(isThinking){
-    div.id='ai-thinking-bubble';
-    div.innerHTML=`
-      <div class="ai-msg-avatar">${avatarEmoji}</div>
-      <div class="ai-msg-bubble">
-        <div class="ai-thinking">
-          <div class="ai-thinking-dot"></div>
-          <div class="ai-thinking-dot"></div>
-          <div class="ai-thinking-dot"></div>
-        </div>
-      </div>`;
-  }else{
-    // Simple markdown-ish: code blocks, bold
-    let html=escapeHtml(content)
-      .replace(/`([^`]+)`/g,'<code style="background:rgba(255,255,255,.1);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:.9em">$1</code>')
-      .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
-      .replace(/\n/g,'<br>');
-    div.innerHTML=`<div class="ai-msg-avatar">${avatarEmoji}</div><div class="ai-msg-bubble">${html}</div>`;
-  }
+  const avatar=role==='user'
+    ? `<div class="ai-msg-avatar" style="font-size:.75em;font-weight:800">${initials(currentProfile?.display_name||'U')}</div>`
+    : `<div class="ai-msg-avatar">🤖</div>`;
+  div.innerHTML=`${avatar}<div class="ai-msg-bubble">${aiRenderContent(content)}</div>`;
+  container.appendChild(div);
+  container.scrollTop=container.scrollHeight;
+  return div;
+}
+
+function aiShowThinking(){
+  const welcome=document.getElementById('aiWelcome');
+  if(welcome) welcome.style.display='none';
+  const container=document.getElementById('aiChatMessages');
+  const div=document.createElement('div');
+  div.className='ai-msg assistant'; div.id='ai-thinking-bubble';
+  div.innerHTML=`<div class="ai-msg-avatar">🤖</div><div class="ai-msg-bubble"><div class="ai-thinking"><div class="ai-thinking-dot"></div><div class="ai-thinking-dot"></div><div class="ai-thinking-dot"></div></div></div>`;
+  container.appendChild(div); container.scrollTop=container.scrollHeight;
+  return div;
+}
+
+function aiCreateStreamBubble(){
+  const welcome=document.getElementById('aiWelcome');
+  if(welcome) welcome.style.display='none';
+  const container=document.getElementById('aiChatMessages');
+  const div=document.createElement('div');
+  div.className='ai-msg assistant';
+  div.innerHTML=`<div class="ai-msg-avatar">🤖</div><div class="ai-msg-bubble" id="ai-stream-content"></div>`;
   container.appendChild(div);
   container.scrollTop=container.scrollHeight;
   return div;
 }
 
 async function sendAiMessage(){
-  if(aiIsThinking)return;
+  if(aiIsThinking) return;
   const input=document.getElementById('aiChatInput');
   const content=input.value.trim();
-  if(!content)return;
-  input.value='';input.style.height='';
+  if(!content) return;
+  input.value=''; input.style.height='';
   aiIsThinking=true;
   document.getElementById('aiSendBtn').disabled=true;
 
-  // Add user message to UI and history
-  aiAppendMessage('user',content);
-  aiMessages.push({role:'user',content});
+  aiAppendMessage('user', content);
+  aiMessages.push({role:'user', content});
 
-  // Show thinking bubble
-  const thinkBubble=aiAppendMessage('assistant','',true);
+  // Build prompt string with system context prepended on first message
+  const prompt = aiMessages.length===1
+    ? AI_SYSTEM + '\n\nUser: ' + content
+    : content;
+
+  // Show thinking dots while waiting for stream to start
+  const thinkBubble=aiShowThinking();
+  let streamBubble=null;
+  let fullReply='';
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:`You are a helpful developer assistant for "Maths Support", a student gaming and study platform. 
-You help the admin with: HTML/CSS/JS code questions, GitHub repository management, Vercel deployment questions, and platform features.
-Be concise, practical, and developer-friendly. Use code examples when helpful.`,
-        messages:aiMessages
-      })
+    const response = await puter.ai.chat(prompt, {
+      model: 'claude-sonnet-4-6',
+      stream: true
     });
-    const data=await res.json();
-    // Remove thinking bubble
+
+    // First token arrived — swap thinking for stream bubble
     thinkBubble.remove();
-    if(data.error){
-      aiAppendMessage('assistant','⚠️ API Error: '+data.error.message);
-    }else{
-      const reply=data.content?.find(b=>b.type==='text')?.text||'(No response)';
-      aiAppendMessage('assistant',reply);
-      aiMessages.push({role:'assistant',content:reply});
+    streamBubble = aiCreateStreamBubble();
+    const streamEl = document.getElementById('ai-stream-content');
+
+    for await (const part of response){
+      const chunk = part?.text || '';
+      fullReply += chunk;
+      if(streamEl){
+        streamEl.innerHTML = aiRenderContent(fullReply);
+        document.getElementById('aiChatMessages').scrollTop = document.getElementById('aiChatMessages').scrollHeight;
+      }
     }
+
+    aiMessages.push({role:'assistant', content: fullReply});
+
   }catch(e){
-    thinkBubble.remove();
-    aiAppendMessage('assistant','⚠️ Could not reach Claude API. Make sure you are on a network that allows requests to api.anthropic.com.\n\nError: '+e.message);
+    if(thinkBubble) thinkBubble.remove();
+    if(streamBubble) streamBubble.remove();
+    aiAppendMessage('assistant', '⚠️ Error: ' + e.message + '\n\nMake sure you are signed in to Puter (puter.com) or try refreshing.');
   }
+
   aiIsThinking=false;
   document.getElementById('aiSendBtn').disabled=false;
   input.focus();
@@ -2698,7 +2641,7 @@ document.getElementById('aiChatInput').addEventListener('keydown',function(e){
 });
 // Enter on GitHub token input to connect
 document.addEventListener('keydown',function(e){
-  if(e.key==='Enter'&&document.activeElement&&document.activeElement.id==='ghToken'){
+  if(e.key==='Enter'&&document.activeElement&&document.activeElement.id==='ghTokenInput'){
     ghConnect();
   }
 });
