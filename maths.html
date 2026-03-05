@@ -360,6 +360,34 @@ body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:url('htt
 .empty-list{padding:28px 0;text-align:center;color:#ccc;font-size:.9em}
 .section-sub-title{font-size:1em;font-weight:700;color:#667eea;margin:20px 0 12px;display:flex;align-items:center;gap:8px}
 
+
+/* ── STREAK & PET SYSTEM ────────────────────────────────────── */
+.streak-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:linear-gradient(135deg,#fff9f0,#fff3e0);border-bottom:1.5px solid #ffe0b2;flex-shrink:0;gap:10px}
+.streak-pet-wrap{display:flex;align-items:center;gap:10px;flex:1}
+.streak-pet-emoji{font-size:2em;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.15));transition:transform .3s;cursor:pointer;position:relative}
+.streak-pet-emoji:hover{transform:scale(1.2) rotate(-5deg)}
+.streak-pet-emoji.bounce{animation:petBounce .5s ease}
+@keyframes petBounce{0%,100%{transform:scale(1)}30%{transform:scale(1.35) rotate(8deg)}60%{transform:scale(.9) rotate(-4deg)}}
+.streak-pet-info{flex:1}
+.streak-pet-name{font-size:.78em;font-weight:800;color:#e65100;line-height:1.2}
+.streak-pet-mood{font-size:.7em;color:#ff8f00;font-weight:500}
+.streak-count-wrap{display:flex;flex-direction:column;align-items:center;gap:2px}
+.streak-flame{font-size:1.4em;line-height:1}
+.streak-num{font-size:1.1em;font-weight:900;color:#f4511e;line-height:1;font-variant-numeric:tabular-nums}
+.streak-label{font-size:.62em;color:#ff8f00;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.streak-xp-bar-wrap{width:80px}
+.streak-xp-label{font-size:.65em;color:#ff8f00;font-weight:600;margin-bottom:3px;display:flex;justify-content:space-between}
+.streak-xp-track{height:5px;background:#ffe0b2;border-radius:3px;overflow:hidden}
+.streak-xp-fill{height:100%;background:linear-gradient(90deg,#ff8f00,#f4511e);border-radius:3px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.streak-broken{background:linear-gradient(135deg,#fff5f5,#fff0f0);border-bottom-color:#ffcdd2}
+.streak-broken .streak-flame{filter:grayscale(1);opacity:.4}
+.streak-broken .streak-num{color:#bbb}
+.streak-broken .streak-pet-mood{color:#e57373}
+.streak-milestone-toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);background:linear-gradient(135deg,#ff8f00,#f4511e);color:#fff;padding:14px 28px;border-radius:50px;font-size:.95em;font-weight:800;box-shadow:0 8px 32px rgba(244,81,30,.4);z-index:99997;opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+.streak-milestone-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ── cli streak badge ── */
+.cli-streak{font-size:.75em;font-weight:800;color:#f4511e;display:flex;align-items:center;gap:2px;flex-shrink:0}
+
 /* ── CHAT PAGE ───────────────────────────────────────────────── */
 .chat-page{display:none;max-width:1060px;margin:0 auto}
 .chat-page.active{display:block}
@@ -652,6 +680,25 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
           <div class="chat-convo-header">
             <div class="chat-convo-avatar" id="chatConvoAvatar">?</div>
             <span class="chat-convo-name" id="chatConvoName">Friend</span>
+          </div>
+          <!-- STREAK BAR -->
+          <div class="streak-bar" id="streakBar">
+            <div class="streak-pet-wrap">
+              <div class="streak-pet-emoji" id="streakPetEmoji" onclick="bouncePet()" title="¡Tu mascota!">🥚</div>
+              <div class="streak-pet-info">
+                <div class="streak-pet-name" id="streakPetName">Huevo misterioso</div>
+                <div class="streak-pet-mood" id="streakPetMood">Chatea para empezar tu racha</div>
+              </div>
+            </div>
+            <div class="streak-xp-bar-wrap">
+              <div class="streak-xp-label"><span id="streakXpCur">0</span><span id="streakXpMax">XP</span></div>
+              <div class="streak-xp-track"><div class="streak-xp-fill" id="streakXpFill" style="width:0%"></div></div>
+            </div>
+            <div class="streak-count-wrap">
+              <div class="streak-flame" id="streakFlame">🔥</div>
+              <div class="streak-num" id="streakNum">0</div>
+              <div class="streak-label">días</div>
+            </div>
           </div>
           <div class="chat-messages" id="chatMessages">
             <div class="chat-empty-msgs"><span>👋</span><span>Say hello!</span></div>
@@ -1096,6 +1143,174 @@ async function acceptFriend(friendshipId){
   await loadFriends();
 }
 
+
+// ══════════════════════════════════════════════════════════════════
+// STREAK & PET SYSTEM
+// Each friendship pair has its own streak stored in Supabase table:
+//   chat_streaks (id, user_a uuid, user_b uuid, streak int,
+//                 last_date date, xp int, pet_stage int,
+//                 pet_name text, created_at timestamptz)
+// user_a is always the smaller UUID (canonical order) so it's unique.
+// ══════════════════════════════════════════════════════════════════
+let streakCache = {};          // keyed by friendId -> streak data
+let currentStreakData = null;  // streak for active conversation
+
+// Pet stages: egg → baby → teen → adult → legendary
+const PET_STAGES = [
+  { emoji:'🥚', name:'Huevo misterioso',  mood:(s)=>'Chatea para romper el cascarón', minXp:0    },
+  { emoji:'🐣', name:'Pollito tímido',    mood:(s)=>`¡${s} día${s!==1?'s':''} de racha! Estoy creciendo`, minXp:10   },
+  { emoji:'🐥', name:'Patito travieso',   mood:(s)=>`¡${s} días! Me encanta charlar`, minXp:50   },
+  { emoji:'🐦', name:'Pájaro curioso',    mood:(s)=>`¡${s} días! ¡Somos inseparables!`, minXp:150  },
+  { emoji:'🦅', name:'Águila legendaria', mood:(s)=>`¡${s} días! ¡Somos leyendas!`, minXp:400  },
+];
+
+// XP needed to reach each stage
+const XP_TO_NEXT = [10, 40, 100, 250];
+
+function getPetStage(xp){
+  let stage = 0;
+  for(let i=0;i<XP_TO_NEXT.length;i++){
+    const needed = XP_TO_NEXT.slice(0,i+1).reduce((a,b)=>a+b,0);
+    if(xp >= needed) stage = i+1; else break;
+  }
+  return Math.min(stage, PET_STAGES.length-1);
+}
+
+function getXpInStage(xp, stage){
+  const base = XP_TO_NEXT.slice(0,stage).reduce((a,b)=>a+b,0);
+  const next = XP_TO_NEXT[stage] || XP_TO_NEXT[XP_TO_NEXT.length-1];
+  return { current: xp - base, max: next };
+}
+
+// Canonical friendship key: smaller UUID first
+function streakKey(a, b){ return [a,b].sort().join('_'); }
+function streakUserA(a,b){ return a<b?a:b; }
+function streakUserB(a,b){ return a<b?b:a; }
+
+async function loadStreak(friendId){
+  const uA = streakUserA(currentUser.id, friendId);
+  const uB = streakUserB(currentUser.id, friendId);
+  const { data } = await sb.from('chat_streaks')
+    .select('*')
+    .eq('user_a', uA).eq('user_b', uB)
+    .maybeSingle();
+  const row = data || { streak:0, xp:0, pet_stage:0, pet_name:null, last_date:null };
+  streakCache[friendId] = row;
+  return row;
+}
+
+async function updateStreak(friendId){
+  const uA = streakUserA(currentUser.id, friendId);
+  const uB = streakUserB(currentUser.id, friendId);
+  const today = new Date().toISOString().slice(0,10);
+
+  const { data:existing } = await sb.from('chat_streaks')
+    .select('*').eq('user_a',uA).eq('user_b',uB).maybeSingle();
+
+  let streak, xp, lastDate, petName;
+
+  if(!existing){
+    streak   = 1;
+    xp       = 5;
+    lastDate = today;
+    petName  = null;
+    await sb.from('chat_streaks').insert({ user_a:uA, user_b:uB, streak, xp, pet_stage:0, pet_name:petName, last_date:today });
+  } else {
+    lastDate = existing.last_date;
+    xp       = existing.xp || 0;
+    petName  = existing.pet_name;
+
+    if(lastDate === today){
+      // Already messaged today — just sync, no streak change
+      streak = existing.streak;
+    } else {
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+      const yStr = yesterday.toISOString().slice(0,10);
+      if(lastDate === yStr){
+        // Consecutive day — extend streak
+        streak = (existing.streak||0) + 1;
+        xp = xp + 5 + Math.min(streak, 10); // bonus XP for longer streaks
+        await sb.from('chat_streaks').update({ streak, xp, last_date:today }).eq('user_a',uA).eq('user_b',uB);
+        checkStreakMilestone(streak);
+      } else {
+        // Broke the streak
+        streak = 1;
+        xp = Math.max(0, xp - 20); // lose some XP for breaking
+        await sb.from('chat_streaks').update({ streak, xp, last_date:today }).eq('user_a',uA).eq('user_b',uB);
+        showToast('💔 ¡Racha rota! Vuelve a empezar...');
+      }
+    }
+  }
+
+  const updated = { streak, xp, pet_name:petName, last_date:today };
+  streakCache[friendId] = updated;
+  currentStreakData = updated;
+  renderStreakBar(updated);
+  return updated;
+}
+
+function checkStreakMilestone(streak){
+  const milestones = { 3:'🔥 ¡3 días seguidos!', 7:'🌟 ¡Una semana de racha!', 14:'💪 ¡14 días! ¡Increíble!', 30:'🏆 ¡UN MES de racha! 🎉', 50:'🚀 ¡50 días! ¡Leyenda!', 100:'👑 ¡100 DÍAS! ¡DIOS!' };
+  if(milestones[streak]) showToast(milestones[streak]);
+}
+
+function renderStreakBar(data){
+  if(!data) return;
+  const bar     = document.getElementById('streakBar');
+  const xp      = data.xp || 0;
+  const streak  = data.streak || 0;
+  const stage   = getPetStage(xp);
+  const pet     = PET_STAGES[stage];
+  const xpInfo  = getXpInStage(xp, stage);
+  const petName = data.pet_name || pet.name;
+  const broken  = streak === 0;
+
+  bar.classList.toggle('streak-broken', broken);
+  document.getElementById('streakPetEmoji').textContent = pet.emoji;
+  document.getElementById('streakPetName').textContent  = petName;
+  document.getElementById('streakPetMood').textContent  = pet.mood(streak);
+  document.getElementById('streakNum').textContent      = streak;
+  document.getElementById('streakFlame').textContent    = streak > 0 ? '🔥' : '💀';
+  document.getElementById('streakXpCur').textContent    = xpInfo.current;
+  document.getElementById('streakXpMax').textContent    = `/${xpInfo.max} XP`;
+  const pct = Math.min(100, Math.round((xpInfo.current / xpInfo.max)*100));
+  document.getElementById('streakXpFill').style.width   = pct+'%';
+}
+
+function bouncePet(){
+  const el = document.getElementById('streakPetEmoji');
+  el.classList.remove('bounce');
+  void el.offsetWidth;
+  el.classList.add('bounce');
+  // Show tooltip with pet info
+  if(currentStreakData){
+    const xp = currentStreakData.xp||0;
+    const stage = getPetStage(xp);
+    const pet = PET_STAGES[stage];
+    showToast(`${pet.emoji} ${currentStreakData.pet_name||pet.name} — ${xp} XP total`);
+  }
+}
+
+function showToast(msg){
+  let toast = document.getElementById('streakToast');
+  if(!toast){
+    toast = document.createElement('div');
+    toast.id='streakToast';
+    toast.className='streak-milestone-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>toast.classList.remove('show'), 3200);
+}
+
+async function loadStreakForConvo(friendId){
+  const data = await loadStreak(friendId);
+  currentStreakData = data;
+  renderStreakBar(data);
+}
+
 // ══════════════════════════════════════════════════════════════════
 // CHAT
 // ══════════════════════════════════════════════════════════════════
@@ -1110,7 +1325,10 @@ function renderChatList(accepted){
     const div = document.createElement('div');
     div.className='chat-list-item'+(activeChatFriendId===p.id?' active':'');
     div.id='cli-'+p.id;
-    div.innerHTML=`<div class="cli-avatar">${initials(name)}</div><span class="cli-name">${name}</span>`;
+    const sData = streakCache[p.id] || {};
+    const sd = sData.streak||0;
+    const streakBadge = sd>0 ? `<span class="cli-streak">🔥${sd}</span>` : '';
+    div.innerHTML=`<div class="cli-avatar">${initials(name)}</div><span class="cli-name">${name}</span>${streakBadge}`;
     div.onclick=()=>openChatWith(p.id,name);
     el.appendChild(div);
   });
@@ -1128,6 +1346,7 @@ function openChatWith(friendId, friendName){
   document.getElementById('chatConvoName').textContent   = friendName;
   showSection('chat');
   loadMessages(friendId);
+  loadStreakForConvo(friendId);
 }
 
 async function loadMessages(friendId){
@@ -1175,6 +1394,7 @@ async function sendMessage(){
   if(!error&&data){
     appendBubble(data);
     document.getElementById('chatMessages').scrollTop=99999;
+    updateStreak(activeChatFriendId);
   }
 }
 
