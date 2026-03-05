@@ -617,9 +617,19 @@ async function doLogin(){
   errEl.classList.remove('show');
   if(!email||!password){ errEl.textContent='Please fill in all fields.'; errEl.classList.add('show'); return; }
   btn.disabled=true; btn.textContent='Signing in...';
+
+  console.log('[LOGIN] Attempting login for:', email);
   const {data, error} = await sb.auth.signInWithPassword({email, password});
+  console.log('[LOGIN] Response data:', JSON.stringify(data));
+  console.log('[LOGIN] Response error:', JSON.stringify(error));
+
   btn.disabled=false; btn.textContent='Sign In →';
-  if(error){ errEl.textContent=error.message; errEl.classList.add('show'); return; }
+  if(error){
+    // Show the raw error so we can debug
+    errEl.textContent = error.message + ' (code: ' + (error.status||error.code||'?') + ')';
+    errEl.classList.add('show'); return;
+  }
+  if(!data.user){ errEl.textContent='Login failed: no user returned. Check console.'; errEl.classList.add('show'); return; }
   await onSignedIn(data.user);
 }
 
@@ -637,19 +647,51 @@ async function doRegister(){
   if(!username||!email||!password){ errEl.textContent='Please fill in all fields.'; errEl.classList.add('show'); return; }
   if(username.length<3){ errEl.textContent='Username must be at least 3 characters.'; errEl.classList.add('show'); return; }
   if(password.length<6){ errEl.textContent='Password must be at least 6 characters.'; errEl.classList.add('show'); return; }
-  // Check username taken
+
   const {data:existing} = await sb.from('profiles').select('id').eq('username',username).maybeSingle();
-  if(existing){ errEl.textContent='That username is already taken.'; errEl.classList.add('show'); return; }
+  if(existing){ errEl.textContent='That username is already taken — try another.'; errEl.classList.add('show'); return; }
+
   btn.disabled=true; btn.textContent='Creating account...';
+  console.log('[REGISTER] Attempting signUp for:', email);
   const {data, error} = await sb.auth.signUp({email, password});
-  if(error){ btn.disabled=false; btn.textContent='Create Account →'; errEl.textContent=error.message; errEl.classList.add('show'); return; }
+  console.log('[REGISTER] signUp data:', JSON.stringify(data));
+  console.log('[REGISTER] signUp error:', JSON.stringify(error));
+
+  if(error){
+    btn.disabled=false; btn.textContent='Create Account →';
+    errEl.textContent = error.message + ' (code: '+(error.status||error.code||'?')+')';
+    errEl.classList.add('show'); return;
+  }
+
+  // Check if user was actually created
+  if(!data.user){
+    btn.disabled=false; btn.textContent='Create Account →';
+    errEl.textContent='Sign-up returned no user — check console for details.';
+    errEl.classList.add('show'); return;
+  }
+
+  // If signUp returns a user but no session, email confirmation is still required
+  if(!data.session){
+    btn.disabled=false; btn.textContent='Create Account →';
+    okEl.textContent='✅ Account created! Check your email for a confirmation link, then sign in.';
+    okEl.classList.add('show');
+    return;
+  }
+
   // Create profile
   const friendCode = genCode();
-  await sb.from('profiles').insert({id:data.user.id, username, display_name:username, friend_code:friendCode});
-  okEl.textContent='Account created! Signing you in…'; okEl.classList.add('show');
+  console.log('[REGISTER] Creating profile for user id:', data.user.id);
+  const {error: profileError} = await sb.from('profiles').insert({id:data.user.id, username, display_name:username, friend_code:friendCode});
+  console.log('[REGISTER] Profile insert error:', JSON.stringify(profileError));
+
   btn.disabled=false; btn.textContent='Create Account →';
-  // Auto login
-  setTimeout(()=>{ document.getElementById('loginEmail').value=email; document.getElementById('loginPassword').value=password; doLogin(); }, 800);
+  okEl.textContent='✅ Account created! Signing you in…'; okEl.classList.add('show');
+  setTimeout(async()=>{
+    document.getElementById('loginEmail').value=email;
+    document.getElementById('loginPassword').value=password;
+    switchAuthTab('login');
+    await doLogin();
+  }, 900);
 }
 
 // ══════════════════════════════════════════════════════════════════
