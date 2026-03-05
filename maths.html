@@ -10,6 +10,117 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 
+/* ── SITE PASSWORD OVERLAY ───────────────────────────────────── */
+.sitepass-overlay{
+  position:fixed;inset:0;z-index:999999999;
+  background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+  display:flex;justify-content:center;align-items:center;overflow:hidden;
+}
+.sitepass-overlay.hidden{display:none!important}
+
+/* animated background blobs */
+.sp-blob{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none}
+.sp-blob-1{width:500px;height:500px;background:radial-gradient(circle,rgba(102,126,234,.35),transparent 70%);top:-120px;left:-120px;animation:spFloat 9s ease-in-out infinite}
+.sp-blob-2{width:400px;height:400px;background:radial-gradient(circle,rgba(118,75,162,.3),transparent 70%);bottom:-100px;right:-80px;animation:spFloat 11s ease-in-out infinite reverse}
+.sp-blob-3{width:300px;height:300px;background:radial-gradient(circle,rgba(246,79,89,.18),transparent 70%);top:50%;left:55%;animation:spFloat 7s ease-in-out infinite 2s}
+@keyframes spFloat{0%,100%{transform:scale(1) translate(0,0)}33%{transform:scale(1.08) translate(10px,-15px)}66%{transform:scale(.95) translate(-8px,12px)}}
+
+/* grid texture overlay */
+.sp-grid{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(102,126,234,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(102,126,234,.07) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+
+.sitepass-card{
+  position:relative;z-index:1;
+  background:rgba(255,255,255,.04);
+  backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:28px;
+  padding:52px 56px 44px;
+  max-width:440px;width:90%;
+  box-shadow:0 32px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);
+  animation:spCardIn .6s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes spCardIn{from{opacity:0;transform:translateY(28px) scale(.96)}to{opacity:1;transform:none}}
+
+.sp-icon{
+  width:68px;height:68px;border-radius:20px;margin:0 auto 22px;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8em;
+  box-shadow:0 8px 24px rgba(102,126,234,.45);
+}
+.sp-title{color:#fff;font-size:1.65em;font-weight:800;text-align:center;margin-bottom:6px;letter-spacing:-.3px}
+.sp-sub{color:rgba(255,255,255,.45);font-size:.88em;text-align:center;margin-bottom:32px;line-height:1.5}
+
+.sp-input-wrap{position:relative;margin-bottom:14px}
+.sp-input{
+  width:100%;padding:15px 52px 15px 18px;
+  background:rgba(255,255,255,.07);
+  border:1.5px solid rgba(255,255,255,.15);
+  border-radius:14px;
+  color:#fff;font-size:1em;outline:none;
+  font-family:inherit;letter-spacing:1px;
+  transition:border-color .25s,background .25s,box-shadow .25s;
+}
+.sp-input::placeholder{color:rgba(255,255,255,.3);letter-spacing:0}
+.sp-input:focus{
+  border-color:#667eea;
+  background:rgba(102,126,234,.12);
+  box-shadow:0 0 0 3px rgba(102,126,234,.2);
+}
+.sp-input.error{border-color:#f64f59;background:rgba(246,79,89,.1);animation:spShake .35s ease}
+@keyframes spShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+.sp-toggle-vis{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:rgba(255,255,255,.35);
+  cursor:pointer;font-size:1.1em;padding:4px;
+  transition:color .2s;line-height:1;
+}
+.sp-toggle-vis:hover{color:rgba(255,255,255,.7)}
+
+.sp-error{
+  color:#f64f59;font-size:.82em;
+  background:rgba(246,79,89,.1);
+  border:1px solid rgba(246,79,89,.25);
+  border-radius:9px;padding:9px 13px;margin-bottom:12px;
+  display:none;animation:spFadeIn .25s ease;
+}
+.sp-error.show{display:block}
+@keyframes spFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+.sp-btn{
+  width:100%;padding:16px;margin-top:4px;
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  border:none;border-radius:14px;
+  color:#fff;font-size:1em;font-weight:700;
+  cursor:pointer;letter-spacing:.4px;
+  transition:transform .2s,box-shadow .2s,opacity .2s;
+  position:relative;overflow:hidden;
+}
+.sp-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.sp-btn:hover:not(:disabled)::before{opacity:1}
+.sp-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(102,126,234,.5)}
+.sp-btn:active:not(:disabled){transform:translateY(0)}
+.sp-btn:disabled{opacity:.55;cursor:not-allowed}
+
+.sp-spinner{
+  display:inline-block;width:16px;height:16px;
+  border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spSpin .7s linear infinite;vertical-align:middle;margin-right:6px;
+}
+@keyframes spSpin{to{transform:rotate(360deg)}}
+
+.sp-footer{color:rgba(255,255,255,.2);font-size:.75em;text-align:center;margin-top:20px}
+
 /* ── AUTH MODAL ─────────────────────────────────────────────── */
 .auth-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);z-index:99999;display:flex;justify-content:center;align-items:center}
 .auth-overlay.hidden{display:none!important}
@@ -304,8 +415,37 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
 </head>
 <body>
 
+<!-- ══ SITE PASSWORD OVERLAY ═════════════════════════════════ -->
+<div class="sitepass-overlay" id="sitePassOverlay">
+  <div class="sp-blob sp-blob-1"></div>
+  <div class="sp-blob sp-blob-2"></div>
+  <div class="sp-blob sp-blob-3"></div>
+  <div class="sp-grid"></div>
+  <div class="sitepass-card">
+    <div class="sp-icon">🔐</div>
+    <h2 class="sp-title">Maths Support</h2>
+    <p class="sp-sub">Enter the site password to continue</p>
+    <div class="sp-input-wrap">
+      <input
+        type="password"
+        class="sp-input"
+        id="sitePassInput"
+        placeholder="Enter site password..."
+        autocomplete="off"
+        spellcheck="false"
+      >
+      <button class="sp-toggle-vis" id="spToggleVis" onclick="toggleSpVisibility()" title="Show/hide password">👁</button>
+    </div>
+    <div class="sp-error" id="spError">Incorrect password. Please try again.</div>
+    <button class="sp-btn" id="spBtn" onclick="checkSitePassword()">
+      Unlock Site →
+    </button>
+    <p class="sp-footer">🔒 Protected by Maths Support</p>
+  </div>
+</div>
+
 <!-- ══ AUTH OVERLAY ══════════════════════════════════════════ -->
-<div class="auth-overlay" id="authOverlay">
+<div class="auth-overlay hidden" id="authOverlay">
   <div class="auth-box">
     <div class="auth-logo">🎮</div>
     <h2>Maths Support</h2>
@@ -583,6 +723,95 @@ let chatRealtime = null;
 let friendsPollTimer = null;
 
 // ══════════════════════════════════════════════════════════════════
+// SITE PASSWORD PROTECTION
+// Fetches password(s) from the `passwords` table in Supabase.
+// Expected table schema:
+//   passwords (id, password text, active boolean, created_at)
+// All rows where active = true are treated as valid passwords.
+// ══════════════════════════════════════════════════════════════════
+const SP_SESSION_KEY = 'sitepass_granted';
+
+function toggleSpVisibility(){
+  const input = document.getElementById('sitePassInput');
+  const btn   = document.getElementById('spToggleVis');
+  if(input.type === 'password'){ input.type = 'text';  btn.textContent = '🙈'; }
+  else                         { input.type = 'password'; btn.textContent = '👁'; }
+}
+
+async function checkSitePassword(){
+  const input  = document.getElementById('sitePassInput');
+  const errEl  = document.getElementById('spError');
+  const btn    = document.getElementById('spBtn');
+  const entered = input.value.trim();
+
+  errEl.classList.remove('show');
+  input.classList.remove('error');
+
+  if(!entered){
+    errEl.textContent = 'Please enter the site password.';
+    errEl.classList.add('show');
+    input.classList.add('error');
+    input.focus();
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="sp-spinner"></span>Checking...';
+
+  try {
+    // Fetch all active passwords from the passwords table
+    const { data, error } = await sb
+      .from('passwords')
+      .select('password')
+      .eq('active', true);
+
+    if(error) throw error;
+
+    const validPasswords = (data || []).map(row => row.password);
+
+    if(validPasswords.length === 0){
+      // No active passwords configured — fail safe: deny access
+      errEl.textContent = 'No active passwords configured. Contact the site admin.';
+      errEl.classList.add('show');
+      btn.disabled = false;
+      btn.innerHTML = 'Unlock Site →';
+      return;
+    }
+
+    const isCorrect = validPasswords.includes(entered);
+
+    if(isCorrect){
+      // Grant access for this session
+      sessionStorage.setItem(SP_SESSION_KEY, 'true');
+      // Animate card out
+      const card = document.querySelector('.sitepass-card');
+      card.style.transition = 'opacity .4s ease, transform .4s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(.95) translateY(-10px)';
+      setTimeout(()=>{
+        document.getElementById('sitePassOverlay').classList.add('hidden');
+        // Now proceed with the rest of the app init
+        runAppInit();
+      }, 420);
+    } else {
+      input.classList.add('error');
+      errEl.textContent = 'Incorrect password. Please try again.';
+      errEl.classList.add('show');
+      input.value = '';
+      input.focus();
+      btn.disabled = false;
+      btn.innerHTML = 'Unlock Site →';
+    }
+  } catch(e) {
+    console.error('[SitePass] Error fetching passwords:', e);
+    errEl.textContent = 'Could not verify password — check your connection.';
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.innerHTML = 'Unlock Site →';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════════════
 function initials(name){ return (name||'?').charAt(0).toUpperCase(); }
@@ -625,7 +854,6 @@ async function doLogin(){
 
   btn.disabled=false; btn.textContent='Sign In →';
   if(error){
-    // Show the raw error so we can debug
     errEl.textContent = error.message + ' (code: ' + (error.status||error.code||'?') + ')';
     errEl.classList.add('show'); return;
   }
@@ -663,14 +891,12 @@ async function doRegister(){
     errEl.classList.add('show'); return;
   }
 
-  // Check if user was actually created
   if(!data.user){
     btn.disabled=false; btn.textContent='Create Account →';
     errEl.textContent='Sign-up returned no user — check console for details.';
     errEl.classList.add('show'); return;
   }
 
-  // If signUp returns a user but no session, email confirmation is still required
   if(!data.session){
     btn.disabled=false; btn.textContent='Create Account →';
     okEl.textContent='✅ Account created! Check your email for a confirmation link, then sign in.';
@@ -678,7 +904,6 @@ async function doRegister(){
     return;
   }
 
-  // Create profile
   const friendCode = genCode();
   console.log('[REGISTER] Creating profile for user id:', data.user.id);
   const {error: profileError} = await sb.from('profiles').insert({id:data.user.id, username, display_name:username, friend_code:friendCode});
@@ -714,7 +939,6 @@ async function doSignOut(e){
 // ══════════════════════════════════════════════════════════════════
 async function onSignedIn(user){
   currentUser = user;
-  // Load profile (with retry since trigger may be slightly delayed)
   for(let i=0;i<3;i++){
     const {data} = await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
     if(data){ currentProfile=data; break; }
@@ -788,7 +1012,6 @@ async function startFriendPolling(){
 
 async function loadFriends(){
   if(!currentUser) return;
-  // All friendships involving me
   const {data:all} = await sb.from('friendships')
     .select('id, status, user_id, friend_id, requester:profiles!friendships_user_id_fkey(id,username,display_name), receiver:profiles!friendships_friend_id_fkey(id,username,display_name)')
     .or(`user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id}`);
@@ -800,7 +1023,6 @@ async function loadFriends(){
   renderPendingList(pendingIn);
   renderChatList(accepted);
 
-  // Badges
   const fb = document.getElementById('friendsBadge');
   fb.textContent = pendingIn.length;
   fb.style.display = pendingIn.length>0 ? 'block' : 'none';
@@ -846,7 +1068,6 @@ async function sendFriendRequest(){
   if(currentProfile && code===currentProfile.friend_code){ showMsg('addFriendMsg',"That's your own code!",'err'); return; }
   const {data:target} = await sb.from('profiles').select('id,username').eq('friend_code',code).maybeSingle();
   if(!target){ showMsg('addFriendMsg','No user found with that code.','err'); return; }
-  // Check not already linked
   const {data:exists} = await sb.from('friendships').select('id')
     .or(`and(user_id.eq.${currentUser.id},friend_id.eq.${target.id}),and(user_id.eq.${target.id},friend_id.eq.${currentUser.id})`)
     .maybeSingle();
@@ -886,11 +1107,9 @@ function renderChatList(accepted){
 function openChatWith(friendId, friendName){
   activeChatFriendId = friendId;
   activeChatFriendName = friendName;
-  // Highlight in sidebar
   document.querySelectorAll('.chat-list-item').forEach(el=>el.classList.remove('active'));
   const cli = document.getElementById('cli-'+friendId);
   if(cli) cli.classList.add('active');
-  // Show convo panel
   document.getElementById('chatNoConvo').style.display='none';
   document.getElementById('chatConvo').classList.add('open');
   document.getElementById('chatConvoAvatar').textContent = initials(friendName);
@@ -914,13 +1133,11 @@ async function loadMessages(friendId){
     data.forEach(m=>appendBubble(m));
     container.scrollTop=container.scrollHeight;
   }
-  // Mark incoming as read
   sb.from('messages').update({read:true}).eq('sender_id',friendId).eq('receiver_id',currentUser.id).eq('read',false).then(()=>updateChatBadge());
 }
 
 function appendBubble(m){
   const container = document.getElementById('chatMessages');
-  // Clear empty state if present
   const empty = container.querySelector('.chat-empty-msgs');
   if(empty) empty.remove();
   const isMe = m.sender_id===currentUser.id;
@@ -1047,7 +1264,6 @@ async function initializeGrannyGame(){const canvas=document.querySelector('#unit
 function showSection(section){
   const gc = document.getElementById('gameContainer');
   if(gc.classList.contains('active')) closeGame();
-  // Hide all
   ['gamesGrid','appsPage','accountPage','friendsPage','chatPage'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el) return;
@@ -1100,8 +1316,9 @@ function searchGames(){
 document.getElementById('searchBar').addEventListener('input',searchGames);
 document.addEventListener('fullscreenchange',()=>{const btn=document.querySelector('.fullscreen-button');if(btn)btn.textContent=document.fullscreenElement?'⛶ Exit Fullscreen':'⛶ Fullscreen';});
 
-// Keyboard shortcuts for chat
+// Keyboard shortcuts
 document.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && document.activeElement.id==='sitePassInput') checkSitePassword();
   if(e.key==='Enter' && document.activeElement.id==='chatMsgInput') sendMessage();
   if(e.key==='Enter' && document.activeElement.id==='addCodeInput') sendFriendRequest();
   if(e.key==='Enter' && document.activeElement.id==='loginEmail') document.getElementById('loginPassword').focus();
@@ -1110,9 +1327,9 @@ document.addEventListener('keydown', e=>{
 });
 
 // ══════════════════════════════════════════════════════════════════
-// INIT
+// MAIN APP INIT (runs after site password is cleared)
 // ══════════════════════════════════════════════════════════════════
-window.addEventListener('load', async ()=>{
+async function runAppInit(){
   enableSecurityProtection();
 
   // IP ban check
@@ -1141,6 +1358,21 @@ window.addEventListener('load', async ()=>{
       document.getElementById('userBadge').classList.remove('visible');
     }
   });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PAGE LOAD — check site password first, then proceed
+// ══════════════════════════════════════════════════════════════════
+window.addEventListener('load', async ()=>{
+  // If already granted this session, skip the password screen
+  if(sessionStorage.getItem(SP_SESSION_KEY) === 'true'){
+    document.getElementById('sitePassOverlay').classList.add('hidden');
+    await runAppInit();
+  } else {
+    // Show the site password overlay and wait for user to unlock
+    // runAppInit() will be called by checkSitePassword() on success
+    document.getElementById('sitePassInput').focus();
+  }
 });
 </script>
 </body>
