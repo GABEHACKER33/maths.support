@@ -2636,8 +2636,7 @@ function aiRenderContent(text){
   // We need to handle fenced code blocks specially to inject copy buttons.
   // Split on ``` blocks so we can process them separately.
   const parts = [];
-  const codeRe = /```(\w*)
-?([\s\S]*?)```/g;
+  const codeRe = /```(\w*)\n?([\s\S]*?)```/g;
   let lastIdx = 0, m;
   while((m = codeRe.exec(text)) !== null){
     // Push text before this code block
