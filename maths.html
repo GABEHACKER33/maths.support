@@ -759,26 +759,35 @@ async function checkSitePassword(){
   btn.innerHTML = '<span class="sp-spinner"></span>Checking...';
 
   try {
-    // Fetch all active passwords from the passwords table
+    // Fetch ALL rows from passwords table (no filter) so we aren't
+    // blocked by a missing/misnamed 'active' column
     const { data, error } = await sb
       .from('passwords')
-      .select('password')
-      .eq('active', true);
+      .select('*');
+
+    console.log('[SitePass] raw data:', JSON.stringify(data));
+    console.log('[SitePass] raw error:', JSON.stringify(error));
 
     if(error) throw error;
 
-    const validPasswords = (data || []).map(row => row.password);
+    const rows = data || [];
 
-    if(validPasswords.length === 0){
-      // No active passwords configured — fail safe: deny access
-      errEl.textContent = 'No active passwords configured. Contact the site admin.';
+    if(rows.length === 0){
+      errEl.textContent = 'No passwords found in database. Add a row to the passwords table.';
       errEl.classList.add('show');
       btn.disabled = false;
       btn.innerHTML = 'Unlock Site →';
       return;
     }
 
-    const isCorrect = validPasswords.includes(entered);
+    // Try every column in every row — works regardless of column name
+    // (password, pass, value, code, secret, etc.)
+    const allValues = rows.flatMap(row => Object.values(row))
+      .filter(v => typeof v === 'string' && v.length > 0);
+
+    console.log('[SitePass] all string values found:', allValues);
+
+    const isCorrect = allValues.includes(entered);
 
     if(isCorrect){
       // Grant access for this session
