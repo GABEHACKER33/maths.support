@@ -750,106 +750,89 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .gh-empty-editor p{font-size:.9em;max-width:260px;text-align:center;line-height:1.6}
 
 /* ── AI CHAT TAB ── */
-.ai-chat-layout{
-  flex:1;display:flex;flex-direction:column;overflow:hidden;
-  background:radial-gradient(ellipse at top,rgba(102,126,234,.08) 0%,transparent 60%);
-}
-.ai-chat-messages{
-  flex:1;overflow-y:auto;padding:28px 32px;
-  display:flex;flex-direction:column;gap:20px;
-}
-.ai-chat-messages::-webkit-scrollbar{width:4px}
-.ai-chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
-.ai-msg{display:flex;gap:14px;align-items:flex-start;animation:aiMsgIn .3s ease both}
-@keyframes aiMsgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ai-chat-layout{flex:1;display:flex;overflow:hidden;background:#0b0b14}
+/* Sidebar */
+.ai-sidebar{width:210px;min-width:210px;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;overflow-y:auto;background:#0d0d18}
+.ai-sidebar::-webkit-scrollbar{width:3px}
+.ai-sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+.ai-sidebar-section{padding:14px 12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.ai-sidebar-title{font-size:.7em;font-weight:800;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px}
+.ai-sidebar-hint{font-size:.7em;color:rgba(255,255,255,.22);line-height:1.5;margin-bottom:8px}
+.ai-memory-list{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.ai-memory-empty{font-size:.72em;color:rgba(255,255,255,.18);text-align:center;padding:6px 0}
+.ai-memory-item{background:rgba(102,126,234,.1);border:1px solid rgba(102,126,234,.2);border-radius:7px;padding:6px 24px 6px 8px;font-size:.72em;color:rgba(255,255,255,.65);line-height:1.4;position:relative}
+.ai-memory-item-del{position:absolute;top:4px;right:6px;background:none;border:none;color:rgba(255,255,255,.2);cursor:pointer;font-size:.85em;padding:0;line-height:1}
+.ai-memory-item-del:hover{color:#f87171}
+.ai-file-context-name{font-size:.72em;color:rgba(102,126,234,.8);font-family:monospace;padding:5px 7px;background:rgba(102,126,234,.08);border:1px solid rgba(102,126,234,.15);border-radius:5px;margin-bottom:7px;word-break:break-all;min-height:24px}
+.ai-sidebar-btn{width:100%;padding:6px 9px;margin-top:5px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.5);font-size:.72em;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;text-align:left}
+.ai-sidebar-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.ai-sidebar-btn.danger:hover{background:rgba(246,79,89,.15);border-color:rgba(246,79,89,.3);color:#f87171}
+.ai-quick-btn{width:100%;padding:6px 9px;margin-top:4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:7px;color:rgba(255,255,255,.4);font-size:.7em;cursor:pointer;font-family:inherit;transition:all .2s;text-align:left;line-height:1.4}
+.ai-quick-btn:hover{background:rgba(102,126,234,.15);border-color:rgba(102,126,234,.3);color:rgba(255,255,255,.9)}
+/* Main */
+.ai-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.ai-topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 18px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.2);flex-shrink:0}
+.ai-topbar-left{display:flex;align-items:center;gap:10px}
+.ai-topbar-avatar{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:.95em;flex-shrink:0}
+.ai-topbar-name{color:#fff;font-size:.88em;font-weight:800}
+.ai-topbar-sub{color:rgba(255,255,255,.32);font-size:.7em;margin-top:1px}
+.ai-topbar-actions{display:flex;gap:7px}
+.ai-topbar-btn{width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85em;transition:all .2s}
+.ai-topbar-btn:hover{background:rgba(255,255,255,.12);color:#fff}
+/* Messages */
+.ai-chat-messages{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+.ai-chat-messages::-webkit-scrollbar{width:3px}
+.ai-chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+.ai-msg{display:flex;gap:9px;align-items:flex-start;animation:aiMsgIn .22s ease both}
+@keyframes aiMsgIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 .ai-msg.user{flex-direction:row-reverse}
-.ai-msg-avatar{
-  width:36px;height:36px;border-radius:50%;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-size:.95em;
-}
-.ai-msg.assistant .ai-msg-avatar{background:linear-gradient(135deg,#667eea,#764ba2)}
-.ai-msg.user .ai-msg-avatar{background:linear-gradient(135deg,#f64f59,#c0392b)}
-.ai-msg-bubble{
-  max-width:78%;padding:14px 18px;border-radius:18px;
-  font-size:.95em;line-height:1.65;
-}
-.ai-msg.assistant .ai-msg-bubble{
-  background:rgba(255,255,255,.07);
-  border:1px solid rgba(255,255,255,.08);
-  color:rgba(255,255,255,.9);border-top-left-radius:4px;
-}
-.ai-msg.user .ai-msg-bubble{
-  background:linear-gradient(135deg,#667eea,#764ba2);
-  color:#fff;border-top-right-radius:4px;
-  box-shadow:0 4px 16px rgba(102,126,234,.3);
-}
-.ai-thinking{display:flex;gap:6px;align-items:center;padding:4px 0}
-.ai-thinking-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4);animation:typingBounce 1.2s infinite ease-in-out}
+.ai-msg-avatar{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.78em;font-weight:800;margin-top:2px}
+.ai-msg.assistant .ai-msg-avatar{background:linear-gradient(135deg,#667eea,#764ba2);font-size:.95em}
+.ai-msg.user .ai-msg-avatar{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.1)}
+.ai-msg-content{max-width:84%;display:flex;flex-direction:column;gap:3px}
+.ai-msg.user .ai-msg-content{align-items:flex-end}
+.ai-msg-bubble{padding:11px 15px;border-radius:14px;font-size:.88em;line-height:1.7}
+.ai-msg.assistant .ai-msg-bubble{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.88);border-top-left-radius:3px}
+.ai-msg.user .ai-msg-bubble{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-top-right-radius:3px;box-shadow:0 3px 12px rgba(102,126,234,.3)}
+.ai-msg.system .ai-msg-bubble{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.18);color:rgba(250,204,21,.75);border-radius:9px;font-size:.8em}
+.ai-msg-meta{font-size:.65em;color:rgba(255,255,255,.22);padding:0 3px}
+.ai-thinking{display:flex;gap:5px;align-items:center;padding:3px 0}
+.ai-thinking-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);animation:typingBounce 1.2s infinite ease-in-out}
 .ai-thinking-dot:nth-child(2){animation-delay:.2s}
 .ai-thinking-dot:nth-child(3){animation-delay:.4s}
-.ai-chat-input-area{
-  padding:16px 24px 22px;flex-shrink:0;
-  border-top:1px solid rgba(255,255,255,.06);
-  background:rgba(0,0,0,.25);
-}
-.ai-chat-input-row{display:flex;gap:12px;align-items:flex-end}
-.ai-chat-input{
-  flex:1;padding:14px 20px;
-  background:rgba(255,255,255,.07);
-  border:1.5px solid rgba(255,255,255,.1);
-  border-radius:22px;color:#fff;
-  font-size:.95em;outline:none;
-  font-family:inherit;resize:none;
-  min-height:50px;max-height:160px;line-height:1.5;
-  transition:border-color .25s;
-}
-.ai-chat-input::placeholder{color:rgba(255,255,255,.28)}
-.ai-chat-input:focus{border-color:rgba(102,126,234,.5);background:rgba(102,126,234,.07)}
-.ai-send-btn{
-  width:50px;height:50px;border-radius:50%;
-  background:linear-gradient(135deg,#667eea,#764ba2);
-  border:none;color:#fff;font-size:1.15em;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:all .2s;
-  box-shadow:0 4px 16px rgba(102,126,234,.4);
-}
-.ai-send-btn:hover{transform:scale(1.1);box-shadow:0 6px 22px rgba(102,126,234,.55)}
-.ai-send-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
-.ai-hint{font-size:.75em;color:rgba(255,255,255,.2);margin-top:8px;text-align:center}
-@keyframes aiCursor{0%,100%{opacity:1}50%{opacity:0}}
-/* ── AI code block wrapper ── */
-.ai-code-block{position:relative;margin:8px 0}
-.ai-code-block pre{margin:0;border-radius:0 0 10px 10px!important;border-top:none!important}
-.ai-code-header{
-  display:flex;align-items:center;justify-content:space-between;
-  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);
-  border-radius:10px 10px 0 0;padding:7px 14px;
-}
-.ai-code-lang{font-size:.72em;color:rgba(255,255,255,.35);font-family:monospace;font-weight:600;text-transform:uppercase;letter-spacing:1px}
-.ai-copy-btn{
-  display:flex;align-items:center;gap:6px;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
-  color:rgba(255,255,255,.6);border-radius:6px;padding:4px 10px;
-  font-size:.75em;font-weight:700;cursor:pointer;
-  font-family:inherit;transition:all .2s;
-}
-.ai-copy-btn:hover{background:rgba(102,126,234,.25);border-color:rgba(102,126,234,.4);color:#fff}
-.ai-copy-btn.copied{background:rgba(34,197,94,.2);border-color:rgba(34,197,94,.4);color:#4ade80}
-/* ── Clear chat button ── */
-.ai-clear-btn{
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  color:rgba(255,255,255,.35);border-radius:50%;width:38px;height:38px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:.95em;transition:all .2s;flex-shrink:0;
-}
-.ai-clear-btn:hover{background:rgba(246,79,89,.15);border-color:rgba(246,79,89,.4);color:#f87171}
-.ai-welcome{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;color:rgba(255,255,255,.3);
-  gap:16px;text-align:center;padding:40px;
-}
-.ai-welcome-icon{font-size:4em;animation:aiGlow 3s ease-in-out infinite}
+/* Input */
+.ai-input-wrap{padding:12px 18px 16px;flex-shrink:0;border-top:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.3)}
+.ai-input-row{display:flex;gap:9px;align-items:flex-end}
+.ai-chat-input{flex:1;padding:11px 16px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.09);border-radius:14px;color:#fff;font-size:.9em;outline:none;font-family:inherit;resize:none;min-height:44px;max-height:130px;line-height:1.5;transition:border-color .2s,background .2s}
+.ai-chat-input::placeholder{color:rgba(255,255,255,.22)}
+.ai-chat-input:focus{border-color:rgba(102,126,234,.5);background:rgba(102,126,234,.06)}
+.ai-send-btn{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;box-shadow:0 3px 12px rgba(102,126,234,.35)}
+.ai-send-btn:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(102,126,234,.5)}
+.ai-send-btn:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+.ai-input-footer{display:flex;justify-content:space-between;align-items:center;margin-top:7px;font-size:.7em;color:rgba(255,255,255,.18)}
+#aiActionStatus{color:#facc15;font-weight:700;font-size:.9em}
+/* Welcome */
+.ai-welcome{flex:1;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:24px;padding:32px}
+.ai-welcome-icon{font-size:3em;animation:aiGlow 3s ease-in-out infinite;flex-shrink:0}
 @keyframes aiGlow{0%,100%{filter:drop-shadow(0 0 8px rgba(102,126,234,.4))}50%{filter:drop-shadow(0 0 20px rgba(102,126,234,.8))}}
+.ai-welcome-text strong{color:rgba(255,255,255,.75);font-size:1.05em;display:block;margin-bottom:7px}
+.ai-welcome-text p{color:rgba(255,255,255,.32);font-size:.83em;line-height:1.7;max-width:300px}
+.ai-welcome-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.ai-welcome-chips span{padding:5px 11px;border-radius:18px;font-size:.75em;background:rgba(102,126,234,.1);border:1px solid rgba(102,126,234,.22);color:rgba(255,255,255,.55);cursor:pointer;transition:all .2s}
+.ai-welcome-chips span:hover{background:rgba(102,126,234,.22);color:#fff}
+@keyframes aiCursor{0%,100%{opacity:1}50%{opacity:0}}
+/* Code blocks */
+.ai-code-block{position:relative;margin:8px 0}
+.ai-code-header{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.1);border-radius:9px 9px 0 0;padding:6px 12px}
+.ai-code-lang{font-size:.7em;color:rgba(255,255,255,.32);font-family:monospace;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.ai-code-actions{display:flex;gap:6px}
+.ai-copy-btn,.ai-apply-btn{display:flex;align-items:center;gap:4px;border-radius:5px;padding:3px 9px;font-size:.72em;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.ai-copy-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.55)}
+.ai-copy-btn:hover{background:rgba(102,126,234,.22);border-color:rgba(102,126,234,.4);color:#fff}
+.ai-copy-btn.copied{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.35);color:#4ade80}
+.ai-apply-btn{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#4ade80}
+.ai-apply-btn:hover{background:rgba(34,197,94,.22);border-color:rgba(34,197,94,.45);color:#86efac}
+.ai-apply-btn.applied{background:rgba(102,126,234,.2);border-color:rgba(102,126,234,.4);color:#a5b4fc}
 #granny-unity-container{position:fixed;width:100%;height:100%;left:0;top:0;z-index:99998;display:none;background:url('https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/background.png') no-repeat center center fixed;background-size:cover}
 #granny-unity-container.active{display:block}
 #unity-canvas{position:absolute;width:100%;height:100%}
@@ -1021,7 +1004,7 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
     <button class="game-button" onclick="openGame('5 nights at epstein','https://ig.gabriel-oli-ren-micro.workers.dev/')"><img src="img/epstein.png" alt="5 nights at epstein" class="game-image"><div class="game-info"><h3>5 nights at epstein</h3><p>escape epstein</p></div></button>
     <button class="game-button" onclick="openGrannyGame()"><img src="img/granny.png" alt="Granny" class="game-image"><div class="game-info"><h3>👵 Granny</h3><p>Horror survival escape game</p></div></button>
     <button class="game-button" onclick="openGame('Territorial','https://territorial-io.com/')"><img src="img/territorial.png" alt="Territorial" class="game-image"><div class="game-info"><h3>🌍 Territorial</h3><p>Multiplayer strategy game</p></div></button>
-    <button class="game-button" onclick="openGame('Futboll-11','https://whatsapp.gabriel-oli-ren-micro.workers.dev/')"><img src="img/futboll.png" alt="Futboll-11" class="game-image"><div class="game-info"><h3>Futboll-11</h3><p>Futboll Games</p></div></button>
+    <button class="game-button" onclick="openGame('Futboll-11','https://whatsapp.gabriel-oli-ren-micro.workers.dev/')"><img src="img/futboll" alt="Futboll-11" class="game-image"><div class="game-info"><h3>Futboll-11</h3><p>Futboll Games</p></div></button>
   </div>
 
   <!-- APPS PAGE -->
@@ -1287,25 +1270,79 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
       </div>
     </div>
 
-        <!-- ── CLAUDE AI CHAT ── -->
+    <!-- ── CLAUDE AI CHAT ── -->
     <div class="dev-tab-panel" id="devPanel-ai">
       <div class="ai-chat-layout">
-        <div class="ai-chat-messages" id="aiChatMessages">
-          <div class="ai-welcome" id="aiWelcome">
-            <div class="ai-welcome-icon">🤖</div>
-            <div>
-              <strong style="color:rgba(255,255,255,.7);font-size:1.05em;display:block;margin-bottom:8px">Claude Sonnet 4.6 — Developer Assistant</strong>
-              <p style="font-size:.9em;line-height:1.7;max-width:340px">Ask me anything about your codebase, HTML, CSS, JavaScript, GitHub, Vercel — or just brainstorm ideas for the platform.</p>
+
+        <!-- Sidebar: memory + file context -->
+        <div class="ai-sidebar">
+          <div class="ai-sidebar-section">
+            <div class="ai-sidebar-title">🧠 Memory</div>
+            <div class="ai-sidebar-hint">Claude remembers facts across sessions</div>
+            <div id="aiMemoryList" class="ai-memory-list">
+              <div class="ai-memory-empty">No memories yet</div>
             </div>
+            <button class="ai-sidebar-btn" onclick="aiClearMemory()">🗑 Clear Memory</button>
+          </div>
+          <div class="ai-sidebar-section">
+            <div class="ai-sidebar-title">📄 File Context</div>
+            <div class="ai-sidebar-hint">Load a file so Claude can read &amp; edit it</div>
+            <div id="aiFileContext" class="ai-file-context-name">No file loaded</div>
+            <button class="ai-sidebar-btn" onclick="aiLoadCurrentFile()">📂 Load Open File</button>
+            <button class="ai-sidebar-btn danger" onclick="aiUnloadFile()">✕ Unload</button>
+          </div>
+          <div class="ai-sidebar-section">
+            <div class="ai-sidebar-title">⚡ Quick Actions</div>
+            <button class="ai-quick-btn" onclick="aiQuick('Read the current file and summarise it')">📖 Summarise file</button>
+            <button class="ai-quick-btn" onclick="aiQuick('Find and fix any bugs or errors in the current file')">🐛 Fix bugs</button>
+            <button class="ai-quick-btn" onclick="aiQuick('Improve the CSS and styling of the current file')">🎨 Improve styling</button>
+            <button class="ai-quick-btn" onclick="aiQuick('Optimise and clean up the JavaScript in the current file')">⚡ Optimise JS</button>
+            <button class="ai-quick-btn" onclick="aiQuick('What changes would you recommend for this project?')">💡 Suggestions</button>
           </div>
         </div>
-        <div class="ai-chat-input-area">
-          <div class="ai-chat-input-row">
-            <button class="ai-clear-btn" onclick="aiClearChat()" title="Clear chat">🗑️</button>
-            <textarea class="ai-chat-input" id="aiChatInput" placeholder="Ask Claude anything…" rows="1"></textarea>
-            <button class="ai-send-btn" id="aiSendBtn" onclick="sendAiMessage()">➤</button>
+
+        <!-- Main chat area -->
+        <div class="ai-main">
+          <div class="ai-topbar">
+            <div class="ai-topbar-left">
+              <div class="ai-topbar-avatar">🤖</div>
+              <div>
+                <div class="ai-topbar-name">Claude Sonnet 4.6</div>
+                <div class="ai-topbar-sub" id="aiStatusLine">Ready · Puter.js · Free &amp; unlimited</div>
+              </div>
+            </div>
+            <div class="ai-topbar-actions">
+              <button class="ai-topbar-btn" onclick="aiClearChat()" title="Clear conversation">🗑️</button>
+            </div>
           </div>
-          <div class="ai-hint">Powered by Claude Sonnet 4.6 via Puter.js · Free &amp; unlimited · Shift+Enter for new line</div>
+
+          <div class="ai-chat-messages" id="aiChatMessages">
+            <div class="ai-welcome" id="aiWelcome">
+              <div class="ai-welcome-icon">🤖</div>
+              <div class="ai-welcome-text">
+                <strong>Claude — Dev Assistant</strong>
+                <p>I can read, edit and publish your site files directly. Load a file from the sidebar, then ask me to modify it and I'll commit the changes to GitHub automatically.</p>
+                <div class="ai-welcome-chips">
+                  <span onclick="aiQuick('What files are in the repo?')">List repo files</span>
+                  <span onclick="aiQuick('Read the current index.html and tell me what it does')">Read index.html</span>
+                  <span onclick="aiQuick('What Supabase tables does the app use?')">Supabase tables</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-input-wrap">
+            <div class="ai-input-row">
+              <textarea class="ai-chat-input" id="aiChatInput" placeholder="Ask Claude to read, edit or publish changes…" rows="1"></textarea>
+              <button class="ai-send-btn" id="aiSendBtn" onclick="sendAiMessage()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+            <div class="ai-input-footer">
+              <span id="aiActionStatus"></span>
+              <span>Enter to send · Shift+Enter for new line</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -2370,6 +2407,7 @@ function switchDevTab(tab){
   document.getElementById('devPanel-'+tab).classList.add('active');
   // Auto-load Vercel if token is set; GitHub uses its own restore
   if(tab==='github') ghRestoreSavedToken();
+  if(tab==='ai') aiLoadMemory();
 }
 
 // ── Keep dev panel left edge in sync with sidebar ──
@@ -2625,95 +2663,62 @@ async function ghSaveFile(force=false){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// CLAUDE AI CHAT — powered by Puter.js (free, unlimited, no API key)
+// CLAUDE AI — memory + file read/edit/publish + better UI
 // ══════════════════════════════════════════════════════════════════
-let aiMessages = []; // full conversation history
-let aiIsThinking = false;
+let aiMessages      = [];   // conversation history (this session)
+let aiIsThinking    = false;
+let aiMemory        = [];   // persistent memories from Supabase
+let aiFileCtx       = null; // { path, content, sha } — loaded file
 
-const AI_SYSTEM = `You are a helpful developer assistant for "Maths Support" — a student gaming and study hub built as a single HTML file, deployed on Vercel, with Supabase as the backend. The GitHub repo is GABEHACKER33/maths.support. Help with HTML, CSS, JavaScript, Supabase queries, and platform features. Be concise and practical. Use code examples when helpful.`;
+// ── Helpers ──────────────────────────────────────────────────────
+function aiStatus(msg){ const el=document.getElementById('aiActionStatus'); if(el) el.textContent=msg||''; }
+
+function aiTime(){
+  const now=new Date();
+  return now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+}
 
 function aiRenderContent(text){
-  // We need to handle fenced code blocks specially to inject copy buttons.
-  // Split on ``` blocks so we can process them separately.
-  const parts = [];
-  const codeRe = /```(\w*)\n?([\s\S]*?)```/g;
-  let lastIdx = 0, m;
-  while((m = codeRe.exec(text)) !== null){
-    // Push text before this code block
-    if(m.index > lastIdx){
-      parts.push({type:'text', content: text.slice(lastIdx, m.index)});
-    }
-    parts.push({type:'code', lang: m[1]||'', content: m[2]});
-    lastIdx = m.index + m[0].length;
+  const parts=[];
+  const codeRe=/```(\w*)\n?([\s\S]*?)```/g;
+  let lastIdx=0,m;
+  while((m=codeRe.exec(text))!==null){
+    if(m.index>lastIdx) parts.push({type:'text',content:text.slice(lastIdx,m.index)});
+    parts.push({type:'code',lang:m[1]||'',content:m[2]});
+    lastIdx=m.index+m[0].length;
   }
-  if(lastIdx < text.length) parts.push({type:'text', content: text.slice(lastIdx)});
-
+  if(lastIdx<text.length) parts.push({type:'text',content:text.slice(lastIdx)});
   return parts.map(p=>{
     if(p.type==='code'){
-      const safeCode = escapeHtml(p.content);
-      // Store raw code in a data attr so copy btn can grab it
-      const dataCode = p.content.replace(/"/g,'&quot;');
-      return `<div class="ai-code-block">
-        <div class="ai-code-header">
-          <span class="ai-code-lang">${p.lang||'code'}</span>
-          <button class="ai-copy-btn" onclick="aiCopyCode(this)" data-code="${dataCode}">📋 Copy</button>
-        </div>
-        <pre style="background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1);border-top:none;border-radius:0 0 10px 10px;padding:12px 16px;margin:0;overflow-x:auto;font-family:'Courier New',monospace;font-size:.83em;line-height:1.6;white-space:pre-wrap">${safeCode}</pre>
-      </div>`;
+      const safe=escapeHtml(p.content);
+      const dataCode=p.content.replace(/"/g,'&quot;');
+      const hasHtml=p.lang==='html'||p.lang==='';
+      const applyBtn=hasHtml?`<button class="ai-apply-btn" onclick="aiApplyCode(this)" data-code="${dataCode}" title="Apply to open file & publish">⚡ Apply & Publish</button>`:'';
+      return `<div class="ai-code-block"><div class="ai-code-header"><span class="ai-code-lang">${p.lang||'code'}</span><div class="ai-code-actions"><button class="ai-copy-btn" onclick="aiCopyCode(this)" data-code="${dataCode}">📋 Copy</button>${applyBtn}</div></div><pre style="background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1);border-top:none;border-radius:0 0 10px 10px;padding:12px 16px;margin:0;overflow-x:auto;font-family:'Courier New',monospace;font-size:.82em;line-height:1.6;white-space:pre-wrap">${safe}</pre></div>`;
     } else {
       return escapeHtml(p.content)
-        .replace(/`([^`\n]+)`/g,'<code style="background:rgba(255,255,255,.12);padding:2px 7px;border-radius:5px;font-family:monospace;font-size:.88em">$1</code>')
+        .replace(/`([^`\n]+)`/g,'<code style="background:rgba(255,255,255,.12);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:.87em">$1</code>')
         .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
         .replace(/\n/g,'<br>');
     }
   }).join('');
 }
 
-function aiCopyCode(btn){
-  const code = btn.getAttribute('data-code');
-  navigator.clipboard.writeText(code).then(()=>{
-    btn.textContent='✅ Copied!';
-    btn.classList.add('copied');
-    setTimeout(()=>{ btn.textContent='📋 Copy'; btn.classList.remove('copied'); }, 2000);
-  }).catch(()=>{
-    // Fallback for browsers that block clipboard
-    const ta = document.createElement('textarea');
-    ta.value = code; ta.style.position='fixed'; ta.style.opacity='0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent='✅ Copied!'; btn.classList.add('copied');
-    setTimeout(()=>{ btn.textContent='📋 Copy'; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
-function aiClearChat(){
-  if(!confirm('Clear the entire conversation?')) return;
-  aiMessages = [];
-  const container = document.getElementById('aiChatMessages');
-  container.innerHTML = '';
-  // Re-show welcome screen
-  const welcome = document.createElement('div');
-  welcome.className = 'ai-welcome'; welcome.id = 'aiWelcome';
-  welcome.innerHTML = `
-    <div class="ai-welcome-icon">🤖</div>
-    <div>
-      <strong style="color:rgba(255,255,255,.7);font-size:1.05em;display:block;margin-bottom:8px">Claude Sonnet 4.6 — Developer Assistant</strong>
-      <p style="font-size:.9em;line-height:1.7;max-width:340px">Ask me anything about your codebase, HTML, CSS, JavaScript, GitHub, Vercel — or just brainstorm ideas for the platform.<br><span style="font-size:.85em;color:rgba(255,255,255,.3);display:block;margin-top:8px">Free &amp; unlimited via Puter.js · Streaming responses</span></p>
-    </div>`;
-  container.appendChild(welcome);
-}
-
-function aiAppendMessage(role, content=''){
+function aiAppendMsg(role, content='', extra=''){
   const welcome=document.getElementById('aiWelcome');
   if(welcome) welcome.style.display='none';
   const container=document.getElementById('aiChatMessages');
   const div=document.createElement('div');
-  div.className='ai-msg '+(role==='user'?'user':'assistant');
-  const avatar=role==='user'
-    ? `<div class="ai-msg-avatar" style="font-size:.75em;font-weight:800">${initials(currentProfile?.display_name||'U')}</div>`
-    : `<div class="ai-msg-avatar">🤖</div>`;
-  div.innerHTML=`${avatar}<div class="ai-msg-bubble">${aiRenderContent(content)}</div>`;
+  div.className='ai-msg '+role;
+  const time=`<div class="ai-msg-meta">${aiTime()}</div>`;
+  if(role==='user'){
+    const av=initials(currentProfile?.display_name||'U');
+    div.innerHTML=`<div class="ai-msg-avatar">${av}</div><div class="ai-msg-content"><div class="ai-msg-bubble">${escapeHtml(content)}</div>${time}</div>`;
+  } else if(role==='system'){
+    div.innerHTML=`<div class="ai-msg-content"><div class="ai-msg-bubble">${content}</div></div>`;
+  } else {
+    div.innerHTML=`<div class="ai-msg-avatar">🤖</div><div class="ai-msg-content"><div class="ai-msg-bubble" id="${extra||''}">${aiRenderContent(content)}</div>${time}</div>`;
+  }
   container.appendChild(div);
   container.scrollTop=container.scrollHeight;
   return div;
@@ -2722,26 +2727,183 @@ function aiAppendMessage(role, content=''){
 function aiShowThinking(){
   const welcome=document.getElementById('aiWelcome');
   if(welcome) welcome.style.display='none';
-  const container=document.getElementById('aiChatMessages');
-  const div=document.createElement('div');
-  div.className='ai-msg assistant'; div.id='ai-thinking-bubble';
-  div.innerHTML=`<div class="ai-msg-avatar">🤖</div><div class="ai-msg-bubble"><div class="ai-thinking"><div class="ai-thinking-dot"></div><div class="ai-thinking-dot"></div><div class="ai-thinking-dot"></div></div></div>`;
-  container.appendChild(div); container.scrollTop=container.scrollHeight;
-  return div;
+  const c=document.getElementById('aiChatMessages');
+  const div=document.createElement('div'); div.className='ai-msg assistant'; div.id='ai-think';
+  div.innerHTML='<div class="ai-msg-avatar">🤖</div><div class="ai-msg-content"><div class="ai-msg-bubble"><div class="ai-thinking"><div class="ai-thinking-dot"></div><div class="ai-thinking-dot"></div><div class="ai-thinking-dot"></div></div></div></div>';
+  c.appendChild(div); c.scrollTop=c.scrollHeight; return div;
 }
 
-function aiCreateStreamBubble(){
-  const welcome=document.getElementById('aiWelcome');
-  if(welcome) welcome.style.display='none';
-  const container=document.getElementById('aiChatMessages');
-  const div=document.createElement('div');
-  div.className='ai-msg assistant';
-  div.innerHTML=`<div class="ai-msg-avatar">🤖</div><div class="ai-msg-bubble" id="ai-stream-content"></div>`;
-  container.appendChild(div);
-  container.scrollTop=container.scrollHeight;
-  return div;
+// ── Copy / Apply ─────────────────────────────────────────────────
+function aiCopyCode(btn){
+  const code=btn.getAttribute('data-code');
+  navigator.clipboard.writeText(code).then(()=>{
+    const orig=btn.textContent; btn.textContent='✅ Copied!'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},2000);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=code;ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    const orig=btn.textContent; btn.textContent='✅ Copied!'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},2000);
+  });
 }
 
+async function aiApplyCode(btn){
+  const code=btn.getAttribute('data-code');
+  if(!aiFileCtx){ aiAppendMsg('system','⚠️ No file loaded. Click "Load Open File" in the sidebar first.'); return; }
+  if(!ghToken){ aiAppendMsg('system','⚠️ GitHub not connected. Open the GitHub tab first.'); return; }
+  if(!confirm('Apply this code to '+aiFileCtx.path+' and publish to GitHub?')) return;
+  btn.textContent='⏳ Publishing...'; btn.disabled=true;
+  aiStatus('⚡ Publishing to GitHub...');
+  try{
+    const encoded=btoa(unescape(encodeURIComponent(code)));
+    const body={message:'AI: update '+aiFileCtx.path,content:encoded,sha:aiFileCtx.sha,branch:GH_BRANCH};
+    const res=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+aiFileCtx.path,{method:'PUT',headers:ghGetHeaders(),body:JSON.stringify(body)});
+    if(!res.ok){
+      // Try force: re-fetch SHA
+      const shaRes=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+aiFileCtx.path+'?ref='+GH_BRANCH,{headers:ghGetHeaders()});
+      if(shaRes.ok){
+        const shaData=await shaRes.json(); body.sha=shaData.sha; aiFileCtx.sha=shaData.sha;
+        const res2=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+aiFileCtx.path,{method:'PUT',headers:ghGetHeaders(),body:JSON.stringify(body)});
+        if(!res2.ok){const e2=await res2.json();throw new Error(e2.message);}
+        const d2=await res2.json(); aiFileCtx.sha=d2.content.sha; aiFileCtx.content=code;
+      }
+    } else {
+      const data=await res.json(); aiFileCtx.sha=data.content.sha; aiFileCtx.content=code;
+    }
+    btn.textContent='✅ Applied!'; btn.classList.add('applied');
+    aiStatus('');
+    aiAppendMsg('system','✅ Published <strong>'+aiFileCtx.path+'</strong> to GitHub successfully.');
+    // Also update ghTextarea if it's open on same file
+    const ta=document.getElementById('ghTextarea');
+    const fp=document.getElementById('ghFilePath');
+    if(ta && fp && fp.textContent===aiFileCtx.path) ta.value=code;
+  }catch(e){
+    btn.textContent='❌ Failed'; aiStatus('');
+    aiAppendMsg('system','❌ Publish failed: '+e.message);
+    setTimeout(()=>{btn.textContent='⚡ Apply & Publish';btn.disabled=false;},3000);
+  }
+}
+
+// ── Memory (Supabase) ────────────────────────────────────────────
+async function aiLoadMemory(){
+  if(!currentUser) return;
+  try{
+    const{data}=await sb.from('ai_memory').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:true});
+    aiMemory=(data||[]);
+    aiRenderMemoryList();
+  }catch(e){ console.warn('aiLoadMemory:',e); }
+}
+
+function aiRenderMemoryList(){
+  const list=document.getElementById('aiMemoryList');
+  if(!list) return;
+  if(!aiMemory.length){ list.innerHTML='<div class="ai-memory-empty">No memories yet</div>'; return; }
+  list.innerHTML=aiMemory.map(m=>
+    `<div class="ai-memory-item">${escapeHtml(m.content)}<button class="ai-memory-item-del" onclick="aiDeleteMemory('${m.id}')">×</button></div>`
+  ).join('');
+}
+
+async function aiSaveMemory(text){
+  if(!currentUser||!text.trim()) return;
+  try{
+    const{data}=await sb.from('ai_memory').insert({user_id:currentUser.id,content:text.trim()}).select().single();
+    if(data){ aiMemory.push(data); aiRenderMemoryList(); }
+  }catch(e){ console.warn('aiSaveMemory:',e); }
+}
+
+async function aiDeleteMemory(id){
+  try{
+    await sb.from('ai_memory').delete().eq('id',id);
+    aiMemory=aiMemory.filter(m=>m.id!==id); aiRenderMemoryList();
+  }catch(e){}
+}
+
+async function aiClearMemory(){
+  if(!confirm('Clear all memories? This cannot be undone.')) return;
+  try{
+    await sb.from('ai_memory').delete().eq('user_id',currentUser.id);
+    aiMemory=[]; aiRenderMemoryList();
+  }catch(e){}
+}
+
+// Extract and save any REMEMBER: directives from AI response
+function aiExtractMemories(text){
+  const re=/REMEMBER:\s*(.+)/g; let m;
+  while((m=re.exec(text))!==null) aiSaveMemory(m[1].trim());
+}
+
+// ── File context ─────────────────────────────────────────────────
+async function aiLoadCurrentFile(){
+  if(!ghToken){ aiAppendMsg('system','⚠️ Connect GitHub first (GitHub tab → connect).'); return; }
+  // Use whichever file is open in the editor
+  if(!ghCurrentFile){ aiAppendMsg('system','⚠️ Open a file in the GitHub Editor tab first.'); return; }
+  aiStatus('📂 Loading file...');
+  try{
+    const res=await fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+ghCurrentFile.path+'?ref='+GH_BRANCH,{headers:ghGetHeaders()});
+    if(!res.ok) throw new Error('Could not fetch file');
+    const data=await res.json();
+    const decoded=decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
+    aiFileCtx={path:ghCurrentFile.path,content:decoded,sha:data.sha};
+    const el=document.getElementById('aiFileContext');
+    if(el) el.textContent=aiFileCtx.path;
+    aiStatus('');
+    aiAppendMsg('system','📄 Loaded <strong>'+aiFileCtx.path+'</strong> ('+Math.round(decoded.length/1024,1)+' KB) — Claude can now read and edit it.');
+  }catch(e){ aiStatus(''); aiAppendMsg('system','❌ '+e.message); }
+}
+
+function aiUnloadFile(){
+  aiFileCtx=null;
+  const el=document.getElementById('aiFileContext'); if(el) el.textContent='No file loaded';
+  aiAppendMsg('system','File context cleared.');
+}
+
+// ── Quick actions ─────────────────────────────────────────────────
+function aiQuick(prompt){ document.getElementById('aiChatInput').value=prompt; sendAiMessage(); }
+
+// ── Clear chat ────────────────────────────────────────────────────
+function aiClearChat(){
+  if(!confirm('Clear this conversation?')) return;
+  aiMessages=[];
+  const c=document.getElementById('aiChatMessages'); c.innerHTML='';
+  c.innerHTML=`<div class="ai-welcome" id="aiWelcome">
+    <div class="ai-welcome-icon">🤖</div>
+    <div class="ai-welcome-text">
+      <strong>Claude — Dev Assistant</strong>
+      <p>I can read, edit and publish your site files directly. Load a file from the sidebar, then ask me to modify it and I'll commit the changes to GitHub automatically.</p>
+      <div class="ai-welcome-chips">
+        <span onclick="aiQuick('What files are in the repo?')">List repo files</span>
+        <span onclick="aiQuick('Read the current file and summarise it')">Summarise file</span>
+        <span onclick="aiQuick('What Supabase tables does the app use?')">Supabase tables</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Build system prompt ───────────────────────────────────────────
+function aiSystemPrompt(){
+  let sys=`You are an expert developer assistant for "Maths Support" — a student gaming and study platform. It is a single HTML file deployed on Vercel, with Supabase backend. GitHub repo: GABEHACKER33/maths.support.
+
+CAPABILITIES:
+- You can READ the currently loaded file (shown below if loaded)
+- You can EDIT the file by outputting the full updated HTML in a code block — the admin can click "Apply & Publish" to commit it instantly
+- You have PERSISTENT MEMORY — to remember something across sessions write: REMEMBER: <fact>
+
+RULES:
+- When asked to edit a file, always output the COMPLETE file content in one html code block
+- Be concise but thorough. Use code examples always.
+- If no file is loaded and asked to edit, tell the user to load a file from the sidebar first.`;
+
+  if(aiMemory.length){
+    sys+='\n\nYOUR MEMORY (facts from previous sessions):\n'+aiMemory.map(m=>'- '+m.content).join('\n');
+  }
+  if(aiFileCtx){
+    const preview=aiFileCtx.content.length>60000?aiFileCtx.content.slice(0,60000)+'\n... [truncated]':aiFileCtx.content;
+    sys+='\n\nCURRENTLY LOADED FILE: '+aiFileCtx.path+'\n```html\n'+preview+'\n```';
+  }
+  return sys;
+}
+
+// ── Main send ─────────────────────────────────────────────────────
 async function sendAiMessage(){
   if(aiIsThinking) return;
   const input=document.getElementById('aiChatInput');
@@ -2751,45 +2913,47 @@ async function sendAiMessage(){
   aiIsThinking=true;
   document.getElementById('aiSendBtn').disabled=true;
 
-  aiAppendMessage('user', content);
-  aiMessages.push({role:'user', content});
+  aiAppendMsg('user', content);
+  aiMessages.push({role:'user',content});
 
-  // Build prompt string with system context prepended on first message
-  const prompt = aiMessages.length===1
-    ? AI_SYSTEM + '\n\nUser: ' + content
-    : content;
-
-  // Show thinking dots while waiting for stream to start
   const thinkBubble=aiShowThinking();
-  let streamBubble=null;
-  let fullReply='';
+  let streamDiv=null, streamEl=null, fullReply='';
 
   try{
-    const response = await puter.ai.chat(prompt, {
-      model: 'claude-sonnet-4-6',
-      stream: true
+    // Build full conversation with system injected into first user message
+    const msgs=aiMessages.map((msg,i)=>{
+      if(i===0) return {role:'user',content:aiSystemPrompt()+'\n\nUser: '+msg.content};
+      return msg;
     });
 
-    // First token arrived — swap thinking for stream bubble
-    thinkBubble.remove();
-    streamBubble = aiCreateStreamBubble();
-    const streamEl = document.getElementById('ai-stream-content');
+    const response=await puter.ai.chat(msgs,{model:'claude-sonnet-4-6',stream:true});
 
-    for await (const part of response){
-      const chunk = part?.text || '';
-      fullReply += chunk;
-      if(streamEl){
-        streamEl.innerHTML = aiRenderContent(fullReply);
-        document.getElementById('aiChatMessages').scrollTop = document.getElementById('aiChatMessages').scrollHeight;
-      }
+    thinkBubble.remove();
+    // Create streaming bubble
+    const welcome=document.getElementById('aiWelcome'); if(welcome) welcome.style.display='none';
+    const c=document.getElementById('aiChatMessages');
+    streamDiv=document.createElement('div'); streamDiv.className='ai-msg assistant';
+    const streamId='ai-stream-'+Date.now();
+    streamDiv.innerHTML='<div class="ai-msg-avatar">🤖</div><div class="ai-msg-content"><div class="ai-msg-bubble" id="'+streamId+'"></div><div class="ai-msg-meta">'+aiTime()+'</div></div>';
+    c.appendChild(streamDiv); c.scrollTop=c.scrollHeight;
+    streamEl=document.getElementById(streamId);
+
+    for await(const part of response){
+      const chunk=part?.text||'';
+      fullReply+=chunk;
+      if(streamEl){ streamEl.innerHTML=aiRenderContent(fullReply); c.scrollTop=c.scrollHeight; }
     }
 
-    aiMessages.push({role:'assistant', content: fullReply});
+    aiMessages.push({role:'assistant',content:fullReply});
+    // Extract any REMEMBER directives
+    aiExtractMemories(fullReply);
+    aiStatus('');
 
   }catch(e){
     if(thinkBubble) thinkBubble.remove();
-    if(streamBubble) streamBubble.remove();
-    aiAppendMessage('assistant', '⚠️ Error: ' + e.message + '\n\nMake sure you are signed in to Puter (puter.com) or try refreshing.');
+    if(streamDiv) streamDiv.remove();
+    aiAppendMsg('system','⚠️ '+e.message+' — Make sure you are signed in to Puter (puter.com).');
+    aiStatus('');
   }
 
   aiIsThinking=false;
@@ -2797,9 +2961,9 @@ async function sendAiMessage(){
   input.focus();
 }
 
-// Auto-resize AI chat input
+// Auto-resize
 document.getElementById('aiChatInput').addEventListener('input',function(){
-  this.style.height='';this.style.height=Math.min(this.scrollHeight,160)+'px';
+  this.style.height='';this.style.height=Math.min(this.scrollHeight,130)+'px';
 });
 document.getElementById('aiChatInput').addEventListener('keydown',function(e){
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAiMessage();}
