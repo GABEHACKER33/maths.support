@@ -565,7 +565,327 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .reveal-modal-btn.cancel{background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.12)}
 .reveal-modal-btn.cancel:hover{background:rgba(255,255,255,.12)}
 
-/* ── GRANNY ── */
+/* ══════════════════════════════════════════════════════
+   ── ADMIN DEVELOPER PANEL ──
+══════════════════════════════════════════════════════ */
+
+/* Entry button on account page */
+.admin-dev-entry{
+  display:none; /* shown via JS for admins only */
+  align-items:center;gap:16px;
+  background:linear-gradient(135deg,#0d0d1a,#1a0a2e);
+  border:1.5px solid rgba(246,79,89,.4);
+  border-radius:18px;padding:20px 24px;margin-bottom:22px;
+  cursor:pointer;transition:all .3s;position:relative;overflow:hidden;
+}
+.admin-dev-entry.visible{display:flex}
+.admin-dev-entry::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(246,79,89,.08),rgba(102,126,234,.06));
+  opacity:0;transition:opacity .3s;
+}
+.admin-dev-entry:hover::before{opacity:1}
+.admin-dev-entry:hover{border-color:rgba(246,79,89,.7);transform:translateY(-2px);box-shadow:0 8px 32px rgba(246,79,89,.2)}
+.admin-dev-icon{
+  width:54px;height:54px;border-radius:15px;flex-shrink:0;
+  background:linear-gradient(135deg,#f64f59,#c0392b);
+  display:flex;align-items:center;justify-content:center;font-size:1.5em;
+  box-shadow:0 6px 20px rgba(246,79,89,.4);
+}
+.admin-dev-text h4{color:#fff;font-size:1.05em;font-weight:800;margin-bottom:3px}
+.admin-dev-text p{color:rgba(255,255,255,.45);font-size:.82em;line-height:1.4}
+.admin-dev-arrow{margin-left:auto;color:rgba(246,79,89,.6);font-size:1.4em;transition:transform .3s}
+.admin-dev-entry:hover .admin-dev-arrow{transform:translateX(4px)}
+.admin-dev-pill{
+  position:absolute;top:12px;right:48px;
+  background:rgba(246,79,89,.2);border:1px solid rgba(246,79,89,.4);
+  color:#f64f59;font-size:.68em;font-weight:800;letter-spacing:1px;
+  padding:3px 10px;border-radius:20px;text-transform:uppercase;
+}
+
+/* Full-screen dev panel */
+.dev-panel{
+  display:none;position:fixed;
+  top:0;bottom:0;left:60px;right:0;
+  z-index:950;
+  background:#0a0a0f;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  flex-direction:column;
+}
+.dev-panel.active{display:flex}
+.sidebar:hover ~ .dev-panel{left:250px}
+.dev-panel-topbar{
+  display:flex;align-items:center;gap:16px;
+  padding:14px 24px;
+  background:rgba(246,79,89,.06);
+  border-bottom:1px solid rgba(246,79,89,.2);
+  flex-shrink:0;
+}
+.dev-panel-back{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+  color:#fff;width:38px;height:38px;border-radius:10px;
+  cursor:pointer;font-size:1.1em;display:flex;align-items:center;
+  justify-content:center;transition:all .2s;flex-shrink:0;
+}
+.dev-panel-back:hover{background:rgba(255,255,255,.15)}
+.dev-panel-brand{display:flex;align-items:center;gap:10px;flex:1}
+.dev-panel-brand-icon{font-size:1.3em}
+.dev-panel-brand-title{color:#fff;font-size:1.05em;font-weight:800;letter-spacing:-.2px}
+.dev-panel-brand-badge{
+  background:linear-gradient(135deg,#f64f59,#c0392b);
+  color:#fff;font-size:.65em;font-weight:800;letter-spacing:1px;
+  padding:3px 10px;border-radius:12px;text-transform:uppercase;
+}
+
+/* Tab bar */
+.dev-tabs{
+  display:flex;gap:4px;padding:0 24px;
+  background:#0d0d16;border-bottom:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;overflow-x:auto;
+}
+.dev-tabs::-webkit-scrollbar{display:none}
+.dev-tab{
+  display:flex;align-items:center;gap:8px;
+  padding:14px 20px;color:rgba(255,255,255,.4);
+  font-size:.88em;font-weight:700;cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;
+  font-family:inherit;background:none;border-top:none;border-left:none;border-right:none;
+}
+.dev-tab:hover{color:rgba(255,255,255,.7)}
+.dev-tab.active{color:#fff;border-bottom-color:#f64f59}
+.dev-tab-icon{font-size:1em}
+
+/* Tab panels */
+.dev-tab-panels{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.dev-tab-panel{display:none;flex:1;flex-direction:column;overflow:hidden}
+.dev-tab-panel.active{display:flex}
+
+/* ── GITHUB EDITOR TAB ── */
+.gh-layout{display:flex;flex:1;overflow:hidden}
+.gh-sidebar{
+  width:260px;min-width:260px;
+  border-right:1px solid rgba(255,255,255,.06);
+  display:flex;flex-direction:column;
+  background:#0d0d16;
+}
+.gh-sidebar-header{
+  padding:16px 18px;font-size:.82em;font-weight:700;
+  color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;
+  border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;
+  display:flex;align-items:center;gap:8px;
+}
+.gh-config-area{padding:14px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.gh-input{
+  width:100%;padding:9px 12px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;color:#fff;font-size:.82em;
+  outline:none;font-family:'Courier New',monospace;
+  margin-bottom:8px;transition:border-color .2s;
+}
+.gh-input:focus{border-color:rgba(102,126,234,.5)}
+.gh-input::placeholder{color:rgba(255,255,255,.25)}
+.gh-load-btn{
+  width:100%;padding:9px;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  border:none;border-radius:8px;color:#fff;
+  font-size:.82em;font-weight:700;cursor:pointer;
+  transition:all .2s;font-family:inherit;
+}
+.gh-load-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(102,126,234,.4)}
+.gh-file-list{flex:1;overflow-y:auto;padding:8px}
+.gh-file-list::-webkit-scrollbar{width:3px}
+.gh-file-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.gh-file-item{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;border-radius:8px;cursor:pointer;
+  font-size:.82em;color:rgba(255,255,255,.6);
+  transition:all .15s;border:1px solid transparent;
+}
+.gh-file-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.gh-file-item.active{background:rgba(102,126,234,.15);border-color:rgba(102,126,234,.3);color:#a5b4fc}
+.gh-file-icon{font-size:.9em;flex-shrink:0}
+.gh-editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.gh-editor-topbar{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 18px;background:#0d0d16;
+  border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;
+}
+.gh-file-path{
+  flex:1;font-size:.8em;color:rgba(255,255,255,.35);
+  font-family:'Courier New',monospace;
+}
+.gh-editor-btn{
+  padding:7px 16px;border-radius:8px;border:none;
+  font-size:.8em;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all .2s;
+}
+.gh-editor-btn.save{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+.gh-editor-btn.save:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(34,197,94,.4)}
+.gh-editor-btn.discard{background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
+.gh-editor-btn.discard:hover{background:rgba(255,255,255,.12);color:#fff}
+.gh-editor-status{font-size:.75em;padding:3px 10px;border-radius:6px;font-weight:700}
+.gh-editor-status.saving{background:rgba(234,179,8,.15);color:#facc15;border:1px solid rgba(234,179,8,.3)}
+.gh-editor-status.saved{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.gh-editor-status.error{background:rgba(246,79,89,.15);color:#f87171;border:1px solid rgba(246,79,89,.3)}
+.gh-textarea{
+  flex:1;width:100%;padding:20px 24px;
+  background:#080810;color:#e2e8f0;
+  border:none;outline:none;resize:none;
+  font-family:'Courier New',Courier,monospace;
+  font-size:.9em;line-height:1.7;
+  tab-size:2;
+}
+.gh-textarea::selection{background:rgba(102,126,234,.3)}
+.gh-empty-editor{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  color:rgba(255,255,255,.15);gap:14px;
+}
+.gh-empty-editor span:first-child{font-size:3em;opacity:.5}
+.gh-empty-editor p{font-size:.9em;max-width:260px;text-align:center;line-height:1.6}
+
+/* ── VERCEL TAB ── */
+.vc-layout{flex:1;display:flex;flex-direction:column;padding:24px;overflow-y:auto;gap:20px}
+.vc-layout::-webkit-scrollbar{width:5px}
+.vc-layout::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+.vc-config-row{display:flex;gap:12px;align-items:flex-end}
+.vc-input{
+  flex:1;padding:11px 14px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;color:#fff;font-size:.88em;
+  outline:none;font-family:inherit;transition:border-color .2s;
+}
+.vc-input:focus{border-color:rgba(102,126,234,.5)}
+.vc-input::placeholder{color:rgba(255,255,255,.25)}
+.vc-load-btn{
+  padding:11px 22px;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  border:none;border-radius:10px;color:#fff;
+  font-size:.88em;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all .2s;white-space:nowrap;
+}
+.vc-load-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(102,126,234,.4)}
+.vc-section-title{
+  font-size:.75em;font-weight:800;color:rgba(255,255,255,.3);
+  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;
+}
+.vc-deployments-grid{display:flex;flex-direction:column;gap:10px}
+.vc-deploy-card{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;padding:16px 20px;
+  display:flex;align-items:center;gap:16px;
+  transition:all .2s;cursor:default;
+}
+.vc-deploy-card:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12)}
+.vc-deploy-status{
+  width:10px;height:10px;border-radius:50%;flex-shrink:0;
+}
+.vc-deploy-status.ready{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.5)}
+.vc-deploy-status.building{background:#facc15;box-shadow:0 0 8px rgba(250,204,21,.5);animation:vcPulse 1s infinite}
+.vc-deploy-status.error{background:#f64f59;box-shadow:0 0 8px rgba(246,79,89,.5)}
+.vc-deploy-status.canceled{background:#6b7280}
+@keyframes vcPulse{0%,100%{opacity:1}50%{opacity:.4}}
+.vc-deploy-info{flex:1;min-width:0}
+.vc-deploy-name{font-size:.9em;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vc-deploy-meta{font-size:.75em;color:rgba(255,255,255,.35);margin-top:3px;display:flex;gap:12px}
+.vc-deploy-badge{
+  padding:3px 10px;border-radius:6px;font-size:.72em;font-weight:800;flex-shrink:0;
+}
+.vc-deploy-badge.ready{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25)}
+.vc-deploy-badge.building{background:rgba(250,204,21,.15);color:#facc15;border:1px solid rgba(250,204,21,.25)}
+.vc-deploy-badge.error{background:rgba(246,79,89,.15);color:#f87171;border:1px solid rgba(246,79,89,.25)}
+.vc-deploy-badge.canceled{background:rgba(107,114,128,.15);color:#9ca3af;border:1px solid rgba(107,114,128,.25)}
+.vc-deploy-link{
+  padding:6px 14px;background:rgba(102,126,234,.15);
+  border:1px solid rgba(102,126,234,.3);border-radius:8px;
+  color:#a5b4fc;font-size:.78em;font-weight:700;
+  text-decoration:none;flex-shrink:0;transition:all .2s;
+}
+.vc-deploy-link:hover{background:rgba(102,126,234,.28);color:#fff}
+.vc-empty{
+  text-align:center;padding:60px 20px;
+  color:rgba(255,255,255,.2);font-size:.9em;line-height:1.7;
+}
+.vc-empty-icon{font-size:3em;display:block;margin-bottom:14px;opacity:.4}
+
+/* ── AI CHAT TAB ── */
+.ai-chat-layout{
+  flex:1;display:flex;flex-direction:column;overflow:hidden;
+  background:radial-gradient(ellipse at top,rgba(102,126,234,.08) 0%,transparent 60%);
+}
+.ai-chat-messages{
+  flex:1;overflow-y:auto;padding:28px 32px;
+  display:flex;flex-direction:column;gap:20px;
+}
+.ai-chat-messages::-webkit-scrollbar{width:4px}
+.ai-chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.ai-msg{display:flex;gap:14px;align-items:flex-start;animation:aiMsgIn .3s ease both}
+@keyframes aiMsgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ai-msg.user{flex-direction:row-reverse}
+.ai-msg-avatar{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:.95em;
+}
+.ai-msg.assistant .ai-msg-avatar{background:linear-gradient(135deg,#667eea,#764ba2)}
+.ai-msg.user .ai-msg-avatar{background:linear-gradient(135deg,#f64f59,#c0392b)}
+.ai-msg-bubble{
+  max-width:78%;padding:14px 18px;border-radius:18px;
+  font-size:.95em;line-height:1.65;
+}
+.ai-msg.assistant .ai-msg-bubble{
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.9);border-top-left-radius:4px;
+}
+.ai-msg.user .ai-msg-bubble{
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:#fff;border-top-right-radius:4px;
+  box-shadow:0 4px 16px rgba(102,126,234,.3);
+}
+.ai-thinking{display:flex;gap:6px;align-items:center;padding:4px 0}
+.ai-thinking-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4);animation:typingBounce 1.2s infinite ease-in-out}
+.ai-thinking-dot:nth-child(2){animation-delay:.2s}
+.ai-thinking-dot:nth-child(3){animation-delay:.4s}
+.ai-chat-input-area{
+  padding:16px 24px 22px;flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,.06);
+  background:rgba(0,0,0,.25);
+}
+.ai-chat-input-row{display:flex;gap:12px;align-items:flex-end}
+.ai-chat-input{
+  flex:1;padding:14px 20px;
+  background:rgba(255,255,255,.07);
+  border:1.5px solid rgba(255,255,255,.1);
+  border-radius:22px;color:#fff;
+  font-size:.95em;outline:none;
+  font-family:inherit;resize:none;
+  min-height:50px;max-height:160px;line-height:1.5;
+  transition:border-color .25s;
+}
+.ai-chat-input::placeholder{color:rgba(255,255,255,.28)}
+.ai-chat-input:focus{border-color:rgba(102,126,234,.5);background:rgba(102,126,234,.07)}
+.ai-send-btn{
+  width:50px;height:50px;border-radius:50%;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  border:none;color:#fff;font-size:1.15em;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s;
+  box-shadow:0 4px 16px rgba(102,126,234,.4);
+}
+.ai-send-btn:hover{transform:scale(1.1);box-shadow:0 6px 22px rgba(102,126,234,.55)}
+.ai-send-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.ai-hint{font-size:.75em;color:rgba(255,255,255,.2);margin-top:8px;text-align:center}
+.ai-welcome{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;color:rgba(255,255,255,.3);
+  gap:16px;text-align:center;padding:40px;
+}
+.ai-welcome-icon{font-size:4em;animation:aiGlow 3s ease-in-out infinite}
+@keyframes aiGlow{0%,100%{filter:drop-shadow(0 0 8px rgba(102,126,234,.4))}50%{filter:drop-shadow(0 0 20px rgba(102,126,234,.8))}}
 #granny-unity-container{position:fixed;width:100%;height:100%;left:0;top:0;z-index:99998;display:none;background:url('https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/background.png') no-repeat center center fixed;background-size:cover}
 #granny-unity-container.active{display:block}
 #unity-canvas{position:absolute;width:100%;height:100%}
@@ -597,7 +917,7 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
     </div>
     <div class="sp-error" id="spError">Incorrect password. Please try again.</div>
     <button class="sp-btn" id="spBtn" onclick="checkSitePassword()">Unlock Site →</button>
-    <p class="sp-footer">🔒 Protected by Maths Gods</p>
+    <p class="sp-footer">🔒 Protected by Maths Support</p>
   </div>
 </div>
 
@@ -753,6 +1073,17 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
 
   <!-- ACCOUNT PAGE -->
   <div class="account-page" id="accountPage">
+
+    <!-- ADMIN ONLY: Dev Panel Entry Button -->
+    <div class="admin-dev-entry" id="adminDevEntry" onclick="openDevPanel()">
+      <div class="admin-dev-icon">⚡</div>
+      <div class="admin-dev-text">
+        <h4>Developer Panel</h4>
+        <p>Edit site HTML via GitHub · View Vercel deployments · Chat with Claude AI</p>
+      </div>
+      <div class="admin-dev-pill">Admin Only</div>
+      <div class="admin-dev-arrow">→</div>
+    </div>
     <div class="page-card">
       <h3>👤 Your Profile</h3>
       <div class="account-avatar-row">
@@ -909,6 +1240,117 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ══ ADMIN DEVELOPER PANEL ══ -->
+<div class="dev-panel" id="devPanel">
+  <!-- Top bar -->
+  <div class="dev-panel-topbar">
+    <button class="dev-panel-back" onclick="closeDevPanel()">←</button>
+    <div class="dev-panel-brand">
+      <span class="dev-panel-brand-icon">⚡</span>
+      <span class="dev-panel-brand-title">Developer Panel</span>
+      <span class="dev-panel-brand-badge">Admin</span>
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="dev-tabs">
+    <button class="dev-tab active" id="devTab-github" onclick="switchDevTab('github')">
+      <span class="dev-tab-icon">🐙</span> GitHub Editor
+    </button>
+    <button class="dev-tab" id="devTab-vercel" onclick="switchDevTab('vercel')">
+      <span class="dev-tab-icon">▲</span> Vercel Deployments
+    </button>
+    <button class="dev-tab" id="devTab-ai" onclick="switchDevTab('ai')">
+      <span class="dev-tab-icon">🤖</span> Claude AI
+    </button>
+  </div>
+
+  <!-- Tab panels -->
+  <div class="dev-tab-panels">
+
+    <!-- ── GITHUB EDITOR ── -->
+    <div class="dev-tab-panel active" id="devPanel-github">
+      <div class="gh-layout">
+
+        <!-- Sidebar: config + file list -->
+        <div class="gh-sidebar">
+          <div class="gh-sidebar-header">🐙 Repository</div>
+          <div class="gh-config-area">
+            <input type="text" class="gh-input" id="ghToken" placeholder="GitHub Token (ghp_...)" autocomplete="off">
+            <input type="text" class="gh-input" id="ghRepo" placeholder="owner/repo-name">
+            <input type="text" class="gh-input" id="ghBranch" placeholder="Branch (default: main)" value="main">
+            <button class="gh-load-btn" onclick="ghLoadFiles()">📂 Load Files</button>
+          </div>
+          <div class="gh-file-list" id="ghFileList">
+            <div style="padding:20px 12px;color:rgba(255,255,255,.2);font-size:.8em;text-align:center">Enter repo details above to browse files</div>
+          </div>
+        </div>
+
+        <!-- Editor -->
+        <div class="gh-editor-area" id="ghEditorArea">
+          <div class="gh-empty-editor" id="ghEmptyEditor">
+            <span>📄</span>
+            <p>Select a file from the sidebar to start editing</p>
+          </div>
+          <div id="ghEditorMain" style="display:none;flex:1;flex-direction:column;overflow:hidden;display:none">
+            <div class="gh-editor-topbar">
+              <span class="gh-file-path" id="ghFilePath">No file selected</span>
+              <span class="gh-editor-status" id="ghEditorStatus" style="display:none"></span>
+              <button class="gh-editor-btn discard" onclick="ghDiscardChanges()">↩ Discard</button>
+              <button class="gh-editor-btn save" onclick="ghSaveFile()">💾 Commit &amp; Push</button>
+            </div>
+            <textarea class="gh-textarea" id="ghTextarea" spellcheck="false" placeholder="File content will appear here..."></textarea>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── VERCEL DEPLOYMENTS ── -->
+    <div class="dev-tab-panel" id="devPanel-vercel">
+      <div class="vc-layout">
+        <div class="vc-config-row">
+          <input type="text" class="vc-input" id="vcToken" placeholder="Vercel API Token" autocomplete="off">
+          <input type="text" class="vc-input" id="vcProjectId" placeholder="Project ID or name (optional)">
+          <button class="vc-load-btn" onclick="vcLoadDeployments()">▲ Load Deployments</button>
+        </div>
+        <div>
+          <div class="vc-section-title">Recent Deployments</div>
+          <div class="vc-deployments-grid" id="vcDeployList">
+            <div class="vc-empty">
+              <span class="vc-empty-icon">▲</span>
+              Enter your Vercel API token above to see deployments
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CLAUDE AI CHAT ── -->
+    <div class="dev-tab-panel" id="devPanel-ai">
+      <div class="ai-chat-layout">
+        <div class="ai-chat-messages" id="aiChatMessages">
+          <div class="ai-welcome" id="aiWelcome">
+            <div class="ai-welcome-icon">🤖</div>
+            <div>
+              <strong style="color:rgba(255,255,255,.7);font-size:1.05em;display:block;margin-bottom:8px">Claude AI — Developer Assistant</strong>
+              <p style="font-size:.9em;line-height:1.7;max-width:340px">Ask me anything about your codebase, HTML, CSS, JavaScript, GitHub, Vercel — or just brainstorm ideas for the platform.</p>
+            </div>
+          </div>
+        </div>
+        <div class="ai-chat-input-area">
+          <div class="ai-chat-input-row">
+            <textarea class="ai-chat-input" id="aiChatInput" placeholder="Ask Claude anything…" rows="1"></textarea>
+            <button class="ai-send-btn" id="aiSendBtn" onclick="sendAiMessage()">➤</button>
+          </div>
+          <div class="ai-hint">Powered by Claude claude-sonnet-4-20250514 · Shift+Enter for new line · Enter to send</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1187,12 +1629,13 @@ function populateAccountPage(){
   const rs=document.getElementById('roleSelect');
   rs.value=currentProfile.role||'';
   previewRole();
-  // Hide admin option if not admin
+  // Show/hide admin-only UI
+  const isAdmin=ADMIN_USER_IDS.includes(currentUser.id)||currentProfile?.is_admin;
   const adminOpt=rs.querySelector('option[value="admin"]');
-  if(adminOpt){
-    const isAdmin=ADMIN_USER_IDS.includes(currentUser.id)||currentProfile?.is_admin;
-    adminOpt.style.display=isAdmin?'':'none';
-  }
+  if(adminOpt) adminOpt.style.display=isAdmin?'':'none';
+  // Show Dev Panel entry button only for admins
+  const devEntry=document.getElementById('adminDevEntry');
+  if(devEntry) devEntry.classList.toggle('visible', !!isAdmin);
 }
 async function saveDisplayName(){
   const val=document.getElementById('acctDisplayName').value.trim();
@@ -1940,7 +2383,296 @@ async function runAppInit(){
   });
 }
 
-// ── Keep chat page left edge in sync with sidebar width ──
+// ══════════════════════════════════════════════════════════════════
+// ADMIN DEVELOPER PANEL
+// ══════════════════════════════════════════════════════════════════
+
+function isAdminUser(){
+  return ADMIN_USER_IDS.includes(currentUser?.id) || currentProfile?.is_admin === true;
+}
+
+function openDevPanel(){
+  if(!isAdminUser()) return;
+  document.getElementById('devPanel').classList.add('active');
+  document.body.style.overflow='hidden';
+}
+
+function closeDevPanel(){
+  document.getElementById('devPanel').classList.remove('active');
+  document.body.style.overflow='';
+}
+
+function switchDevTab(tab){
+  document.querySelectorAll('.dev-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.dev-tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('devTab-'+tab).classList.add('active');
+  document.getElementById('devPanel-'+tab).classList.add('active');
+}
+
+// ── Keep dev panel left edge in sync with sidebar ──
+(function(){
+  const sidebar=document.querySelector('.sidebar');
+  const devPanel=document.getElementById('devPanel');
+  if(!sidebar||!devPanel)return;
+  sidebar.addEventListener('mouseenter',()=>{devPanel.style.left='250px';});
+  sidebar.addEventListener('mouseleave',()=>{devPanel.style.left='60px';});
+})();
+
+// ══════════════════════════════════════════════════════════════════
+// GITHUB EDITOR
+// ══════════════════════════════════════════════════════════════════
+let ghCurrentFile = null;  // { path, sha, content (original) }
+let ghOriginalContent = '';
+
+function ghGetHeaders(){
+  const token = document.getElementById('ghToken').value.trim();
+  return { 'Authorization':'token '+token, 'Accept':'application/vnd.github.v3+json', 'Content-Type':'application/json' };
+}
+function ghGetRepo(){ return document.getElementById('ghRepo').value.trim(); }
+function ghGetBranch(){ return document.getElementById('ghBranch').value.trim()||'main'; }
+
+async function ghLoadFiles(path=''){
+  const repo=ghGetRepo();
+  const token=document.getElementById('ghToken').value.trim();
+  if(!token||!repo){ ghShowFileError('Please enter a GitHub token and repo (owner/repo)'); return; }
+  const el=document.getElementById('ghFileList');
+  el.innerHTML='<div style="padding:20px;color:rgba(255,255,255,.3);font-size:.8em;text-align:center">⏳ Loading...</div>';
+  try{
+    const res=await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${ghGetBranch()}`,{headers:ghGetHeaders()});
+    if(!res.ok){ const e=await res.json(); throw new Error(e.message||'GitHub API error '+res.status); }
+    const items=await res.json();
+    el.innerHTML='';
+    // Back button if in subdirectory
+    if(path){
+      const back=document.createElement('div');back.className='gh-file-item';
+      back.innerHTML='<span class="gh-file-icon">⬆️</span>../';
+      const parentPath=path.split('/').slice(0,-1).join('/');
+      back.onclick=()=>ghLoadFiles(parentPath);el.appendChild(back);
+    }
+    // Sort: dirs first, then files
+    const sorted=[...items].sort((a,b)=>{if(a.type==='dir'&&b.type!=='dir')return -1;if(b.type==='dir'&&a.type!=='dir')return 1;return a.name.localeCompare(b.name);});
+    sorted.forEach(item=>{
+      const div=document.createElement('div');div.className='gh-file-item';
+      const icon=item.type==='dir'?'📁':ghFileIcon(item.name);
+      div.innerHTML=`<span class="gh-file-icon">${icon}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.name}</span>`;
+      if(item.type==='dir') div.onclick=()=>ghLoadFiles(item.path);
+      else div.onclick=()=>ghOpenFile(item);
+      el.appendChild(div);
+    });
+  }catch(e){ ghShowFileError('Error: '+e.message); }
+}
+
+function ghShowFileError(msg){
+  document.getElementById('ghFileList').innerHTML=`<div style="padding:16px 12px;color:#f87171;font-size:.78em;line-height:1.5">${msg}</div>`;
+}
+
+function ghFileIcon(name){
+  if(name.endsWith('.html')||name.endsWith('.htm'))return '🌐';
+  if(name.endsWith('.css'))return '🎨';
+  if(name.endsWith('.js')||name.endsWith('.mjs'))return '⚡';
+  if(name.endsWith('.json'))return '📋';
+  if(name.endsWith('.md'))return '📝';
+  if(name.endsWith('.png')||name.endsWith('.jpg')||name.endsWith('.svg'))return '🖼️';
+  return '📄';
+}
+
+async function ghOpenFile(item){
+  // Mark active
+  document.querySelectorAll('.gh-file-item').forEach(f=>f.classList.remove('active'));
+  event?.currentTarget?.classList.add('active');
+  const emptyEl=document.getElementById('ghEmptyEditor');
+  const mainEl=document.getElementById('ghEditorMain');
+  if(emptyEl)emptyEl.style.display='none';
+  if(mainEl){mainEl.style.display='flex';mainEl.style.flexDirection='column';mainEl.style.flex='1';mainEl.style.overflow='hidden';}
+  document.getElementById('ghFilePath').textContent=item.path;
+  document.getElementById('ghEditorStatus').style.display='none';
+  const textarea=document.getElementById('ghTextarea');
+  textarea.value='⏳ Loading file...';textarea.disabled=true;
+  try{
+    const res=await fetch(item.url,{headers:ghGetHeaders()});
+    if(!res.ok)throw new Error('Could not fetch file: '+res.status);
+    const data=await res.json();
+    // GitHub returns base64 content
+    const decoded=decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
+    textarea.value=decoded;textarea.disabled=false;
+    ghCurrentFile={path:item.path,sha:data.sha,url:item.url};
+    ghOriginalContent=decoded;
+    textarea.focus();
+  }catch(e){
+    textarea.value='Error loading file: '+e.message;textarea.disabled=false;
+  }
+}
+
+function ghDiscardChanges(){
+  if(!ghCurrentFile)return;
+  if(confirm('Discard all changes and reload original?')){
+    document.getElementById('ghTextarea').value=ghOriginalContent;
+    const s=document.getElementById('ghEditorStatus');s.style.display='none';
+  }
+}
+
+async function ghSaveFile(){
+  if(!ghCurrentFile){ alert('No file open'); return; }
+  const content=document.getElementById('ghTextarea').value;
+  const msg=prompt('Commit message:','Update '+ghCurrentFile.path);
+  if(!msg)return;
+  const statusEl=document.getElementById('ghEditorStatus');
+  statusEl.className='gh-editor-status saving';statusEl.textContent='⏳ Saving...';statusEl.style.display='';
+  try{
+    const encoded=btoa(unescape(encodeURIComponent(content)));
+    const body={message:msg,content:encoded,sha:ghCurrentFile.sha,branch:ghGetBranch()};
+    const res=await fetch(`https://api.github.com/repos/${ghGetRepo()}/contents/${ghCurrentFile.path}`,{method:'PUT',headers:ghGetHeaders(),body:JSON.stringify(body)});
+    if(!res.ok){const e=await res.json();throw new Error(e.message||'Save failed '+res.status);}
+    const data=await res.json();
+    // Update sha for next save
+    ghCurrentFile.sha=data.content.sha;
+    ghOriginalContent=content;
+    statusEl.className='gh-editor-status saved';statusEl.textContent='✅ Committed!';
+    setTimeout(()=>{statusEl.style.display='none';},4000);
+  }catch(e){
+    statusEl.className='gh-editor-status error';statusEl.textContent='❌ '+e.message;
+    setTimeout(()=>{statusEl.style.display='none';},5000);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VERCEL DEPLOYMENTS
+// ══════════════════════════════════════════════════════════════════
+async function vcLoadDeployments(){
+  const token=document.getElementById('vcToken').value.trim();
+  const projectId=document.getElementById('vcProjectId').value.trim();
+  if(!token){ alert('Please enter a Vercel API token'); return; }
+  const listEl=document.getElementById('vcDeployList');
+  listEl.innerHTML='<div class="vc-empty"><span class="vc-empty-icon" style="font-size:2em">⏳</span>Loading deployments...</div>';
+  try{
+    let url='https://api.vercel.com/v6/deployments?limit=20';
+    if(projectId) url+=`&projectId=${encodeURIComponent(projectId)}`;
+    const res=await fetch(url,{headers:{'Authorization':'Bearer '+token}});
+    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Vercel API error '+res.status);}
+    const data=await res.json();
+    const deploys=data.deployments||[];
+    if(!deploys.length){listEl.innerHTML='<div class="vc-empty"><span class="vc-empty-icon">▲</span>No deployments found for this project.</div>';return;}
+    listEl.innerHTML='';
+    deploys.forEach(d=>{
+      const state=(d.state||d.readyState||'').toLowerCase();
+      const stateLabel={'ready':'Ready','building':'Building','error':'Error','canceled':'Canceled','queued':'Queued'}[state]||state;
+      const created=d.created?new Date(d.created).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Unknown';
+      const branch=d.meta?.githubCommitRef||d.gitBranch||'—';
+      const commitMsg=d.meta?.githubCommitMessage||d.name||'—';
+      const url=d.url?`https://${d.url}`:'';
+      const card=document.createElement('div');card.className='vc-deploy-card';
+      card.innerHTML=`
+        <div class="vc-deploy-status ${state}"></div>
+        <div class="vc-deploy-info">
+          <div class="vc-deploy-name" title="${commitMsg}">${commitMsg.substring(0,72)}${commitMsg.length>72?'…':''}</div>
+          <div class="vc-deploy-meta">
+            <span>🕐 ${created}</span>
+            <span>🌿 ${branch}</span>
+          </div>
+        </div>
+        <span class="vc-deploy-badge ${state}">${stateLabel}</span>
+        ${url?`<a href="${url}" target="_blank" class="vc-deploy-link">Open ↗</a>`:''}
+      `;
+      listEl.appendChild(card);
+    });
+  }catch(e){listEl.innerHTML=`<div class="vc-empty"><span class="vc-empty-icon">⚠️</span>${e.message}</div>`;}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CLAUDE AI CHAT (Developer Panel)
+// Uses Anthropic API via fetch — needs CORS proxy or same-origin
+// ══════════════════════════════════════════════════════════════════
+let aiMessages = []; // conversation history
+let aiIsThinking = false;
+
+function aiAppendMessage(role, content, isThinking=false){
+  const welcome=document.getElementById('aiWelcome');
+  if(welcome)welcome.style.display='none';
+  const container=document.getElementById('aiChatMessages');
+  const div=document.createElement('div');
+  div.className='ai-msg '+(role==='user'?'user':'assistant');
+  const avatarEmoji=role==='user'?(initials(currentProfile?.display_name||'U')):'🤖';
+  if(isThinking){
+    div.id='ai-thinking-bubble';
+    div.innerHTML=`
+      <div class="ai-msg-avatar">${avatarEmoji}</div>
+      <div class="ai-msg-bubble">
+        <div class="ai-thinking">
+          <div class="ai-thinking-dot"></div>
+          <div class="ai-thinking-dot"></div>
+          <div class="ai-thinking-dot"></div>
+        </div>
+      </div>`;
+  }else{
+    // Simple markdown-ish: code blocks, bold
+    let html=escapeHtml(content)
+      .replace(/`([^`]+)`/g,'<code style="background:rgba(255,255,255,.1);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:.9em">$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+      .replace(/\n/g,'<br>');
+    div.innerHTML=`<div class="ai-msg-avatar">${avatarEmoji}</div><div class="ai-msg-bubble">${html}</div>`;
+  }
+  container.appendChild(div);
+  container.scrollTop=container.scrollHeight;
+  return div;
+}
+
+async function sendAiMessage(){
+  if(aiIsThinking)return;
+  const input=document.getElementById('aiChatInput');
+  const content=input.value.trim();
+  if(!content)return;
+  input.value='';input.style.height='';
+  aiIsThinking=true;
+  document.getElementById('aiSendBtn').disabled=true;
+
+  // Add user message to UI and history
+  aiAppendMessage('user',content);
+  aiMessages.push({role:'user',content});
+
+  // Show thinking bubble
+  const thinkBubble=aiAppendMessage('assistant','',true);
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`You are a helpful developer assistant for "Maths Support", a student gaming and study platform. 
+You help the admin with: HTML/CSS/JS code questions, GitHub repository management, Vercel deployment questions, and platform features.
+Be concise, practical, and developer-friendly. Use code examples when helpful.`,
+        messages:aiMessages
+      })
+    });
+    const data=await res.json();
+    // Remove thinking bubble
+    thinkBubble.remove();
+    if(data.error){
+      aiAppendMessage('assistant','⚠️ API Error: '+data.error.message);
+    }else{
+      const reply=data.content?.find(b=>b.type==='text')?.text||'(No response)';
+      aiAppendMessage('assistant',reply);
+      aiMessages.push({role:'assistant',content:reply});
+    }
+  }catch(e){
+    thinkBubble.remove();
+    aiAppendMessage('assistant','⚠️ Could not reach Claude API. Make sure you are on a network that allows requests to api.anthropic.com.\n\nError: '+e.message);
+  }
+  aiIsThinking=false;
+  document.getElementById('aiSendBtn').disabled=false;
+  input.focus();
+}
+
+// Auto-resize AI chat input
+document.getElementById('aiChatInput').addEventListener('input',function(){
+  this.style.height='';this.style.height=Math.min(this.scrollHeight,160)+'px';
+});
+document.getElementById('aiChatInput').addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAiMessage();}
+});
+
+// ── Keep sidebar hover listener ──
 (function(){
   const sidebar = document.querySelector('.sidebar');
   const chatPage = document.getElementById('chatPage');
