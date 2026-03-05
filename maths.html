@@ -382,6 +382,35 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .cli-time{font-size:.72em;color:rgba(255,255,255,.3)}
 .cli-unread-badge{width:20px;height:20px;border-radius:50%;background:#667eea;display:flex;align-items:center;justify-content:center;font-size:.68em;color:#fff;font-weight:800}
 
+/* ── TALK TO ADMIN BUTTON ── */
+.chat-admin-btn{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;
+  margin:10px 10px 4px;
+  border-radius:16px;
+  cursor:pointer;
+  background:linear-gradient(135deg,rgba(246,79,89,.15),rgba(192,57,43,.1));
+  border:1.5px solid rgba(246,79,89,.35);
+  transition:all .2s;
+  position:relative;
+}
+.chat-admin-btn:hover{
+  background:linear-gradient(135deg,rgba(246,79,89,.25),rgba(192,57,43,.18));
+  border-color:rgba(246,79,89,.6);
+  transform:translateY(-1px);
+}
+.chat-admin-btn-avatar{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,#f64f59,#c0392b);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2em;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(246,79,89,.4);
+}
+.chat-admin-btn-info{flex:1;min-width:0}
+.chat-admin-btn-name{font-size:.95em;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px}
+.chat-admin-btn-sub{font-size:.78em;color:rgba(255,255,255,.4);margin-top:2px}
+.chat-admin-divider{height:1px;background:rgba(255,255,255,.07);margin:8px 10px 4px;}
+
 /* RIGHT / MAIN PANEL */
 .chat-main-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:rgba(255,255,255,.015)}
 
@@ -431,11 +460,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 
 /* ── BIG READABLE BUBBLES ── */
 .chat-bubble{
-  max-width:72%;          /* wider — uses more of the space */
-  padding:13px 18px;      /* generous padding inside bubble */
+  max-width:88%;          /* nearly full width — long messages shine */
+  padding:14px 20px;
   border-radius:22px;
-  font-size:1.05em;       /* noticeably bigger text */
-  line-height:1.6;
+  font-size:1.08em;
+  line-height:1.65;
   word-break:break-word;
   position:relative;
   animation:bubbleIn .2s cubic-bezier(.34,1.56,.64,1) both;
@@ -1389,8 +1418,48 @@ let renderedMsgIds = new Set();
 
 function renderChatList(accepted){
   const el=document.getElementById('chatList');
-  if(!accepted.length){el.innerHTML='<div class="empty-list" style="padding:24px 12px;font-size:.85em;color:rgba(255,255,255,.3)">Add friends to start chatting</div>';return;}
   el.innerHTML='';
+
+  // ── Always show "Talk to Admin" button at top ──
+  // Check if current user IS the admin — if so, skip the button for themselves
+  const iAmAdmin = ADMIN_USER_IDS.includes(currentUser?.id) || currentProfile?.is_admin;
+  if(!iAmAdmin){
+    // Check if we already have an accepted friend who is admin
+    const adminFriend = accepted.find(f=>{ const p=otherProfile(f); return p&&(p.role==='admin'||p.is_admin); });
+    const adminBtn = document.createElement('div');
+    adminBtn.className='chat-admin-btn';
+    adminBtn.id='chat-admin-contact-btn';
+    if(adminFriend){
+      // Already friends — open chat directly
+      const p=otherProfile(adminFriend);
+      adminBtn.innerHTML=`
+        <div class="chat-admin-btn-avatar">👑</div>
+        <div class="chat-admin-btn-info">
+          <div class="chat-admin-btn-name">Talk to Admin <span class="role-badge admin">👑 Admin</span></div>
+          <div class="chat-admin-btn-sub">Tap to open chat</div>
+        </div>`;
+      adminBtn.onclick=()=>openChatWith(p.id,'Admin');
+    } else {
+      adminBtn.innerHTML=`
+        <div class="chat-admin-btn-avatar">👑</div>
+        <div class="chat-admin-btn-info">
+          <div class="chat-admin-btn-name">Talk to Admin <span class="role-badge admin">👑 Admin</span></div>
+          <div class="chat-admin-btn-sub" id="adminBtnSub">Send a chat request</div>
+        </div>`;
+      adminBtn.onclick=contactAdmin;
+    }
+    el.appendChild(adminBtn);
+    // divider
+    const div=document.createElement('div');div.className='chat-admin-divider';el.appendChild(div);
+  }
+
+  if(!accepted.length){
+    const empty=document.createElement('div');
+    empty.className='empty-list';empty.style.cssText='padding:24px 12px;font-size:.85em;color:rgba(255,255,255,.3)';
+    empty.textContent='Add friends to start chatting';
+    el.appendChild(empty);return;
+  }
+
   accepted.forEach(f=>{
     const p=otherProfile(f);if(!p)return;
     const di=getDisplayInfo(p,f);
@@ -1413,6 +1482,69 @@ function renderChatList(accepted){
     div.onclick=()=>openChatWith(p.id,di.shown);
     el.appendChild(div);
   });
+}
+
+// ── Contact Admin — finds any user with role='admin' or is_admin=true
+//    and sends them a friend request so chat can begin ──
+async function contactAdmin(){
+  const btn=document.getElementById('chat-admin-contact-btn');
+  const sub=document.getElementById('adminBtnSub');
+  if(sub)sub.textContent='Sending request...';
+  if(btn)btn.style.pointerEvents='none';
+
+  try{
+    // Find all admin profiles (excluding self)
+    const{data:admins,error}=await sb.from('profiles')
+      .select('id,username,display_name,role,is_admin,friend_code')
+      .or('role.eq.admin,is_admin.eq.true')
+      .neq('id',currentUser.id);
+
+    if(error||!admins||!admins.length){
+      if(sub)sub.textContent='No admin found right now';
+      if(btn){btn.style.pointerEvents='auto';setTimeout(()=>{if(sub)sub.textContent='Send a chat request';},3000);}
+      return;
+    }
+
+    // Pick first admin
+    const admin=admins[0];
+
+    // Check if friendship already exists
+    const{data:exists}=await sb.from('friendships').select('id,status')
+      .or(`and(user_id.eq.${currentUser.id},friend_id.eq.${admin.id}),and(user_id.eq.${admin.id},friend_id.eq.${currentUser.id})`)
+      .maybeSingle();
+
+    if(exists){
+      if(exists.status==='accepted'){
+        // Already friends — open chat
+        if(sub)sub.textContent='Opening chat...';
+        await loadFriends();
+        openChatWith(admin.id,'Admin');
+        return;
+      }else{
+        if(sub)sub.textContent='Request already sent!';
+        if(btn)btn.style.pointerEvents='auto';
+        return;
+      }
+    }
+
+    // Send the request
+    const{error:reqErr}=await sb.from('friendships').insert({
+      user_id:currentUser.id,friend_id:admin.id,status:'pending'
+    });
+    if(reqErr){
+      if(sub)sub.textContent='Error — try again';
+      if(btn)btn.style.pointerEvents='auto';
+      return;
+    }
+
+    if(sub)sub.textContent='✅ Request sent! Waiting for admin...';
+    showToast('👑 Chat request sent to Admin!');
+    // Don't re-enable — pending state
+  }catch(e){
+    console.error('contactAdmin error:',e);
+    if(sub)sub.textContent='Something went wrong';
+    if(btn)btn.style.pointerEvents='auto';
+  }
 }
 
 function openChatWith(friendId, friendName){
