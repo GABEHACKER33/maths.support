@@ -662,7 +662,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .dev-tab-panel{display:none;flex:1;flex-direction:column;overflow:hidden}
 .dev-tab-panel.active{display:flex}
 
-/* ── GITHUB EDITOR TAB ── */
+/* ── GITHUB EDITOR TAB (unchanged from original) ── */
 .gh-layout{display:flex;flex:1;overflow:hidden}
 .gh-sidebar{
   width:260px;min-width:260px;
@@ -749,7 +749,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .gh-empty-editor span:first-child{font-size:3em;opacity:.5}
 .gh-empty-editor p{font-size:.9em;max-width:260px;text-align:center;line-height:1.6}
 
-/* ── AI CHAT TAB ── */
+/* ── AI CHAT TAB with OpenRouter integration ── */
 .ai-chat-layout{flex:1;display:flex;overflow:hidden;background:#0b0b14}
 /* Sidebar */
 .ai-sidebar{width:210px;min-width:210px;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;overflow-y:auto;background:#0d0d18}
@@ -769,6 +769,31 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .ai-sidebar-btn.danger:hover{background:rgba(246,79,89,.15);border-color:rgba(246,79,89,.3);color:#f87171}
 .ai-quick-btn{width:100%;padding:6px 9px;margin-top:4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:7px;color:rgba(255,255,255,.4);font-size:.7em;cursor:pointer;font-family:inherit;transition:all .2s;text-align:left;line-height:1.4}
 .ai-quick-btn:hover{background:rgba(102,126,234,.15);border-color:rgba(102,126,234,.3);color:rgba(255,255,255,.9)}
+
+/* New: Model selector */
+.ai-model-selector{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:8px;
+  padding:5px 8px;
+  background:rgba(0,0,0,.3);
+  border-radius:8px;
+}
+.ai-model-select{
+  flex:1;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:6px;
+  color:#fff;
+  font-size:.75em;
+  padding:5px;
+  outline:none;
+  cursor:pointer;
+  font-family:inherit;
+}
+.ai-model-select option{background:#1a1a2e;color:#fff}
+
 /* Main */
 .ai-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .ai-topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 18px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.2);flex-shrink:0}
@@ -1207,16 +1232,15 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
     <button class="dev-tab active" id="devTab-github" onclick="switchDevTab('github')">
       <span class="dev-tab-icon">🐙</span> GitHub Editor
     </button>
-
     <button class="dev-tab" id="devTab-ai" onclick="switchDevTab('ai')">
-      <span class="dev-tab-icon">🤖</span> Claude AI
+      <span class="dev-tab-icon">🤖</span> AI Assistant
     </button>
   </div>
 
   <!-- Tab panels -->
   <div class="dev-tab-panels">
 
-    <!-- ── GITHUB EDITOR ── -->
+    <!-- ── GITHUB EDITOR ── (unchanged) -->
     <div class="dev-tab-panel active" id="devPanel-github">
       <!-- Token gate: shown until token is loaded from Supabase -->
       <div id="ghTokenGate" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;padding:40px">
@@ -1270,15 +1294,15 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
       </div>
     </div>
 
-    <!-- ── CLAUDE AI CHAT ── -->
+    <!-- ── AI CHAT with OpenRouter ── -->
     <div class="dev-tab-panel" id="devPanel-ai">
       <div class="ai-chat-layout">
 
-        <!-- Sidebar: memory + file context -->
+        <!-- Sidebar: memory + file context + model selector -->
         <div class="ai-sidebar">
           <div class="ai-sidebar-section">
             <div class="ai-sidebar-title">🧠 Memory</div>
-            <div class="ai-sidebar-hint">Claude remembers facts across sessions</div>
+            <div class="ai-sidebar-hint">AI remembers facts across sessions</div>
             <div id="aiMemoryList" class="ai-memory-list">
               <div class="ai-memory-empty">No memories yet</div>
             </div>
@@ -1286,7 +1310,7 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
           </div>
           <div class="ai-sidebar-section">
             <div class="ai-sidebar-title">📄 File Context</div>
-            <div class="ai-sidebar-hint">Load a file so Claude can read &amp; edit it</div>
+            <div class="ai-sidebar-hint">Load a file so AI can read & edit it</div>
             <div id="aiFileContext" class="ai-file-context-name">No file loaded</div>
             <button class="ai-sidebar-btn" onclick="aiLoadCurrentFile()">📂 Load Open File</button>
             <button class="ai-sidebar-btn danger" onclick="aiUnloadFile()">✕ Unload</button>
@@ -1307,8 +1331,8 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
             <div class="ai-topbar-left">
               <div class="ai-topbar-avatar">🤖</div>
               <div>
-                <div class="ai-topbar-name">Claude Sonnet 4.6</div>
-                <div class="ai-topbar-sub" id="aiStatusLine">Ready · Puter.js · Free &amp; unlimited</div>
+                <div class="ai-topbar-name">OpenRouter AI</div>
+                <div class="ai-topbar-sub" id="aiStatusLine">Connected · Multiple models</div>
               </div>
             </div>
             <div class="ai-topbar-actions">
@@ -1320,11 +1344,11 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
             <div class="ai-welcome" id="aiWelcome">
               <div class="ai-welcome-icon">🤖</div>
               <div class="ai-welcome-text">
-                <strong>Claude — Dev Assistant</strong>
-                <p>I can read, edit and publish your site files directly. Load a file from the sidebar, then ask me to modify it and I'll commit the changes to GitHub automatically.</p>
+                <strong>OpenRouter AI Assistant</strong>
+                <p>I can read, edit and publish your site files. Load a file from the sidebar, then ask me to modify it and I'll commit changes to GitHub.</p>
                 <div class="ai-welcome-chips">
                   <span onclick="aiQuick('What files are in the repo?')">List repo files</span>
-                  <span onclick="aiQuick('Read the current index.html and tell me what it does')">Read index.html</span>
+                  <span onclick="aiQuick('Read the current file and summarise it')">Summarise file</span>
                   <span onclick="aiQuick('What Supabase tables does the app use?')">Supabase tables</span>
                 </div>
               </div>
@@ -1332,15 +1356,28 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
           </div>
 
           <div class="ai-input-wrap">
+            <!-- Model selector -->
+            <div class="ai-model-selector">
+              <span style="color:rgba(255,255,255,.4);font-size:.7em">Model:</span>
+              <select id="aiModelSelect" class="ai-model-select">
+                <option value="claude-3.5-sonnet">Claude 3.5 Sonnet (OpenRouter)</option>
+                <option value="gpt-4o">GPT-4o</option>
+                <option value="claude-3-haiku">Claude 3 Haiku</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                <option value="llama-3.1-70b">Llama 3.1 70B</option>
+                <option value="mixtral-8x7b">Mixtral 8x7B</option>
+                <option value="qwen-2.5-72b">Qwen 2.5 72B</option>
+              </select>
+            </div>
             <div class="ai-input-row">
-              <textarea class="ai-chat-input" id="aiChatInput" placeholder="Ask Claude to read, edit or publish changes…" rows="1"></textarea>
+              <textarea class="ai-chat-input" id="aiChatInput" placeholder="Ask me to read, edit or publish changes…" rows="1"></textarea>
               <button class="ai-send-btn" id="aiSendBtn" onclick="sendAiMessage()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               </button>
             </div>
             <div class="ai-input-footer">
               <span id="aiActionStatus"></span>
-              <span>Enter to send · Shift+Enter for new line</span>
+              <span>Enter to send · Shift+Enter new line</span>
             </div>
           </div>
         </div>
@@ -1406,8 +1443,12 @@ const SP_SESSION_KEY = 'sitepass_granted';
 const ADMIN_USER_IDS = []; // Fill with your user UUID e.g. ['abc-123-...']
 // Alternatively we check via profile.is_admin flag
 
+// OpenRouter API Key
+const OPENROUTER_API_KEY = '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';
+const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+
 // ══════════════════════════════════════════════════════════════════
-// ROLES CONFIG
+// ROLES CONFIG (unchanged)
 // ══════════════════════════════════════════════════════════════════
 const ROLES = {
   admin:     { label:'Admin',     icon:'👑', class:'admin'     },
@@ -1423,8 +1464,6 @@ function roleBadgeHTML(role){
 }
 
 // How to display someone's name to ME (the current user)
-// If they have a role and haven't revealed to me → show role tag
-// If they revealed OR I'm admin → show real name
 function displayNameForMe(profile, friendshipData){
   const name    = profile.display_name || profile.username || 'User';
   const role    = profile.role;
@@ -1471,7 +1510,7 @@ async function saveRole(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// SITE PASSWORD
+// SITE PASSWORD (unchanged)
 // ══════════════════════════════════════════════════════════════════
 function toggleSpVisibility(){
   const input=document.getElementById('sitePassInput'), btn=document.getElementById('spToggleVis');
@@ -1502,7 +1541,7 @@ async function checkSitePassword(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// HELPERS
+// HELPERS (unchanged)
 // ══════════════════════════════════════════════════════════════════
 function initials(name){return(name||'?').charAt(0).toUpperCase();}
 function genCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<6;i++)c+=chars[Math.floor(Math.random()*chars.length)];return c;}
@@ -1519,7 +1558,7 @@ function friendlyDate(ts){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// AUTH
+// AUTH (unchanged)
 // ══════════════════════════════════════════════════════════════════
 function switchAuthTab(tab){
   document.getElementById('loginForm').style.display=tab==='login'?'':'none';
@@ -1594,7 +1633,7 @@ async function onSignedIn(user){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// USER BADGE
+// USER BADGE (unchanged)
 // ══════════════════════════════════════════════════════════════════
 function renderUserBadge(){
   if(!currentProfile)return;
@@ -1609,7 +1648,7 @@ function closeDropdown(){document.getElementById('userDropdown').classList.remov
 document.addEventListener('click',e=>{const b=document.getElementById('userBadge');if(b&&!b.contains(e.target))closeDropdown();});
 
 // ══════════════════════════════════════════════════════════════════
-// ACCOUNT PAGE
+// ACCOUNT PAGE (unchanged)
 // ══════════════════════════════════════════════════════════════════
 function populateAccountPage(){
   if(!currentProfile)return;
@@ -1646,7 +1685,7 @@ function copyFriendCode(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// FRIENDS
+// FRIENDS (unchanged)
 // ══════════════════════════════════════════════════════════════════
 let friendshipMap = {}; // friendId -> friendship row
 
@@ -1757,7 +1796,7 @@ async function confirmRevealFromRequest(friendshipId){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// STREAK & PET SYSTEM
+// STREAK & PET SYSTEM (unchanged)
 // ══════════════════════════════════════════════════════════════════
 const PET_STAGES=[
   {emoji:'🥚',name:'Mystery Egg',mood:(s)=>'Chat to hatch your egg',minXp:0},
@@ -1849,9 +1888,7 @@ async function loadStreakForConvo(friendId){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// CHAT — IMPROVED MESSAGING
-// Messages table needs: id, sender_id, receiver_id, content,
-//   status (enum: 'sending'|'sent'|'read'), created_at
+// CHAT (unchanged)
 // ══════════════════════════════════════════════════════════════════
 let renderedMsgIds = new Set();
 
@@ -2217,7 +2254,7 @@ document.getElementById('chatMsgInput').addEventListener('input',function(){
 });
 
 // ══════════════════════════════════════════════════════════════════
-// TIMETABLE CLOCK
+// TIMETABLE CLOCK (unchanged)
 // ══════════════════════════════════════════════════════════════════
 const TIMETABLE=[{name:'Registration',start:'09:00',end:'09:25'},{name:'Period 1',start:'09:30',end:'10:25'},{name:'Period 2',start:'10:30',end:'11:25'},{name:'Break',start:'11:25',end:'11:40'},{name:'Period 3',start:'11:45',end:'12:40'},{name:'Period 4',start:'12:45',end:'13:40'},{name:'Lunch',start:'13:45',end:'14:40'},{name:'Period 5',start:'14:45',end:'15:35'},{name:'Period 6',start:'15:40',end:'16:35'}];
 const PERIOD_EMOJI={'Registration':'📋','Period 1':'📚','Period 2':'📚','Break':'☕','Period 3':'📚','Period 4':'📚','Lunch':'🍽️','Period 5':'📚','Period 6':'📚'};
@@ -2231,7 +2268,7 @@ function startClock(){if(clockIntervalId)return;updateClock();clockIntervalId=se
 function stopClock(){if(clockIntervalId){clearInterval(clockIntervalId);clockIntervalId=null;}document.getElementById('timetableClock').classList.remove('visible');closeTimetableAlert();}
 
 // ══════════════════════════════════════════════════════════════════
-// QUESTIONNAIRE
+// QUESTIONNAIRE (unchanged)
 // ══════════════════════════════════════════════════════════════════
 async function checkAndShowQuestionnaire(){try{const{data}=await sb.from('questionnaire_config').select('*').eq('active',true).order('id',{ascending:false}).limit(1).maybeSingle();if(!data)return;currentQuestionnaireId=data.id;questionnaireQuestions=data.questions||[];renderQuestionnaire(data);document.getElementById('questionnaireOverlay').classList.add('active');document.body.style.overflow='hidden';}catch(e){console.warn('Q error:',e);}}
 function renderQuestionnaire(cfg){document.getElementById('qLoading').style.display='none';document.getElementById('qFormContent').style.display='';document.getElementById('qTitle').textContent=cfg.title||'Before you enter...';document.getElementById('qDescription').textContent=cfg.description||'Take a minute to help us!';const c=document.getElementById('qQuestionsContainer');c.innerHTML='';questionnaireQuestions.forEach((q,i)=>{const b=document.createElement('div');b.className='q-question-block';b.dataset.questionId=q.id;b.innerHTML=`<div class="q-question-label"><span class="q-question-num">${i+1}</span><span>${q.label}${q.required?'<span class="q-required">*</span>':''}</span></div>`;if(q.type==='radio'){const od=document.createElement('div');od.className='q-options';(q.options||[]).forEach(opt=>{const ol=document.createElement('label');ol.className='q-option';ol.innerHTML=`<input type="radio" name="${q.id}" value="${opt}"> ${opt}`;ol.addEventListener('click',()=>{od.querySelectorAll('.q-option').forEach(x=>x.classList.remove('selected'));ol.classList.add('selected');updateProgress();});od.appendChild(ol);});b.appendChild(od);}else if(q.type==='text'){const inp=document.createElement('input');inp.type='text';inp.className='q-input';inp.placeholder=q.placeholder||'Your answer...';inp.dataset.qid=q.id;inp.addEventListener('input',updateProgress);b.appendChild(inp);}else if(q.type==='textarea'){const ta=document.createElement('textarea');ta.className='q-textarea';ta.placeholder=q.placeholder||'Your answer...';ta.dataset.qid=q.id;ta.addEventListener('input',updateProgress);b.appendChild(ta);}else if(q.type==='scale'){const sd=document.createElement('div');sd.className='q-scale';for(let v=(q.scale_min||1);v<=(q.scale_max||5);v++){const btn=document.createElement('button');btn.type='button';btn.className='q-scale-btn';btn.textContent=v;btn.dataset.val=v;btn.dataset.qid=q.id;btn.addEventListener('click',()=>{sd.querySelectorAll('.q-scale-btn').forEach(x=>x.classList.remove('selected'));btn.classList.add('selected');updateProgress();});sd.appendChild(btn);}b.appendChild(sd);if(q.scale_label_min||q.scale_label_max){const ld=document.createElement('div');ld.className='q-scale-labels';ld.innerHTML=`<span>${q.scale_label_min||''}</span><span>${q.scale_label_max||''}</span>`;b.appendChild(ld);}}const ed=document.createElement('div');ed.className='q-field-error';ed.id='err-'+q.id;ed.textContent='This field is required.';b.appendChild(ed);c.appendChild(b);});updateProgress();}
@@ -2243,7 +2280,7 @@ function closeQuestionnaire(){document.getElementById('questionnaireOverlay').cl
 function skipQuestionnaire(){sessionStorage.setItem('questionnaire_done','true');closeQuestionnaire();}
 
 // ══════════════════════════════════════════════════════════════════
-// SECURITY
+// SECURITY (unchanged)
 // ══════════════════════════════════════════════════════════════════
 function preventAction(e){e.preventDefault();return false;}
 function preventDevTools(e){if(e.keyCode===123||(e.ctrlKey&&e.shiftKey&&[73,74,67].includes(e.keyCode))||(e.ctrlKey&&e.keyCode===85)){e.preventDefault();return false;}}
@@ -2251,7 +2288,7 @@ function enableSecurityProtection(){document.addEventListener('contextmenu',prev
 function disableSecurityProtection(){document.removeEventListener('contextmenu',preventAction);document.removeEventListener('keydown',preventDevTools);}
 
 // ══════════════════════════════════════════════════════════════════
-// GAMES
+// GAMES (unchanged)
 // ══════════════════════════════════════════════════════════════════
 function openGame(name,url){
   document.getElementById('gameTitle').textContent=name;document.getElementById('gameFrame').src=url;
@@ -2272,7 +2309,7 @@ function closeGame(){
 function toggleFullscreen(){const gc=document.getElementById('gameContainer');if(!document.fullscreenElement)gc.requestFullscreen().catch(err=>alert(err.message));else document.exitFullscreen();}
 
 // ══════════════════════════════════════════════════════════════════
-// GRANNY
+// GRANNY (unchanged)
 // ══════════════════════════════════════════════════════════════════
 async function openGrannyGame(){document.getElementById('granny-unity-container').classList.add('active');if(!grannyGameLoaded){await initializeGrannyGame();grannyGameLoaded=true;}startClock();}
 function closeGrannyGame(){document.getElementById('granny-unity-container').classList.remove('active');stopClock();}
@@ -2282,7 +2319,7 @@ function showAdOnClick(){if(!isAdShown&&typeof sdk!=='undefined'&&sdk.showBanner
 async function initializeGrannyGame(){const canvas=document.querySelector('#unity-canvas');const buildUrl='https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/Build';try{const db=await mergeUnityWebFiles(buildUrl,'Granny',2,'data');const wb=await mergeUnityWebFiles(buildUrl,'Granny',2,'wasm');const du=URL.createObjectURL(new Blob([db],{type:'application/octet-stream'}));const wu=URL.createObjectURL(new Blob([wb],{type:'application/octet-stream'}));const cfg={dataUrl:du,frameworkUrl:buildUrl+'/Granny.framework.js',codeUrl:wu,streamingAssetsUrl:'https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/StreamingAssets',companyName:'Anastasia Kazantseva',productName:'Granny',productVersion:'1.0',showBanner:unityShowBanner};const s=document.createElement('script');s.src=buildUrl+'/Granny.loader.js';s.onload=()=>{createUnityInstance(canvas,cfg,p=>{document.querySelector('#unity-progress-bar-full').style.width=100*p+'%';}).then(inst=>{myGameInstance=inst;document.querySelector('#unity-loading-bar').style.display='none';canvas.addEventListener('pointerdown',showAdOnClick);canvas.addEventListener('touchstart',showAdOnClick);}).catch(alert);};document.body.appendChild(s);}catch(e){console.error('Granny init failed:',e);}}
 
 // ══════════════════════════════════════════════════════════════════
-// SECTION NAVIGATION
+// SECTION NAVIGATION (unchanged)
 // ══════════════════════════════════════════════════════════════════
 function showSection(section){
   const gc=document.getElementById('gameContainer');
@@ -2321,7 +2358,7 @@ function showSection(section){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// AI + SEARCH
+// AI + SEARCH (unchanged)
 // ══════════════════════════════════════════════════════════════════
 function openAIHelper(){document.getElementById('aiFrame').src='https://www.chattide.ai/chat-gpt/';document.getElementById('aiOverlay').classList.add('active');}
 function closeAIHelper(){document.getElementById('aiFrame').src='';document.getElementById('aiOverlay').classList.remove('active');}
@@ -2339,7 +2376,7 @@ document.getElementById('searchBar').addEventListener('input',searchGames);
 document.addEventListener('fullscreenchange',()=>{const btn=document.querySelector('.fullscreen-button');if(btn)btn.textContent=document.fullscreenElement?'⛶ Exit Fullscreen':'⛶ Fullscreen';});
 
 // ══════════════════════════════════════════════════════════════════
-// KEYBOARD SHORTCUTS
+// KEYBOARD SHORTCUTS (unchanged)
 // ══════════════════════════════════════════════════════════════════
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.activeElement.id==='sitePassInput')checkSitePassword();
@@ -2352,7 +2389,7 @@ document.addEventListener('keydown',e=>{
 });
 
 // ══════════════════════════════════════════════════════════════════
-// REVEAL MODAL
+// REVEAL MODAL (unchanged)
 // ══════════════════════════════════════════════════════════════════
 function closeRevealModal(){document.getElementById('revealModal').classList.remove('active');revealPendingFriendshipId=null;revealPendingRequester=null;}
 async function confirmReveal(){
@@ -2362,7 +2399,7 @@ async function confirmReveal(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// MAIN APP INIT
+// MAIN APP INIT (unchanged)
 // ══════════════════════════════════════════════════════════════════
 async function runAppInit(){
   enableSecurityProtection();
@@ -2420,7 +2457,7 @@ function switchDevTab(tab){
 })();
 
 // ══════════════════════════════════════════════════════════════════
-// GITHUB EDITOR
+// GITHUB EDITOR (unchanged)
 // ══════════════════════════════════════════════════════════════════
 let ghCurrentFile = null;  // { path, sha, content (original) }
 let ghOriginalContent = '';
@@ -2663,7 +2700,7 @@ async function ghSaveFile(force=false){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// CLAUDE AI — memory + file read/edit/publish + better UI
+// OPENROUTER AI — with file read/edit/publish + better UI
 // ══════════════════════════════════════════════════════════════════
 let aiMessages      = [];   // conversation history (this session)
 let aiIsThinking    = false;
@@ -2847,7 +2884,7 @@ async function aiLoadCurrentFile(){
     const el=document.getElementById('aiFileContext');
     if(el) el.textContent=aiFileCtx.path;
     aiStatus('');
-    aiAppendMsg('system','📄 Loaded <strong>'+aiFileCtx.path+'</strong> ('+Math.round(decoded.length/1024,1)+' KB) — Claude can now read and edit it.');
+    aiAppendMsg('system','📄 Loaded <strong>'+aiFileCtx.path+'</strong> ('+Math.round(decoded.length/1024,1)+' KB) — I can now read and edit it.');
   }catch(e){ aiStatus(''); aiAppendMsg('system','❌ '+e.message); }
 }
 
@@ -2868,8 +2905,8 @@ function aiClearChat(){
   c.innerHTML=`<div class="ai-welcome" id="aiWelcome">
     <div class="ai-welcome-icon">🤖</div>
     <div class="ai-welcome-text">
-      <strong>Claude — Dev Assistant</strong>
-      <p>I can read, edit and publish your site files directly. Load a file from the sidebar, then ask me to modify it and I'll commit the changes to GitHub automatically.</p>
+      <strong>OpenRouter AI Assistant</strong>
+      <p>I can read, edit and publish your site files. Load a file from the sidebar, then ask me to modify it and I'll commit changes to GitHub.</p>
       <div class="ai-welcome-chips">
         <span onclick="aiQuick('What files are in the repo?')">List repo files</span>
         <span onclick="aiQuick('Read the current file and summarise it')">Summarise file</span>
@@ -2903,7 +2940,7 @@ RULES:
   return sys;
 }
 
-// ── Main send ─────────────────────────────────────────────────────
+// ── Main send using OpenRouter ─────────────────────────────────────
 async function sendAiMessage(){
   if(aiIsThinking) return;
   const input=document.getElementById('aiChatInput');
@@ -2917,42 +2954,71 @@ async function sendAiMessage(){
   aiMessages.push({role:'user',content});
 
   const thinkBubble=aiShowThinking();
-  let streamDiv=null, streamEl=null, fullReply='';
+  let fullReply='';
 
   try{
-    // Build full conversation with system injected into first user message
-    const msgs=aiMessages.map((msg,i)=>{
-      if(i===0) return {role:'user',content:aiSystemPrompt()+'\n\nUser: '+msg.content};
-      return msg;
+    // Get selected model
+    const modelSelect = document.getElementById('aiModelSelect');
+    const selectedModel = modelSelect ? modelSelect.value : 'claude-3.5-sonnet';
+    
+    // Map to OpenRouter model IDs
+    const modelMap = {
+      'claude-3.5-sonnet': 'anthropic/claude-3.5-sonnet',
+      'gpt-4o': 'openai/gpt-4o',
+      'claude-3-haiku': 'anthropic/claude-3-haiku',
+      'gemini-1.5-pro': 'google/gemini-1.5-pro',
+      'llama-3.1-70b': 'meta-llama/llama-3.1-70b-instruct',
+      'mixtral-8x7b': 'mistralai/mixtral-8x7b-instruct',
+      'qwen-2.5-72b': 'qwen/qwen-2.5-72b-instruct'
+    };
+    
+    const modelId = modelMap[selectedModel] || 'anthropic/claude-3.5-sonnet';
+
+    // Build messages with system prompt
+    const systemPrompt = aiSystemPrompt();
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...aiMessages
+    ];
+
+    const response = await fetch(OPENROUTER_BASE_URL + '/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + OPENROUTER_API_KEY,
+        'HTTP-Referer': window.location.href,
+        'X-Title': 'Maths Support Dev Panel'
+      },
+      body: JSON.stringify({
+        model: modelId,
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 4000,
+        stream: false
+      })
     });
 
-    const response=await puter.ai.chat(msgs,{model:'claude-sonnet-4-6',stream:true});
-
-    thinkBubble.remove();
-    // Create streaming bubble
-    const welcome=document.getElementById('aiWelcome'); if(welcome) welcome.style.display='none';
-    const c=document.getElementById('aiChatMessages');
-    streamDiv=document.createElement('div'); streamDiv.className='ai-msg assistant';
-    const streamId='ai-stream-'+Date.now();
-    streamDiv.innerHTML='<div class="ai-msg-avatar">🤖</div><div class="ai-msg-content"><div class="ai-msg-bubble" id="'+streamId+'"></div><div class="ai-msg-meta">'+aiTime()+'</div></div>';
-    c.appendChild(streamDiv); c.scrollTop=c.scrollHeight;
-    streamEl=document.getElementById(streamId);
-
-    for await(const part of response){
-      const chunk=part?.text||'';
-      fullReply+=chunk;
-      if(streamEl){ streamEl.innerHTML=aiRenderContent(fullReply); c.scrollTop=c.scrollHeight; }
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'OpenRouter API error: ' + response.status);
     }
 
-    aiMessages.push({role:'assistant',content:fullReply});
+    const data = await response.json();
+    const reply = data.choices[0].message.content;
+
+    thinkBubble.remove();
+
+    // Display the response
+    aiAppendMsg('assistant', reply);
+    aiMessages.push({role:'assistant', content: reply});
+    
     // Extract any REMEMBER directives
-    aiExtractMemories(fullReply);
+    aiExtractMemories(reply);
     aiStatus('');
 
-  }catch(e){
-    if(thinkBubble) thinkBubble.remove();
-    if(streamDiv) streamDiv.remove();
-    aiAppendMsg('system','⚠️ '+e.message+' — Make sure you are signed in to Puter (puter.com).');
+  } catch(e) {
+    thinkBubble.remove();
+    aiAppendMsg('system','⚠️ Error: ' + e.message);
     aiStatus('');
   }
 
