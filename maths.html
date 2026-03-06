@@ -858,6 +858,18 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .ai-apply-btn{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#4ade80}
 .ai-apply-btn:hover{background:rgba(34,197,94,.22);border-color:rgba(34,197,94,.45);color:#86efac}
 .ai-apply-btn.applied{background:rgba(102,126,234,.2);border-color:rgba(102,126,234,.4);color:#a5b4fc}
+/* ── BROADCAST MESSAGE BUBBLE ── */
+.chat-bubble.broadcast{
+  background:linear-gradient(135deg,rgba(246,79,89,.18),rgba(192,57,43,.12));
+  border:1.5px solid rgba(246,79,89,.4);
+  color:#fff;
+  border-bottom-left-radius:5px;
+  width:100%;
+  max-width:100%;
+}
+.broadcast-label{display:flex;align-items:center;gap:6px;font-size:.75em;font-weight:800;color:#f64f59;margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase}
+.chat-broadcast-btn{background:linear-gradient(135deg,#f64f59,#c0392b);border:none;color:#fff;padding:8px 18px;border-radius:10px;font-size:.85em;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap}
+.chat-broadcast-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(246,79,89,.4)}
 #granny-unity-container{position:fixed;width:100%;height:100%;left:0;top:0;z-index:99998;display:none;background:url('https://cdn.jsdelivr.net/gh/gru6nny/ohd@main/background.png') no-repeat center center fixed;background-size:cover}
 #granny-unity-container.active{display:block}
 #unity-canvas{position:absolute;width:100%;height:100%}
@@ -1140,7 +1152,8 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
 <div class="chat-page" id="chatPage">
   <div class="chat-topbar">
     <button class="chat-topbar-back" onclick="showSection('home')">←</button>
-    <div class="chat-topbar-title">💬 Maths Support Chat</div>
+    <div class="chat-topbar-title">💬 Maths Support Chat</div>ç
+    <button class="chat-broadcast-btn" id="broadcastBtn" style="display:none" onclick="showBroadcastModal()">📢Broadcast</button>
     <div class="chat-topbar-badge" id="chatTopBadge" style="display:none">
       <span>📨</span><span id="chatTopBadgeNum">0</span> unread
     </div>
@@ -1387,7 +1400,18 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
 
   </div>
 </div>
-
+<!-- ══ BROADCAST MODAL ══ -->
+<div class="reveal-modal-overlay" id="broadcastModal">
+  <div class="reveal-modal">
+    <h3>📢 Send Broadcast</h3>
+    <p>This message will appear in <strong>every user's chat</strong> instantly.</p>
+    <textarea id="broadcastInput" style="width:100%;padding:13px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;color:#fff;font-size:.95em;font-family:inherit;resize:vertical;min-height:90px;outline:none;margin-bottom:16px" placeholder="Type your broadcast message..."></textarea>
+    <div class="reveal-modal-actions">
+      <button class="reveal-modal-btn cancel" onclick="closeBroadcastModal()">Cancel</button>
+      <button class="reveal-modal-btn confirm" onclick="sendBroadcast()">📢 Send to All</button>
+    </div>
+  </div>
+</div>
 <!-- PERIOD ALERT -->
 <div class="timetable-alert-overlay" id="timetableAlert">
   <div class="timetable-alert-box">
@@ -1631,6 +1655,10 @@ async function onSignedIn(user){
   subscribeToChat();
   subscribeToTyping();
   if(sessionStorage.getItem('questionnaire_done')!=='true')checkAndShowQuestionnaire();
+// Show broadcast button for admins
+  const iAmAdmin=ADMIN_USER_IDS.includes(user.id)||currentProfile?.is_admin;
+  const bcBtn=document.getElementById('broadcastBtn');
+  if(bcBtn)bcBtn.style.display=iAmAdmin?'':'none';
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -2046,9 +2074,72 @@ function openChatWith(friendId, friendName){
 async function loadMessages(friendId){
   const container=document.getElementById('chatMessages');
   container.innerHTML='';renderedMsgIds=new Set();
-  const{data}=await sb.from('messages')
-    .select('*')
-    .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${currentUser.id})`)
+  const[{data:msgs},{data:broadcasts}]=await Promise.all([
+    sb.from('messages').select('*')
+      .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${currentUser.id})`)
+      .order('created_at',{ascending:true}).limit(200),
+    sb.from('broadcast_messages').select('*').order('created_at',{ascending:true})
+  ]);
+  const allMsgs=[
+    ...(msgs||[]).map(m=>({...m,_type:'personal'})),
+    ...(broadcasts||[]).map(m=>({...m,_type:'broadcast',sender_id:'__broadcast__',receiver_id:null}))
+  ].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  if(!allMsgs.length){container.innerHTML='<div class="chat-empty-msgs"><span>👋</span><span>Say hello!</span></div>';return;}
+  let lastDate=null;
+  allMsgs.forEach(m=>{
+    const mDate=new Date(m.created_at).toDateString();
+    if(mDate!==lastDate){appendDateDivider(container,m.created_at);lastDate=mDate;}
+    if(m._type==='broadcast') appendBroadcastBubble(m);
+    else appendBubble(m);
+    if(m.id)lastMsgId=m.id;
+  });
+  container.scrollTop=container.scrollHeight;
+  markMessagesRead(friendId);
+  if(msgs&&msgs.length)updateLastMsgPreview(friendId,msgs[msgs.length-1]);
+}
+ 
+function appendBroadcastBubble(m){
+  const key='bc-'+m.id;
+  if(renderedMsgIds.has(key))return;
+  renderedMsgIds.add(key);
+  const container=document.getElementById('chatMessages');
+  const empty=container.querySelector('.chat-empty-msgs');if(empty)empty.remove();
+  const group=document.createElement('div');
+  group.className='msg-group them';
+  group.dataset.msgId=key;
+  group.innerHTML=`
+    <div class="bubble-row">
+      <div class="msg-group-avatar" style="background:linear-gradient(135deg,#f64f59,#c0392b)">📢</div>
+      <div class="chat-bubble broadcast">
+        <div class="broadcast-label">📢 Admin Broadcast</div>
+        <div class="bubble-content">${escapeHtml(m.content)}</div>
+        <div class="bubble-footer"><span class="bubble-time">${formatTime(m.created_at)}</span></div>
+      </div>
+    </div>`;
+  container.appendChild(group);
+}
+
+function showBroadcastModal(){
+  document.getElementById('broadcastModal').classList.add('active');
+  setTimeout(()=>document.getElementById('broadcastInput').focus(),100);
+}
+
+function closeBroadcastModal(){
+  document.getElementById('broadcastModal').classList.remove('active');
+  document.getElementById('broadcastInput').value='';
+}
+
+async function sendBroadcast(){
+  const content=document.getElementById('broadcastInput').value.trim();
+  if(!content)return;
+  const btn=document.querySelector('#broadcastModal .reveal-modal-btn.confirm');
+  btn.disabled=true;btn.textContent='Sending...';
+  const{error}=await sb.from('broadcast_messages').insert({content,sender_id:currentUser.id});
+  btn.disabled=false;btn.textContent='📢 Send to All';
+  if(error){alert('Error: '+error.message);return;}
+  closeBroadcastModal();
+  showToast('📢 Broadcast sent to all users!');
+}   .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${currentUser.id})`)
     .order('created_at',{ascending:true}).limit(200);
   if(!data||!data.length){container.innerHTML='<div class="chat-empty-msgs"><span>👋</span><span>Say hello!</span></div>';return;}
   let lastDate=null;
@@ -2236,6 +2327,14 @@ function subscribeToChat(){
       const m=payload.new;
       const tick=document.getElementById('tick-'+m.id);
       if(tick)tick.className='msg-tick '+getTickClass(m.status);
+    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'broadcast_messages'},payload=>{
+      if(activeChatFriendId){
+        const container=document.getElementById('chatMessages');
+        const wasAtBottom=container.scrollHeight-container.scrollTop-container.clientHeight<80;
+        appendBroadcastBubble(payload.new);
+        if(wasAtBottom)container.scrollTop=container.scrollHeight;
+      }else{updateChatBadge();}
     })
     .subscribe();
 }
