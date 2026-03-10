@@ -2139,6 +2139,7 @@ async function sendBroadcast(){
   if(error){alert('Error: '+error.message);return;}
   closeBroadcastModal();
   showToast('📢 Broadcast sent to all users!');
+}
 
 async function pollNewMessages(friendId){
   if(!friendId||!currentUser)return;
