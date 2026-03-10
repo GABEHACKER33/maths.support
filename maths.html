@@ -749,67 +749,49 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .gh-empty-editor span:first-child{font-size:3em;opacity:.5}
 .gh-empty-editor p{font-size:.9em;max-width:260px;text-align:center;line-height:1.6}
 
-/* ══════════════════════════════════════════════════
-   ── AI ASSISTANT TAB (full rebuild) ──
-══════════════════════════════════════════════════ */
+/* ── AI ASSISTANT + VERCEL CSS ── */
 .ai-chat-layout{flex:1;display:flex;overflow:hidden;background:#080810}
-
-/* Left sidebar */
 .ai-sidebar{width:230px;min-width:230px;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;overflow-y:auto;background:#0c0c18}
 .ai-sidebar::-webkit-scrollbar{width:3px}
 .ai-sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
-.ai-sidebar-section{padding:12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.ai-sidebar-section{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.05)}
 .ai-sidebar-title{font-size:.68em;font-weight:800;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:3px}
-.ai-sidebar-hint{font-size:.69em;color:rgba(255,255,255,.2);line-height:1.5;margin-bottom:7px}
-
-/* File tree */
-.ai-file-tree{display:flex;flex-direction:column;gap:2px;max-height:300px;overflow-y:auto;margin-bottom:6px}
+.ai-sidebar-hint{font-size:.69em;color:rgba(255,255,255,.2);line-height:1.5;margin-bottom:6px}
+.ai-file-tree{display:flex;flex-direction:column;gap:2px;max-height:220px;overflow-y:auto;margin-bottom:6px}
 .ai-file-tree::-webkit-scrollbar{width:2px}
 .ai-file-tree::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08)}
-.ai-file-node{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:.75em;color:rgba(255,255,255,.55);transition:all .15s;border:1px solid transparent}
-.ai-file-node:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.ai-file-node{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;cursor:pointer;font-size:.74em;color:rgba(255,255,255,.55);transition:all .15s;border:1px solid transparent}
+.ai-file-node:hover{background:rgba(255,255,255,.06);color:#fff}
 .ai-file-node.active{background:rgba(102,126,234,.18);border-color:rgba(102,126,234,.3);color:#a5b4fc}
 .ai-file-node.dir{color:rgba(250,204,21,.6)}
 .ai-file-node.dir:hover{color:#facc15}
 .ai-file-node-icon{font-size:.85em;flex-shrink:0}
 .ai-file-node-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace}
-.ai-file-tree-loading{padding:8px;color:rgba(255,255,255,.2);font-size:.75em;text-align:center}
-
-/* Loaded files chips */
-.ai-loaded-files{display:flex;flex-direction:column;gap:4px;margin-bottom:6px;max-height:120px;overflow-y:auto}
-.ai-loaded-file-chip{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(102,126,234,.1);border:1px solid rgba(102,126,234,.2);border-radius:7px;font-size:.72em;color:rgba(255,255,255,.6)}
-.ai-loaded-file-chip-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace}
-.ai-loaded-file-del{background:none;border:none;color:rgba(255,255,255,.25);cursor:pointer;font-size:.9em;padding:0 2px;line-height:1;flex-shrink:0}
-.ai-loaded-file-del:hover{color:#f87171}
-
-/* Deployments sidebar widget */
-.ai-deploy-mini{display:flex;flex-direction:column;gap:4px;max-height:130px;overflow-y:auto;margin-bottom:6px}
-.ai-deploy-mini-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;font-size:.73em;color:rgba(255,255,255,.55);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);cursor:pointer;transition:all .15s}
-.ai-deploy-mini-item:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.9)}
+.ai-file-tree-loading{padding:8px;color:rgba(255,255,255,.2);font-size:.74em;text-align:center}
+.ai-loaded-files-list{display:flex;flex-direction:column;gap:4px;margin-bottom:6px;max-height:100px;overflow-y:auto}
+.ai-loaded-chip{display:flex;align-items:center;gap:5px;padding:4px 8px;background:rgba(102,126,234,.12);border:1px solid rgba(102,126,234,.22);border-radius:7px;font-size:.72em;color:rgba(255,255,255,.65)}
+.ai-loaded-chip-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace}
+.ai-loaded-chip-del{background:none;border:none;color:rgba(255,255,255,.25);cursor:pointer;font-size:.9em;padding:0 2px;line-height:1}
+.ai-loaded-chip-del:hover{color:#f87171}
+.ai-deploy-mini{display:flex;flex-direction:column;gap:3px;max-height:120px;overflow-y:auto;margin-bottom:6px}
+.ai-deploy-mini-item{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:7px;font-size:.72em;color:rgba(255,255,255,.5);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);cursor:pointer;transition:all .15s}
+.ai-deploy-mini-item:hover{background:rgba(255,255,255,.08);color:#fff}
 .ai-deploy-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.ai-deploy-dot.ready{background:#4ade80}
+.ai-deploy-dot.ready{background:#4ade80;box-shadow:0 0 6px rgba(74,222,128,.5)}
 .ai-deploy-dot.error{background:#f87171}
-.ai-deploy-dot.building{background:#facc15;animation:vcPulse 1s infinite}
-.ai-deploy-mini-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace}
-.ai-deploy-mini-time{color:rgba(255,255,255,.25);flex-shrink:0}
-
-/* Memory */
+.ai-deploy-dot.building,.ai-deploy-dot.initializing,.ai-deploy-dot.queued{background:#facc15;animation:vcPulse 1s infinite}
+.ai-deploy-mini-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace;font-size:.95em}
+.ai-deploy-mini-ago{color:rgba(255,255,255,.25);flex-shrink:0;font-size:.9em}
 .ai-memory-list{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
-.ai-memory-empty{font-size:.72em;color:rgba(255,255,255,.18);text-align:center;padding:6px 0}
+.ai-memory-empty{font-size:.72em;color:rgba(255,255,255,.18);text-align:center;padding:5px 0}
 .ai-memory-item{background:rgba(102,126,234,.1);border:1px solid rgba(102,126,234,.2);border-radius:7px;padding:5px 24px 5px 8px;font-size:.72em;color:rgba(255,255,255,.65);line-height:1.4;position:relative}
 .ai-memory-item-del{position:absolute;top:4px;right:6px;background:none;border:none;color:rgba(255,255,255,.2);cursor:pointer;font-size:.85em;padding:0;line-height:1}
 .ai-memory-item-del:hover{color:#f87171}
-
-/* Quick actions */
-.ai-quick-btn{width:100%;padding:6px 9px;margin-top:4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:7px;color:rgba(255,255,255,.4);font-size:.7em;cursor:pointer;font-family:inherit;transition:all .2s;text-align:left;line-height:1.4}
+.ai-quick-btn{width:100%;padding:5px 8px;margin-top:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:7px;color:rgba(255,255,255,.4);font-size:.7em;cursor:pointer;font-family:inherit;transition:all .2s;text-align:left;line-height:1.4}
 .ai-quick-btn:hover{background:rgba(102,126,234,.15);border-color:rgba(102,126,234,.3);color:rgba(255,255,255,.9)}
-
-/* Sidebar buttons */
-.ai-sidebar-btn{width:100%;padding:6px 9px;margin-top:5px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.5);font-size:.72em;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;text-align:left}
+.ai-sidebar-btn{width:100%;padding:5px 8px;margin-top:4px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.5);font-size:.71em;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;text-align:left}
 .ai-sidebar-btn:hover{background:rgba(255,255,255,.1);color:#fff}
 .ai-sidebar-btn.danger:hover{background:rgba(246,79,89,.15);border-color:rgba(246,79,89,.3);color:#f87171}
-
-/* Main area */
 .ai-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .ai-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.25);flex-shrink:0}
 .ai-topbar-left{display:flex;align-items:center;gap:10px}
@@ -819,14 +801,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .ai-topbar-actions{display:flex;gap:7px;align-items:center}
 .ai-topbar-btn{width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85em;transition:all .2s}
 .ai-topbar-btn:hover{background:rgba(255,255,255,.12);color:#fff}
-
-/* Model selector */
-.ai-model-selector{display:flex;align-items:center;gap:6px;padding:6px 18px;background:rgba(0,0,0,.2);border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0}
+.ai-model-bar{display:flex;align-items:center;gap:8px;padding:6px 18px;background:rgba(0,0,0,.2);border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0}
+.ai-model-label{color:rgba(255,255,255,.3);font-size:.7em;white-space:nowrap}
 .ai-model-select{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#fff;font-size:.75em;padding:5px;outline:none;cursor:pointer;font-family:inherit}
 .ai-model-select option{background:#1a1a2e;color:#fff}
-.ai-model-label{color:rgba(255,255,255,.3);font-size:.7em;white-space:nowrap}
-
-/* Messages */
 .ai-chat-messages{flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:14px}
 .ai-chat-messages::-webkit-scrollbar{width:3px}
 .ai-chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
@@ -841,14 +819,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .ai-msg-bubble{padding:11px 15px;border-radius:14px;font-size:.88em;line-height:1.7}
 .ai-msg.assistant .ai-msg-bubble{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.88);border-top-left-radius:3px}
 .ai-msg.user .ai-msg-bubble{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-top-right-radius:3px;box-shadow:0 3px 12px rgba(102,126,234,.3)}
-.ai-msg.system .ai-msg-bubble{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.18);color:rgba(250,204,21,.75);border-radius:9px;font-size:.8em}
+.ai-msg.system .ai-msg-bubble{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.18);color:rgba(250,204,21,.75);border-radius:9px;font-size:.8em;max-width:100%}
 .ai-msg-meta{font-size:.65em;color:rgba(255,255,255,.22);padding:0 3px}
 .ai-thinking{display:flex;gap:5px;align-items:center;padding:3px 0}
 .ai-thinking-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);animation:typingBounce 1.2s infinite ease-in-out}
 .ai-thinking-dot:nth-child(2){animation-delay:.2s}
 .ai-thinking-dot:nth-child(3){animation-delay:.4s}
-
-/* Input */
 .ai-input-wrap{padding:10px 18px 14px;flex-shrink:0;border-top:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.3)}
 .ai-input-row{display:flex;gap:9px;align-items:flex-end}
 .ai-chat-input{flex:1;padding:11px 16px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.09);border-radius:14px;color:#fff;font-size:.9em;outline:none;font-family:inherit;resize:none;min-height:44px;max-height:130px;line-height:1.5;transition:border-color .2s,background .2s}
@@ -858,9 +834,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .ai-send-btn:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(102,126,234,.5)}
 .ai-send-btn:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
 .ai-input-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:.7em;color:rgba(255,255,255,.18)}
-#aiActionStatus{color:#facc15;font-weight:700;font-size:.9em}
-
-/* Welcome */
+#aiActionStatus{color:#facc15;font-weight:700}
 .ai-welcome{flex:1;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:24px;padding:32px}
 .ai-welcome-icon{font-size:3em;animation:aiGlow 3s ease-in-out infinite;flex-shrink:0}
 @keyframes aiGlow{0%,100%{filter:drop-shadow(0 0 8px rgba(102,126,234,.4))}50%{filter:drop-shadow(0 0 20px rgba(102,126,234,.8))}}
@@ -869,8 +843,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .ai-welcome-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
 .ai-welcome-chips span{padding:5px 11px;border-radius:18px;font-size:.75em;background:rgba(102,126,234,.1);border:1px solid rgba(102,126,234,.22);color:rgba(255,255,255,.55);cursor:pointer;transition:all .2s}
 .ai-welcome-chips span:hover{background:rgba(102,126,234,.22);color:#fff}
-
-/* Code blocks */
 .ai-code-block{position:relative;margin:8px 0}
 .ai-code-header{display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.1);border-radius:9px 9px 0 0;padding:6px 12px}
 .ai-code-lang{font-size:.7em;color:rgba(255,255,255,.32);font-family:monospace;font-weight:700;text-transform:uppercase;letter-spacing:1px}
@@ -882,6 +854,60 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .ai-apply-btn{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#4ade80}
 .ai-apply-btn:hover{background:rgba(34,197,94,.22);border-color:rgba(34,197,94,.45);color:#86efac}
 .ai-apply-btn.applied{background:rgba(102,126,234,.2);border-color:rgba(102,126,234,.4);color:#a5b4fc}
+/* ── VERCEL PANEL CSS ── */
+.vercel-layout{display:flex;flex:1;flex-direction:column;overflow:hidden;background:#0b0b14;height:100%}
+.vc-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(0,0,0,.3);border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;gap:14px}
+.vc-topbar-left{display:flex;align-items:center;gap:12px}
+.vc-stats-row{display:flex;gap:14px;padding:16px 24px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06)}
+.vc-stat-card{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 18px;text-align:center}
+.vc-stat-num{font-size:1.7em;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1}
+.vc-stat-label{font-size:.72em;color:rgba(255,255,255,.35);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.vc-project-bar{display:flex;align-items:center;gap:12px;padding:12px 24px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.vc-select{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:9px;color:#fff;font-size:.88em;padding:9px 12px;outline:none;cursor:pointer;font-family:inherit}
+.vc-select option{background:#1a1a2e;color:#fff}
+.vc-action-btn{padding:8px 16px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:rgba(255,255,255,.7);font-size:.82em;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap}
+.vc-action-btn:hover{background:rgba(255,255,255,.13);color:#fff}
+.vc-action-btn.primary{background:linear-gradient(135deg,#667eea,#764ba2);border-color:transparent;color:#fff}
+.vc-action-btn.primary:hover{box-shadow:0 4px 14px rgba(102,126,234,.4);transform:translateY(-1px)}
+.vc-action-btn.danger{color:#f87171;border-color:rgba(246,79,89,.25)}
+.vc-action-btn.danger:hover{background:rgba(246,79,89,.12);color:#fca5a5}
+.vc-deployments{flex:1;overflow-y:auto;padding:16px 24px;display:flex;flex-direction:column;gap:10px}
+.vc-deployments::-webkit-scrollbar{width:4px}
+.vc-deployments::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.vc-deploy-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;transition:background .15s}
+.vc-deploy-card:hover{background:rgba(255,255,255,.07)}
+.vc-deploy-status{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.vc-deploy-status.ready{background:#4ade80;box-shadow:0 0 8px rgba(74,222,128,.5)}
+.vc-deploy-status.error{background:#f87171}
+.vc-deploy-status.building,.vc-deploy-status.initializing,.vc-deploy-status.queued{background:#facc15;animation:vcPulse 1s infinite}
+.vc-deploy-status.canceled{background:rgba(255,255,255,.2)}
+@keyframes vcPulse{0%,100%{opacity:1}50%{opacity:.4}}
+.vc-deploy-info{flex:1;min-width:0}
+.vc-deploy-name{font-size:.9em;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.vc-deploy-meta{font-size:.75em;color:rgba(255,255,255,.35);margin-top:3px;display:flex;gap:12px;flex-wrap:wrap}
+.vc-deploy-actions{display:flex;gap:8px;flex-shrink:0}
+.vc-deploy-badge{font-size:.68em;font-weight:800;padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px}
+.vc-deploy-badge.ready{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.25)}
+.vc-deploy-badge.error{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.25)}
+.vc-deploy-badge.building,.vc-deploy-badge.initializing,.vc-deploy-badge.queued{background:rgba(250,204,21,.15);color:#facc15;border:1px solid rgba(250,204,21,.25)}
+.vc-deploy-badge.canceled{background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.1)}
+.vc-loading{display:flex;align-items:center;justify-content:center;gap:14px;padding:60px;color:rgba(255,255,255,.3);font-size:.9em}
+.vc-spinner{width:24px;height:24px;border:2px solid rgba(255,255,255,.1);border-top-color:rgba(102,126,234,.8);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.vc-empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,.2);font-size:.9em}
+.vc-log-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:9999999;display:none;justify-content:center;align-items:center}
+.vc-log-overlay.active{display:flex}
+.vc-log-box{background:#0a0a12;border:1px solid rgba(255,255,255,.1);border-radius:18px;width:90%;max-width:820px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(0,0,0,.6)}
+.vc-log-header{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid rgba(255,255,255,.07)}
+.vc-log-title{color:#fff;font-size:.95em;font-weight:800}
+.vc-log-close{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1em;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.vc-log-close:hover{background:rgba(255,255,255,.14);color:#fff}
+.vc-log-body{flex:1;overflow-y:auto;padding:18px 22px;font-family:'Courier New',monospace;font-size:.8em;line-height:1.7;color:rgba(255,255,255,.7)}
+.vc-log-body::-webkit-scrollbar{width:4px}
+.vc-log-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.vc-log-line{padding:1px 0}
+.vc-log-line.err{color:#f87171}
+.vc-log-line.warn{color:#facc15}
+.vc-log-line.ok{color:#4ade80}
 /* ── BROADCAST MESSAGE BUBBLE ── */
 .chat-bubble.broadcast{
   background:linear-gradient(135deg,rgba(246,79,89,.18),rgba(192,57,43,.12));
@@ -1273,6 +1299,9 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
     <button class="dev-tab" id="devTab-ai" onclick="switchDevTab('ai')">
       <span class="dev-tab-icon">🤖</span> AI Assistant
     </button>
+    <button class="dev-tab" id="devTab-vercel" onclick="switchDevTab('vercel')">
+      <span class="dev-tab-icon">▲</span> Vercel
+    </button>
   </div>
 
   <!-- Tab panels -->
@@ -1332,128 +1361,138 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
       </div>
     </div>
 
-    <!-- ── AI ASSISTANT (full rebuild) ── -->
+    <!-- ── AI ASSISTANT ── -->
     <div class="dev-tab-panel" id="devPanel-ai">
       <div class="ai-chat-layout">
-
-        <!-- ═══ LEFT SIDEBAR ═══ -->
+        <!-- SIDEBAR -->
         <div class="ai-sidebar">
-
-          <!-- REPO FILE TREE -->
           <div class="ai-sidebar-section">
             <div class="ai-sidebar-title">📁 Repo Files</div>
             <div class="ai-sidebar-hint">Click to load into AI context</div>
-            <div class="ai-file-tree" id="aiFileTree">
-              <div class="ai-file-tree-loading">Connect GitHub first</div>
-            </div>
-            <button class="ai-sidebar-btn" onclick="aiRefreshFileTree()">↻ Refresh Tree</button>
+            <div class="ai-file-tree" id="aiFileTree"><div class="ai-file-tree-loading">Connect GitHub first</div></div>
+            <button class="ai-sidebar-btn" onclick="aiRefreshFileTree()">↻ Refresh</button>
           </div>
-
-          <!-- LOADED FILE CONTEXTS -->
           <div class="ai-sidebar-section">
             <div class="ai-sidebar-title">📄 Loaded Files</div>
-            <div class="ai-loaded-files" id="aiLoadedFiles">
-              <div class="ai-memory-empty">No files loaded</div>
-            </div>
+            <div class="ai-loaded-files-list" id="aiLoadedFilesList"><div class="ai-memory-empty">None loaded</div></div>
             <button class="ai-sidebar-btn danger" onclick="aiUnloadAllFiles()">✕ Unload All</button>
           </div>
-
-          <!-- VERCEL DEPLOYMENTS WIDGET -->
           <div class="ai-sidebar-section">
-            <div class="ai-sidebar-title">▲ Vercel Deployments</div>
-            <div class="ai-deploy-mini" id="aiDeployMini">
-              <div class="ai-memory-empty">Connect Vercel first</div>
-            </div>
-            <button class="ai-sidebar-btn" onclick="aiRefreshDeployments()">↻ Refresh</button>
-            <button class="ai-sidebar-btn" onclick="aiAskDeploy()">⚡ Ask about deploys</button>
+            <div class="ai-sidebar-title">▲ Deployments</div>
+            <div class="ai-deploy-mini" id="aiDeployMini"><div class="ai-memory-empty">Connect Vercel first</div></div>
+            <button class="ai-sidebar-btn" onclick="aiRefreshDeployMini()">↻ Refresh</button>
           </div>
-
-          <!-- MEMORY -->
           <div class="ai-sidebar-section">
             <div class="ai-sidebar-title">🧠 Memory</div>
-            <div id="aiMemoryList" class="ai-memory-list">
-              <div class="ai-memory-empty">No memories yet</div>
-            </div>
+            <div id="aiMemoryList" class="ai-memory-list"><div class="ai-memory-empty">No memories yet</div></div>
             <button class="ai-sidebar-btn danger" onclick="aiClearMemory()">🗑 Clear Memory</button>
           </div>
-
-          <!-- QUICK ACTIONS -->
           <div class="ai-sidebar-section">
             <div class="ai-sidebar-title">⚡ Quick Actions</div>
-            <button class="ai-quick-btn" onclick="aiQuick('List all files in the GitHub repo GABEHACKER33/maths.support')">📁 List all repo files</button>
-            <button class="ai-quick-btn" onclick="aiQuick('Read and summarise the loaded file')">📖 Summarise file</button>
+            <button class="ai-quick-btn" onclick="aiQuick('List all files in the GitHub repo GABEHACKER33/maths.support')">📁 List repo files</button>
+            <button class="ai-quick-btn" onclick="aiQuick('Summarise the loaded file')">📖 Summarise file</button>
             <button class="ai-quick-btn" onclick="aiQuick('Find and fix all bugs in the loaded file')">🐛 Fix bugs</button>
-            <button class="ai-quick-btn" onclick="aiQuick('Improve the CSS styling in the loaded file')">🎨 Improve styling</button>
-            <button class="ai-quick-btn" onclick="aiQuick('Optimise and clean up the JavaScript in the loaded file')">⚡ Optimise JS</button>
-            <button class="ai-quick-btn" onclick="aiQuick('Show me the latest Vercel deployment status for maths-support')">▲ Deployment status</button>
-            <button class="ai-quick-btn" onclick="aiQuick('What would you recommend changing in this project?')">💡 Suggestions</button>
+            <button class="ai-quick-btn" onclick="aiQuick('Show the latest Vercel deployment status for maths-support')">▲ Deploy status</button>
+            <button class="ai-quick-btn" onclick="aiQuick('What improvements would you recommend for this project?')">💡 Suggestions</button>
           </div>
-
         </div>
-
-        <!-- ═══ MAIN CHAT AREA ═══ -->
+        <!-- MAIN -->
         <div class="ai-main">
-
-          <!-- Top bar -->
           <div class="ai-topbar">
             <div class="ai-topbar-left">
               <div class="ai-topbar-avatar">🤖</div>
               <div>
-                <div class="ai-topbar-name">AI Assistant</div>
+                <div class="ai-topbar-name">AI Dev Assistant</div>
                 <div class="ai-topbar-sub" id="aiStatusLine">OpenRouter · GitHub · Vercel</div>
               </div>
             </div>
             <div class="ai-topbar-actions">
-              <span id="aiActionStatus" style="font-size:.75em;color:#facc15;font-weight:700"></span>
-              <button class="ai-topbar-btn" onclick="aiClearChat()" title="Clear conversation">🗑️</button>
+              <span id="aiActionStatus"></span>
+              <button class="ai-topbar-btn" onclick="aiClearChat()" title="Clear">🗑️</button>
             </div>
           </div>
-
-          <!-- Model selector bar -->
-          <div class="ai-model-selector">
+          <div class="ai-model-bar">
             <span class="ai-model-label">Model:</span>
             <select id="aiModelSelect" class="ai-model-select">
               <option value="anthropic/claude-sonnet-4-5">Claude Sonnet 4.5 ✨</option>
               <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
               <option value="openai/gpt-4o">GPT-4o</option>
               <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
-              <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
               <option value="google/gemini-2.0-flash-001">Gemini 2.0 Flash</option>
               <option value="meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B</option>
               <option value="deepseek/deepseek-chat">DeepSeek V3</option>
             </select>
           </div>
-
-          <!-- Messages -->
           <div class="ai-chat-messages" id="aiChatMessages">
             <div class="ai-welcome" id="aiWelcome">
               <div class="ai-welcome-icon">🤖</div>
               <div class="ai-welcome-text">
                 <strong>AI Dev Assistant</strong>
-                <p>I have full access to your GitHub repo and Vercel deployments. Click any file in the sidebar to load it, then ask me to read, edit or deploy changes.</p>
+                <p>Full access to GitHub repo &amp; Vercel. Click a file in the sidebar to load it, then ask me anything.</p>
                 <div class="ai-welcome-chips">
-                  <span onclick="aiQuick('List all files in GABEHACKER33/maths.support')">📁 List repo files</span>
-                  <span onclick="aiQuick('What is the latest Vercel deployment status?')">▲ Deployment status</span>
-                  <span onclick="aiQuick('Read the loaded file and find any bugs')">🐛 Find bugs</span>
-                  <span onclick="aiQuick('What Supabase tables does this app use?')">🗄 Supabase tables</span>
+                  <span onclick="aiQuick('List all files in GABEHACKER33/maths.support')">📁 List files</span>
+                  <span onclick="aiQuick('Latest Vercel deployment status?')">▲ Deployments</span>
+                  <span onclick="aiQuick('Find bugs in the loaded file')">🐛 Find bugs</span>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- Input -->
           <div class="ai-input-wrap">
             <div class="ai-input-row">
-              <textarea class="ai-chat-input" id="aiChatInput" placeholder="Ask anything — I can read files, fix bugs, check deployments…" rows="1"></textarea>
+              <textarea class="ai-chat-input" id="aiChatInput" placeholder="Ask anything — files, bugs, deployments…" rows="1"></textarea>
               <button class="ai-send-btn" id="aiSendBtn" onclick="sendAiMessage()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               </button>
             </div>
-            <div class="ai-input-footer">
-              <span style="color:rgba(255,255,255,.2)">Enter↵ send · Shift+Enter new line</span>
+            <div class="ai-input-footer"><span>Enter ↵ send · Shift+Enter new line</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VERCEL ── -->
+    <div class="dev-tab-panel" id="devPanel-vercel">
+      <div class="vercel-layout">
+        <!-- Token gate -->
+        <div id="vcTokenGate" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;padding:40px">
+          <div style="font-size:3em">▲</div>
+          <div style="text-align:center">
+            <div style="color:#fff;font-size:1.1em;font-weight:800;margin-bottom:6px">Connect to Vercel</div>
+            <div style="color:rgba(255,255,255,.4);font-size:.85em;max-width:340px;line-height:1.6">Paste your Vercel API token — saved securely and auto-loaded next time.</div>
+          </div>
+          <div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px">
+            <input type="password" class="gh-input" id="vcTokenInput" placeholder="xxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" style="font-size:.95em;padding:13px 16px;text-align:center;letter-spacing:2px">
+            <button class="gh-load-btn" onclick="vcConnect()" style="padding:13px;font-size:.95em">▲ Save &amp; Connect</button>
+            <div id="vcConnectError" style="display:none;color:#f87171;font-size:.8em;text-align:center;padding:8px;background:rgba(246,79,89,.1);border-radius:8px;border:1px solid rgba(246,79,89,.3)"></div>
+            <div id="vcConnectStatus" style="display:none;color:#4ade80;font-size:.8em;text-align:center;padding:8px;background:rgba(34,197,94,.08);border-radius:8px;border:1px solid rgba(34,197,94,.2)"></div>
+          </div>
+        </div>
+        <!-- Dashboard -->
+        <div id="vcDashboard" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+          <div class="vc-topbar">
+            <div class="vc-topbar-left">
+              <span style="font-size:1.3em">▲</span>
+              <div>
+                <div style="color:#fff;font-size:.9em;font-weight:800" id="vcTeamName">Vercel</div>
+                <div style="color:rgba(255,255,255,.35);font-size:.72em" id="vcUserEmail">—</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="vc-action-btn" onclick="vcLoadDeployments()">↻ Refresh</button>
+              <button class="vc-action-btn danger" onclick="vcDisconnect()">Disconnect</button>
             </div>
           </div>
-
+          <div class="vc-stats-row">
+            <div class="vc-stat-card"><div class="vc-stat-num" id="vcStatTotal">—</div><div class="vc-stat-label">Total</div></div>
+            <div class="vc-stat-card"><div class="vc-stat-num" id="vcStatReady" style="color:#4ade80">—</div><div class="vc-stat-label">Ready</div></div>
+            <div class="vc-stat-card"><div class="vc-stat-num" id="vcStatError" style="color:#f87171">—</div><div class="vc-stat-label">Failed</div></div>
+            <div class="vc-stat-card"><div class="vc-stat-num" id="vcStatBuilding" style="color:#facc15">—</div><div class="vc-stat-label">Building</div></div>
+          </div>
+          <div class="vc-project-bar">
+            <select class="vc-select" id="vcProjectSelect" onchange="vcLoadDeployments()"><option value="">All Projects</option></select>
+            <button class="vc-action-btn primary" onclick="vcTriggerDeploy()">⚡ Redeploy Latest</button>
+          </div>
+          <div class="vc-deployments" id="vcDeployments"><div class="vc-loading"><div class="vc-spinner"></div><span>Loading…</span></div></div>
         </div>
       </div>
     </div>
@@ -1529,7 +1568,7 @@ const ADMIN_USER_IDS = []; // Fill with your user UUID e.g. ['abc-123-...']
 // Alternatively we check via profile.is_admin flag
 
 // OpenRouter API Key
-// (OpenRouter constants defined in AI section below)
+// OpenRouter constants defined in AI section below
 
 // ══════════════════════════════════════════════════════════════════
 // ROLES CONFIG (unchanged)
@@ -2583,14 +2622,7 @@ function closeDevPanel(){
   document.body.style.overflow='';
 }
 
-function switchDevTab(tab){
-  document.querySelectorAll('.dev-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.dev-tab-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('devTab-'+tab).classList.add('active');
-  document.getElementById('devPanel-'+tab).classList.add('active');
-  if(tab==='github') ghRestoreSavedToken();
-  if(tab==='ai'){ aiLoadMemory(); aiRefreshFileTree(); aiRefreshDeployments(); }
-}
+// switchDevTab defined in AI section
 
 // ── Keep dev panel left edge in sync with sidebar ──
 (function(){
@@ -2846,71 +2878,67 @@ async function ghSaveFile(force=false){
 
 // ══════════════════════════════════════════════════════════════════
 // ══════════════════════════════════════════════════════════════════
-// AI ASSISTANT — OpenRouter + GitHub full repo + Vercel deployments
+// AI ASSISTANT — OpenRouter + GitHub full repo + Vercel
 // ══════════════════════════════════════════════════════════════════
 const OPENROUTER_API_KEY  = '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';
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
-const AI_GH_REPO          = 'GABEHACKER33/maths.support';
-const AI_GH_BRANCH        = 'main';
-const AI_VERCEL_PROJECT   = 'maths-support';
+const AI_GH_REPO   = 'GABEHACKER33/maths.support';
+const AI_GH_BRANCH = 'main';
+const VERCEL_API   = 'https://api.vercel.com';
 
 let aiMessages    = [];
 let aiIsThinking  = false;
 let aiMemory      = [];
 let aiLoadedFiles = {};   // path -> { content, sha }
 let aiDeployCache = [];
+let vcToken       = '';
+let vcProjects    = [];
+let vcDeploymentsList = [];
 
 // ── UI helpers ────────────────────────────────────────────────────
 function aiStatus(msg){ const el=document.getElementById('aiActionStatus'); if(el)el.textContent=msg||''; }
 function aiTime(){ const n=new Date(); return n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0'); }
+function vcTimeAgo(ts){ if(!ts)return'—'; const d=(Date.now()-ts)/1000; if(d<60)return Math.round(d)+'s ago'; if(d<3600)return Math.round(d/60)+'m ago'; if(d<86400)return Math.round(d/3600)+'h ago'; return Math.round(d/86400)+'d ago'; }
 
 function aiRenderContent(text){
-  // Render markdown-ish: code blocks, inline code, bold, newlines
   const parts=[];
   const codeRe=/```(\w*)\n?([\s\S]*?)```/g;
-  let lastIdx=0,m;
+  let last=0,m;
   while((m=codeRe.exec(text))!==null){
-    if(m.index>lastIdx) parts.push({type:'text',content:text.slice(lastIdx,m.index)});
+    if(m.index>last) parts.push({type:'text',content:text.slice(last,m.index)});
     parts.push({type:'code',lang:m[1]||'',content:m[2]});
-    lastIdx=m.index+m[0].length;
+    last=m.index+m[0].length;
   }
-  if(lastIdx<text.length) parts.push({type:'text',content:text.slice(lastIdx)});
+  if(last<text.length) parts.push({type:'text',content:text.slice(last)});
   return parts.map(p=>{
     if(p.type==='code'){
       const safe=escapeHtml(p.content);
-      const dataCode=encodeURIComponent(p.content);
+      const enc=encodeURIComponent(p.content);
       const isHtml=p.lang==='html'||p.lang==='';
-      const applyBtn=isHtml
-        ?`<button class="ai-apply-btn" onclick="aiApplyCode(this)" data-code="${dataCode}">⚡ Apply &amp; Publish</button>`
-        :'';
-      return `<div class="ai-code-block"><div class="ai-code-header"><span class="ai-code-lang">${p.lang||'code'}</span><div class="ai-code-actions"><button class="ai-copy-btn" onclick="aiCopyCode(this)" data-code="${dataCode}">📋 Copy</button>${applyBtn}</div></div><pre style="background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1);border-top:none;border-radius:0 0 10px 10px;padding:12px 16px;margin:0;overflow-x:auto;font-family:'Courier New',monospace;font-size:.82em;line-height:1.6;white-space:pre-wrap">${safe}</pre></div>`;
-    } else {
-      return escapeHtml(p.content)
-        .replace(/`([^`\n]+)`/g,'<code style="background:rgba(255,255,255,.12);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:.87em">$1</code>')
-        .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
-        .replace(/\n/g,'<br>');
+      const applyBtn=isHtml?`<button class="ai-apply-btn" onclick="aiApplyCode(this)" data-code="${enc}">⚡ Apply &amp; Publish</button>`:'';
+      return `<div class="ai-code-block"><div class="ai-code-header"><span class="ai-code-lang">${p.lang||'code'}</span><div class="ai-code-actions"><button class="ai-copy-btn" onclick="aiCopyCode(this)" data-code="${enc}">📋 Copy</button>${applyBtn}</div></div><pre style="background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1);border-top:none;border-radius:0 0 10px 10px;padding:12px 16px;margin:0;overflow-x:auto;font-family:'Courier New',monospace;font-size:.82em;line-height:1.6;white-space:pre-wrap">${safe}</pre></div>`;
     }
+    return escapeHtml(p.content)
+      .replace(/`([^`\n]+)`/g,'<code style="background:rgba(255,255,255,.12);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:.87em">$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+      .replace(/\n/g,'<br>');
   }).join('');
 }
 
 function aiAppendMsg(role, content=''){
   document.getElementById('aiWelcome')?.remove();
-  const container=document.getElementById('aiChatMessages');
-  const div=document.createElement('div');
-  div.className='ai-msg '+role;
-  const time=`<div class="ai-msg-meta">${aiTime()}</div>`;
+  const c=document.getElementById('aiChatMessages');
+  const div=document.createElement('div'); div.className='ai-msg '+role;
+  const t=`<div class="ai-msg-meta">${aiTime()}</div>`;
   if(role==='user'){
     const av=initials(currentProfile?.display_name||'U');
-    div.innerHTML=`<div class="ai-msg-avatar">${av}</div><div class="ai-msg-content"><div class="ai-msg-bubble">${escapeHtml(content)}</div>${time}</div>`;
+    div.innerHTML=`<div class="ai-msg-avatar">${av}</div><div class="ai-msg-content"><div class="ai-msg-bubble">${escapeHtml(content)}</div>${t}</div>`;
   } else if(role==='system'){
     div.innerHTML=`<div class="ai-msg-content" style="max-width:100%"><div class="ai-msg-bubble">${content}</div></div>`;
   } else {
-    const bubbleId='aib-'+Date.now();
-    div.innerHTML=`<div class="ai-msg-avatar">🤖</div><div class="ai-msg-content"><div class="ai-msg-bubble" id="${bubbleId}">${aiRenderContent(content)}</div>${time}</div>`;
+    div.innerHTML=`<div class="ai-msg-avatar">🤖</div><div class="ai-msg-content"><div class="ai-msg-bubble">${aiRenderContent(content)}</div>${t}</div>`;
   }
-  container.appendChild(div);
-  container.scrollTop=container.scrollHeight;
-  return div;
+  c.appendChild(div); c.scrollTop=c.scrollHeight; return div;
 }
 
 function aiShowThinking(){
@@ -2921,384 +2949,386 @@ function aiShowThinking(){
   c.appendChild(div); c.scrollTop=c.scrollHeight; return div;
 }
 
-// ── Copy / Apply code ─────────────────────────────────────────────
+// ── Copy / Apply ──────────────────────────────────────────────────
 function aiCopyCode(btn){
   const code=decodeURIComponent(btn.getAttribute('data-code'));
-  navigator.clipboard.writeText(code).catch(()=>{
-    const ta=document.createElement('textarea');ta.value=code;ta.style.cssText='position:fixed;opacity:0';
-    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
-  });
-  const orig=btn.textContent; btn.textContent='✅ Copied!'; btn.classList.add('copied');
-  setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},2000);
+  navigator.clipboard.writeText(code).catch(()=>{ const ta=document.createElement('textarea');ta.value=code;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta); });
+  const o=btn.textContent; btn.textContent='✅ Copied!'; btn.classList.add('copied');
+  setTimeout(()=>{btn.textContent=o;btn.classList.remove('copied');},2000);
 }
 
 async function aiApplyCode(btn){
   const code=decodeURIComponent(btn.getAttribute('data-code'));
-  // Pick which file to apply to
   const paths=Object.keys(aiLoadedFiles);
-  let targetPath=null;
-  if(paths.length===0){ aiAppendMsg('system','⚠️ No files loaded. Click a file in the sidebar first.'); return; }
-  if(paths.length===1){ targetPath=paths[0]; }
-  else {
-    targetPath=prompt('Apply to which file?\n'+paths.map((p,i)=>`${i+1}. ${p}`).join('\n')+'\n\nEnter path exactly:',paths[0]);
-    if(!targetPath||!aiLoadedFiles[targetPath]){ aiAppendMsg('system','⚠️ Invalid path.'); return; }
-  }
-  if(!ghToken){ aiAppendMsg('system','⚠️ GitHub not connected. Open the GitHub tab first.'); return; }
-  if(!confirm('Apply this code to '+targetPath+' and publish to GitHub?')) return;
+  if(!paths.length){ aiAppendMsg('system','⚠️ No file loaded. Click a file in the sidebar first.'); return; }
+  if(!ghToken){ aiAppendMsg('system','⚠️ GitHub not connected — open the GitHub tab first.'); return; }
+  let targetPath=paths.length===1?paths[0]:prompt('Apply to which file?\n'+paths.join('\n'),paths[0]);
+  if(!targetPath||!aiLoadedFiles[targetPath]){ return; }
+  if(!confirm('Apply to '+targetPath+' and push to GitHub?')) return;
   btn.textContent='⏳ Publishing...'; btn.disabled=true;
-  aiStatus('⚡ Publishing to GitHub...');
+  aiStatus('⚡ Publishing...');
   try{
-    const sha=aiLoadedFiles[targetPath].sha;
     const encoded=btoa(unescape(encodeURIComponent(code)));
-    let body={message:'AI: update '+targetPath, content:encoded, branch:AI_GH_BRANCH};
-    if(sha) body.sha=sha;
+    let body={message:'AI: update '+targetPath,content:encoded,branch:AI_GH_BRANCH};
+    const sha=aiLoadedFiles[targetPath].sha; if(sha)body.sha=sha;
     let res=await fetch('https://api.github.com/repos/'+AI_GH_REPO+'/contents/'+targetPath,{method:'PUT',headers:ghGetHeaders(),body:JSON.stringify(body)});
     if(!res.ok){
-      // Force: refetch SHA
       const sr=await fetch('https://api.github.com/repos/'+AI_GH_REPO+'/contents/'+targetPath+'?ref='+AI_GH_BRANCH,{headers:ghGetHeaders()});
-      if(sr.ok){ const sd=await sr.json(); body.sha=sd.sha; aiLoadedFiles[targetPath].sha=sd.sha; }
+      if(sr.ok){const sd=await sr.json();body.sha=sd.sha;aiLoadedFiles[targetPath].sha=sd.sha;}
       res=await fetch('https://api.github.com/repos/'+AI_GH_REPO+'/contents/'+targetPath,{method:'PUT',headers:ghGetHeaders(),body:JSON.stringify(body)});
-      if(!res.ok){ const e=await res.json(); throw new Error(e.message||'Push failed'); }
+      if(!res.ok){const e=await res.json();throw new Error(e.message||'Push failed');}
     }
     const data=await res.json(); aiLoadedFiles[targetPath].sha=data.content.sha; aiLoadedFiles[targetPath].content=code;
-    btn.textContent='✅ Applied!'; btn.classList.add('applied');
-    aiStatus('');
-    aiAppendMsg('system','✅ Published <strong>'+targetPath+'</strong> to GitHub successfully.');
-    // Sync to GitHub editor if open
-    const fp=document.getElementById('ghFilePath');
-    const ta=document.getElementById('ghTextarea');
-    if(ta&&fp&&fp.textContent===targetPath) ta.value=code;
+    btn.textContent='✅ Applied!'; btn.classList.add('applied'); aiStatus('');
+    aiAppendMsg('system','✅ Published <strong>'+targetPath+'</strong> to GitHub!');
+    const fp=document.getElementById('ghFilePath'),ta=document.getElementById('ghTextarea');
+    if(ta&&fp&&fp.textContent===targetPath)ta.value=code;
   }catch(e){
     btn.textContent='❌ Failed'; aiStatus('');
-    aiAppendMsg('system','❌ Publish failed: '+e.message);
+    aiAppendMsg('system','❌ '+e.message);
     setTimeout(()=>{btn.textContent='⚡ Apply & Publish';btn.disabled=false;},3000);
   }
 }
 
 // ── GitHub File Tree ──────────────────────────────────────────────
-async function aiRefreshFileTree(path=''){
-  const treeEl=document.getElementById('aiFileTree');
-  if(!ghToken){ treeEl.innerHTML='<div class="ai-file-tree-loading">Connect GitHub first (GitHub tab)</div>'; return; }
-  if(!path) treeEl.innerHTML='<div class="ai-file-tree-loading">⏳ Loading...</div>';
+function aiGhHeaders(){ return ghToken?ghGetHeaders():{}; }
+
+async function aiRefreshFileTree(){
+  const el=document.getElementById('aiFileTree');
+  if(!ghToken){ el.innerHTML='<div class="ai-file-tree-loading">Connect GitHub first (GitHub tab)</div>'; return; }
+  el.innerHTML='<div class="ai-file-tree-loading">⏳ Loading...</div>';
   try{
-    const res=await fetch('https://api.github.com/repos/'+AI_GH_REPO+'/contents/'+path+'?ref='+AI_GH_BRANCH,{headers:ghGetHeaders()});
-    if(!res.ok) throw new Error('GitHub API error '+res.status);
+    const res=await fetch('https://api.github.com/repos/'+AI_GH_REPO+'/contents/?ref='+AI_GH_BRANCH,{headers:ghGetHeaders()});
+    if(!res.ok)throw new Error('GitHub '+res.status);
     const items=await res.json();
-    if(!path) treeEl.innerHTML=''; // clear on root refresh
-    const sorted=[...items].sort((a,b)=>{
-      if(a.type==='dir'&&b.type!=='dir') return -1;
-      if(b.type==='dir'&&a.type!=='dir') return 1;
-      return a.name.localeCompare(b.name);
-    });
-    // If sub-path, render inline under parent
-    const container=path?treeEl:treeEl;
-    const fragment=document.createDocumentFragment();
-    sorted.forEach(item=>{
-      const node=document.createElement('div');
-      node.className='ai-file-node '+(item.type==='dir'?'dir':'');
-      node.style.paddingLeft=(path.split('/').filter(Boolean).length*10+8)+'px';
-      const icon=item.type==='dir'?'📁':aiFileIcon(item.name);
-      node.innerHTML=`<span class="ai-file-node-icon">${icon}</span><span class="ai-file-node-name" title="${item.path}">${item.name}</span>`;
-      if(item.type==='dir'){
-        let expanded=false;
-        node.onclick=async(e)=>{
-          e.stopPropagation();
-          if(!expanded){
-            expanded=true; node.classList.add('active');
-            // Insert children after this node
-            const children=document.createElement('div'); children.id='subtree-'+item.path.replace(/\//g,'-');
-            children.innerHTML='<div class="ai-file-tree-loading" style="padding-left:'+(path.split('/').filter(Boolean).length*10+18)+'px">⏳</div>';
-            node.insertAdjacentElement('afterend',children);
-            // Fetch and render
-            try{
-              const r2=await fetch('https://api.github.com/repos/'+AI_GH_REPO+'/contents/'+item.path+'?ref='+AI_GH_BRANCH,{headers:ghGetHeaders()});
-              if(!r2.ok) throw new Error();
-              const subitems=await r2.json();
-              children.innerHTML='';
-              const sorted2=[...subitems].sort((a,b)=>{if(a.type==='dir'&&b.type!=='dir')return -1;if(b.type==='dir'&&a.type!=='dir')return 1;return a.name.localeCompare(b.name);});
-              sorted2.forEach(si=>{
-                const sn=document.createElement('div');
-                sn.className='ai-file-node '+(si.type==='dir'?'dir':'');
-                sn.style.paddingLeft=((item.path.split('/').length)*10+8)+'px';
-                const sicon=si.type==='dir'?'📁':aiFileIcon(si.name);
-                sn.innerHTML=`<span class="ai-file-node-icon">${sicon}</span><span class="ai-file-node-name" title="${si.path}">${si.name}</span>`;
-                if(si.type==='file') sn.onclick=(e)=>{e.stopPropagation();aiLoadFileIntoContext(si);};
-                children.appendChild(sn);
-              });
-            }catch(e){ children.innerHTML='<div class="ai-file-tree-loading">Error</div>'; }
-          } else {
-            expanded=false; node.classList.remove('active');
-            const children=document.getElementById('subtree-'+item.path.replace(/\//g,'-'));
-            if(children) children.remove();
-          }
-        };
-      } else {
-        node.onclick=(e)=>{e.stopPropagation();aiLoadFileIntoContext(item);};
-      }
-      fragment.appendChild(node);
-    });
-    treeEl.appendChild(fragment);
-  }catch(e){ treeEl.innerHTML='<div class="ai-file-tree-loading">❌ '+e.message+'</div>'; }
+    el.innerHTML='';
+    aiRenderTreeItems(el, items, '');
+  }catch(e){ el.innerHTML='<div class="ai-file-tree-loading">❌ '+e.message+'</div>'; }
 }
 
-function aiFileIcon(name){
-  if(name.endsWith('.html')||name.endsWith('.htm')) return '🌐';
-  if(name.endsWith('.css')) return '🎨';
-  if(name.endsWith('.js')||name.endsWith('.mjs')) return '⚡';
-  if(name.endsWith('.json')) return '📋';
-  if(name.endsWith('.md')) return '📝';
-  if(name.endsWith('.png')||name.endsWith('.jpg')||name.endsWith('.svg')||name.endsWith('.ico')) return '🖼️';
-  if(name.endsWith('.txt')) return '📄';
-  return '📄';
-}
-
-// ── Load file into AI context ─────────────────────────────────────
-async function aiLoadFileIntoContext(item){
-  if(aiLoadedFiles[item.path]){
-    aiAppendMsg('system','ℹ️ <strong>'+item.path+'</strong> already loaded.');
-    return;
-  }
-  aiStatus('📂 Loading '+item.name+'...');
-  try{
-    const res=await fetch(item.url||('https://api.github.com/repos/'+AI_GH_REPO+'/contents/'+item.path+'?ref='+AI_GH_BRANCH),{headers:ghGetHeaders()});
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    // Guard binary files
-    if(!data.content) throw new Error('File has no text content (maybe binary)');
-    const decoded=decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
-    aiLoadedFiles[item.path]={content:decoded,sha:data.sha};
-    aiRenderLoadedFiles();
-    aiStatus('');
-    aiAppendMsg('system','📄 Loaded <strong>'+item.path+'</strong> ('+Math.round(decoded.length/1024*10)/10+' KB) into AI context.');
-    // Mark node active
-    document.querySelectorAll('.ai-file-node').forEach(n=>{
-      if(n.querySelector('.ai-file-node-name')?.title===item.path) n.classList.add('active');
-    });
-  }catch(e){
-    aiStatus('');
-    aiAppendMsg('system','❌ Could not load '+item.path+': '+e.message);
-  }
-}
-
-function aiRenderLoadedFiles(){
-  const el=document.getElementById('aiLoadedFiles');
-  const paths=Object.keys(aiLoadedFiles);
-  if(!paths.length){ el.innerHTML='<div class="ai-memory-empty">No files loaded</div>'; return; }
-  el.innerHTML=paths.map(p=>`
-    <div class="ai-loaded-file-chip">
-      <span class="ai-file-node-icon">${aiFileIcon(p)}</span>
-      <span class="ai-loaded-file-chip-name" title="${p}">${p}</span>
-      <button class="ai-loaded-file-del" onclick="aiUnloadFile('${p}')">×</button>
-    </div>`).join('');
-}
-
-function aiUnloadFile(path){
-  delete aiLoadedFiles[path];
-  aiRenderLoadedFiles();
-  document.querySelectorAll('.ai-file-node').forEach(n=>{
-    if(n.querySelector('.ai-file-node-name')?.title===path) n.classList.remove('active');
+function aiRenderTreeItems(container, items, parentPath){
+  const sorted=[...items].sort((a,b)=>{ if(a.type==='dir'&&b.type!=='dir')return -1; if(b.type==='dir'&&a.type!=='dir')return 1; return a.name.localeCompare(b.name); });
+  const depth=parentPath?parentPath.split('/').length:0;
+  sorted.forEach(item=>{
+    const node=document.createElement('div');
+    node.className='ai-file-node '+(item.type==='dir'?'dir':'');
+    node.style.paddingLeft=(depth*10+8)+'px';
+    node.innerHTML=`<span class="ai-file-node-icon">${item.type==='dir'?'📁':aiFileIcon(item.name)}</span><span class="ai-file-node-name" title="${item.path}">${item.name}</span>`;
+    if(item.type==='dir'){
+      let open=false;
+      node.onclick=async(e)=>{ e.stopPropagation();
+        const subId='sub-'+item.path.replace(/[^a-z0-9]/gi,'-');
+        if(!open){ open=true; node.classList.add('active');
+          const sub=document.createElement('div'); sub.id=subId;
+          sub.innerHTML=`<div class="ai-file-tree-loading" style="padding-left:${(depth+1)*10+8}px">⏳</div>`;
+          node.after(sub);
+          try{
+            const r=await fetch('https://api.github.com/repos/'+AI_GH_REPO+'/contents/'+item.path+'?ref='+AI_GH_BRANCH,{headers:ghGetHeaders()});
+            if(!r.ok)throw new Error();
+            sub.innerHTML='';
+            aiRenderTreeItems(sub, await r.json(), item.path);
+          }catch(){ sub.innerHTML=`<div class="ai-file-tree-loading" style="padding-left:${(depth+1)*10+8}px">❌ error</div>`; }
+        }else{ open=false; node.classList.remove('active'); document.getElementById(subId)?.remove(); }
+      };
+    }else{
+      node.onclick=(e)=>{ e.stopPropagation(); aiLoadFileIntoContext(item); };
+    }
+    container.appendChild(node);
   });
 }
 
-function aiUnloadAllFiles(){
-  aiLoadedFiles={};
-  aiRenderLoadedFiles();
-  document.querySelectorAll('.ai-file-node').forEach(n=>n.classList.remove('active'));
+function aiFileIcon(n){
+  if(/\.html?$/.test(n))return'🌐'; if(/\.css$/.test(n))return'🎨';
+  if(/\.m?js$/.test(n))return'⚡'; if(/\.json$/.test(n))return'📋';
+  if(/\.md$/.test(n))return'📝'; if(/\.(png|jpg|svg|ico|gif|webp)$/.test(n))return'🖼️';
+  return'📄';
 }
 
-// ── Vercel sidebar widget ─────────────────────────────────────────
-async function aiRefreshDeployments(){
+async function aiLoadFileIntoContext(item){
+  if(aiLoadedFiles[item.path]){ aiAppendMsg('system','ℹ️ <strong>'+item.path+'</strong> already loaded.'); return; }
+  aiStatus('📂 Loading '+item.name+'...');
+  try{
+    const url=item.url||('https://api.github.com/repos/'+AI_GH_REPO+'/contents/'+item.path+'?ref='+AI_GH_BRANCH);
+    const res=await fetch(url,{headers:ghGetHeaders()});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(!data.content)throw new Error('No text content (binary file?)');
+    const decoded=decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
+    aiLoadedFiles[item.path]={content:decoded,sha:data.sha};
+    aiRenderLoadedFilesList();
+    aiStatus('');
+    aiAppendMsg('system','📄 Loaded <strong>'+item.path+'</strong> ('+Math.round(decoded.length/1024*10)/10+' KB)');
+    document.querySelectorAll('.ai-file-node').forEach(n=>{ if(n.querySelector('.ai-file-node-name')?.title===item.path)n.classList.add('active'); });
+  }catch(e){ aiStatus(''); aiAppendMsg('system','❌ '+item.path+': '+e.message); }
+}
+
+function aiRenderLoadedFilesList(){
+  const el=document.getElementById('aiLoadedFilesList');
+  const paths=Object.keys(aiLoadedFiles);
+  if(!paths.length){el.innerHTML='<div class="ai-memory-empty">None loaded</div>';return;}
+  el.innerHTML=paths.map(p=>`<div class="ai-loaded-chip"><span>${aiFileIcon(p)}</span><span class="ai-loaded-chip-name" title="${p}">${p}</span><button class="ai-loaded-chip-del" onclick="aiUnloadFile('${p}')">×</button></div>`).join('');
+}
+
+function aiUnloadFile(path){
+  delete aiLoadedFiles[path]; aiRenderLoadedFilesList();
+  document.querySelectorAll('.ai-file-node').forEach(n=>{ if(n.querySelector('.ai-file-node-name')?.title===path)n.classList.remove('active'); });
+}
+function aiUnloadAllFiles(){ aiLoadedFiles={}; aiRenderLoadedFilesList(); document.querySelectorAll('.ai-file-node').forEach(n=>n.classList.remove('active')); }
+
+// ── Vercel mini widget in AI sidebar ─────────────────────────────
+async function aiRefreshDeployMini(){
   const el=document.getElementById('aiDeployMini');
-  if(!vcToken){ el.innerHTML='<div class="ai-memory-empty">Connect Vercel first (Vercel tab)</div>'; return; }
+  if(!vcToken){el.innerHTML='<div class="ai-memory-empty">Connect Vercel first (▲ tab)</div>';return;}
   el.innerHTML='<div class="ai-memory-empty">⏳ Loading...</div>';
   try{
-    // Try to get by project name
-    let url='https://api.vercel.com/v6/deployments?limit=8';
-    if(vcProjects?.length){
-      const proj=vcProjects.find(p=>p.name===AI_VERCEL_PROJECT||p.name.includes('maths'));
-      if(proj) url+='&projectId='+proj.id;
-    }
+    let url=VERCEL_API+'/v6/deployments?limit=8';
+    if(vcProjects.length){const p=vcProjects.find(p=>p.name.toLowerCase().includes('maths'));if(p)url+='&projectId='+p.id;}
     const r=await fetch(url,{headers:{'Authorization':'Bearer '+vcToken}});
-    if(!r.ok) throw new Error('Vercel API error '+r.status);
+    if(!r.ok)throw new Error('Vercel '+r.status);
     const data=await r.json();
     aiDeployCache=(data.deployments||[]).slice(0,8);
-    if(!aiDeployCache.length){ el.innerHTML='<div class="ai-memory-empty">No deployments found</div>'; return; }
+    if(!aiDeployCache.length){el.innerHTML='<div class="ai-memory-empty">No deployments</div>';return;}
     el.innerHTML=aiDeployCache.map(d=>{
-      const state=(d.state||d.readyState||'').toLowerCase();
-      const ago=vcTimeAgo?vcTimeAgo(d.createdAt):'?';
-      return `<div class="ai-deploy-mini-item" onclick="aiAskAboutDeploy('${d.uid||d.id}','${escapeHtml(d.name||'')}')">
-        <span class="ai-deploy-dot ${state}"></span>
-        <span class="ai-deploy-mini-name">${escapeHtml(d.name||'deploy')}</span>
-        <span class="ai-deploy-mini-time">${ago}</span>
-      </div>`;
+      const s=(d.state||d.readyState||'').toLowerCase();
+      return `<div class="ai-deploy-mini-item" onclick="aiQuick('Tell me about Vercel deployment: ${escapeHtml(d.name||d.uid||'')}')"><span class="ai-deploy-dot ${s}"></span><span class="ai-deploy-mini-name">${escapeHtml(d.name||'deploy')}</span><span class="ai-deploy-mini-ago">${vcTimeAgo(d.createdAt)}</span></div>`;
     }).join('');
-  }catch(e){ el.innerHTML='<div class="ai-memory-empty">❌ '+e.message+'</div>'; }
+  }catch(e){el.innerHTML='<div class="ai-memory-empty">❌ '+e.message+'</div>';}
 }
-
-function aiAskDeploy(){ aiQuick('Show me the latest deployment status for the '+AI_VERCEL_PROJECT+' project on Vercel and tell me if there are any issues.'); }
-function aiAskAboutDeploy(id,name){ aiQuick('Tell me about the Vercel deployment "'+name+'" (id: '+id+'). What was deployed and is there anything I should know?'); }
 
 // ── Memory ────────────────────────────────────────────────────────
 async function aiLoadMemory(){
-  if(!currentUser) return;
-  try{
-    const{data}=await sb.from('ai_memory').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:true});
-    aiMemory=(data||[]); aiRenderMemoryList();
-  }catch(e){ console.warn('aiLoadMemory:',e); }
+  if(!currentUser)return;
+  try{ const{data}=await sb.from('ai_memory').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:true}); aiMemory=(data||[]); aiRenderMemoryList(); }catch(e){}
 }
 function aiRenderMemoryList(){
-  const el=document.getElementById('aiMemoryList'); if(!el) return;
-  if(!aiMemory.length){ el.innerHTML='<div class="ai-memory-empty">No memories yet</div>'; return; }
+  const el=document.getElementById('aiMemoryList'); if(!el)return;
+  if(!aiMemory.length){el.innerHTML='<div class="ai-memory-empty">No memories yet</div>';return;}
   el.innerHTML=aiMemory.map(m=>`<div class="ai-memory-item">${escapeHtml(m.content)}<button class="ai-memory-item-del" onclick="aiDeleteMemory('${m.id}')">×</button></div>`).join('');
 }
-async function aiSaveMemory(text){
-  if(!currentUser||!text.trim()) return;
-  try{ const{data}=await sb.from('ai_memory').insert({user_id:currentUser.id,content:text.trim()}).select().single(); if(data){aiMemory.push(data);aiRenderMemoryList();} }catch(e){}
-}
+async function aiSaveMemory(text){ if(!currentUser||!text.trim())return; try{ const{data}=await sb.from('ai_memory').insert({user_id:currentUser.id,content:text.trim()}).select().single(); if(data){aiMemory.push(data);aiRenderMemoryList();} }catch(e){} }
 async function aiDeleteMemory(id){ try{ await sb.from('ai_memory').delete().eq('id',id); aiMemory=aiMemory.filter(m=>m.id!==id); aiRenderMemoryList(); }catch(e){} }
-async function aiClearMemory(){ if(!confirm('Clear all memories?')) return; try{ await sb.from('ai_memory').delete().eq('user_id',currentUser.id); aiMemory=[]; aiRenderMemoryList(); }catch(e){} }
-function aiExtractMemories(text){ const re=/REMEMBER:\s*(.+)/g; let m; while((m=re.exec(text))!==null) aiSaveMemory(m[1].trim()); }
+async function aiClearMemory(){ if(!confirm('Clear all memories?'))return; try{ await sb.from('ai_memory').delete().eq('user_id',currentUser.id); aiMemory=[]; aiRenderMemoryList(); }catch(e){} }
+function aiExtractMemories(text){ const re=/REMEMBER:\s*(.+)/g; let m; while((m=re.exec(text))!==null)aiSaveMemory(m[1].trim()); }
 
-// ── Quick actions ─────────────────────────────────────────────────
 function aiQuick(prompt){ document.getElementById('aiChatInput').value=prompt; sendAiMessage(); }
 function aiClearChat(){
-  if(!confirm('Clear conversation?')) return;
+  if(!confirm('Clear conversation?'))return;
   aiMessages=[];
-  const c=document.getElementById('aiChatMessages');
-  c.innerHTML=`<div class="ai-welcome" id="aiWelcome">
-    <div class="ai-welcome-icon">🤖</div>
-    <div class="ai-welcome-text">
-      <strong>AI Dev Assistant</strong>
-      <p>I have full access to your GitHub repo and Vercel deployments. Click any file in the sidebar to load it, then ask me to read, edit or deploy changes.</p>
-      <div class="ai-welcome-chips">
-        <span onclick="aiQuick('List all files in GABEHACKER33/maths.support')">📁 List repo files</span>
-        <span onclick="aiQuick('What is the latest Vercel deployment status?')">▲ Deployment status</span>
-        <span onclick="aiQuick('Read the loaded file and find any bugs')">🐛 Find bugs</span>
-      </div>
-    </div>
-  </div>`;
+  document.getElementById('aiChatMessages').innerHTML=`<div class="ai-welcome" id="aiWelcome"><div class="ai-welcome-icon">🤖</div><div class="ai-welcome-text"><strong>AI Dev Assistant</strong><p>Full access to GitHub repo &amp; Vercel. Click a file in the sidebar to load it.</p><div class="ai-welcome-chips"><span onclick="aiQuick('List all files in GABEHACKER33/maths.support')">📁 List files</span><span onclick="aiQuick('Latest Vercel deployment status?')">▲ Deployments</span><span onclick="aiQuick('Find bugs in the loaded file')">🐛 Find bugs</span></div></div></div>`;
 }
 
 // ── System prompt ─────────────────────────────────────────────────
 function aiSystemPrompt(){
-  const loadedSummary=Object.keys(aiLoadedFiles).map(p=>`  - ${p} (${Math.round(aiLoadedFiles[p].content.length/1024*10)/10} KB)`).join('\n')||'  None';
-  const deploySummary=aiDeployCache.length
-    ? aiDeployCache.slice(0,5).map(d=>`  - ${d.name} [${(d.state||d.readyState||'').toLowerCase()}] ${vcTimeAgo?vcTimeAgo(d.createdAt):''}`).join('\n')
-    : '  No deployments loaded (click ↻ Refresh in sidebar)';
-
-  let sys=`You are an expert full-stack developer assistant for "Maths Support" — a student gaming and study platform.
-
-TECH STACK:
-- Single HTML file (index.html) deployed on Vercel
-- GitHub repo: GABEHACKER33/maths.support (branch: main)  
-- Supabase backend (tables: profiles, friendships, messages, typing_status, chat_streaks, broadcast_messages, questionnaire_config, questionnaire_responses, passwords, admin_settings, ai_memory)
-- Vercel project: maths-support
-
-YOUR CAPABILITIES:
-1. READ loaded files — full content is injected into this prompt
-2. EDIT files — output complete updated file in a \`\`\`html code block, admin clicks "Apply & Publish" to commit instantly
-3. LIST repo files — you know the structure from the sidebar
-4. CHECK deployments — recent deploy data shown below
-5. PERSISTENT MEMORY — write: REMEMBER: <fact> to remember across sessions
-
-RULES:
-- When editing, ALWAYS output the COMPLETE file content (never partial)
-- Be direct and concise. Show code examples.
-- If no file is loaded when asked to edit, say: "Please load the file from the sidebar first"
-- When outputting full HTML files, use a single \`\`\`html code block
-
-CURRENTLY LOADED FILES:
-${loadedSummary}
-
-RECENT VERCEL DEPLOYMENTS (${AI_VERCEL_PROJECT}):
-${deploySummary}`;
-
-  if(aiMemory.length){
-    sys+='\n\nYOUR MEMORY:\n'+aiMemory.map(m=>'- '+m.content).join('\n');
-  }
-
-  // Inject full file contents
+  const filesSummary=Object.keys(aiLoadedFiles).map(p=>`  - ${p} (${Math.round(aiLoadedFiles[p].content.length/1024*10)/10}KB)`).join('\n')||'  None loaded yet';
+  const deploySummary=aiDeployCache.length?aiDeployCache.slice(0,5).map(d=>`  - ${d.name} [${(d.state||d.readyState||'').toLowerCase()}] ${vcTimeAgo(d.createdAt)}`).join('\n'):'  Not loaded (click ↻ in sidebar)';
+  let sys=`You are an expert developer assistant for "Maths Support" — a student gaming platform.\n\nSTACK: Single HTML file on Vercel. GitHub: GABEHACKER33/maths.support (branch: main). Supabase backend.\nVercel project: maths-support.\n\nCAPABILITIES:\n1. READ full file contents (injected below)\n2. EDIT files — output COMPLETE updated file in \`\`\`html block, admin clicks Apply & Publish\n3. Discuss deployments, bugs, improvements\n4. REMEMBER facts: write REMEMBER: <fact>\n\nRULE: Always output COMPLETE file when editing (never partial snippets for full-file edits).\n\nLOADED FILES:\n${filesSummary}\n\nVERCEL DEPLOYMENTS:\n${deploySummary}`;
+  if(aiMemory.length) sys+='\n\nMEMORY:\n'+aiMemory.map(m=>'- '+m.content).join('\n');
   Object.entries(aiLoadedFiles).forEach(([path,f])=>{
-    const preview=f.content.length>80000?f.content.slice(0,80000)+'\n\n[...truncated at 80KB...]':f.content;
-    sys+=`\n\n${'='.repeat(60)}\nFILE: ${path}\n${'='.repeat(60)}\n${preview}`;
+    const preview=f.content.length>80000?f.content.slice(0,80000)+'\n[...truncated at 80KB]':f.content;
+    sys+=`\n\n${'='.repeat(50)}\nFILE: ${path}\n${'='.repeat(50)}\n${preview}`;
   });
-
   return sys;
 }
 
 // ── Main send ─────────────────────────────────────────────────────
 async function sendAiMessage(){
-  if(aiIsThinking) return;
+  if(aiIsThinking)return;
   const input=document.getElementById('aiChatInput');
-  const content=input.value.trim();
-  if(!content) return;
+  const content=input.value.trim(); if(!content)return;
   input.value=''; input.style.height='';
-  aiIsThinking=true;
-  document.getElementById('aiSendBtn').disabled=true;
-  aiAppendMsg('user', content);
-  aiMessages.push({role:'user',content});
-  const thinkBubble=aiShowThinking();
-  aiStatus('🤔 Thinking...');
-
+  aiIsThinking=true; document.getElementById('aiSendBtn').disabled=true;
+  aiAppendMsg('user',content); aiMessages.push({role:'user',content});
+  const think=aiShowThinking(); aiStatus('🤔 Thinking...');
   try{
-    const modelId=(document.getElementById('aiModelSelect')?.value)||'anthropic/claude-sonnet-4-5';
-    const systemPrompt=aiSystemPrompt();
-    const messages=[{role:'system',content:systemPrompt},...aiMessages];
-
-    const response=await fetch(OPENROUTER_BASE_URL+'/chat/completions',{
+    const modelId=document.getElementById('aiModelSelect')?.value||'anthropic/claude-sonnet-4-5';
+    const res=await fetch(OPENROUTER_BASE_URL+'/chat/completions',{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+OPENROUTER_API_KEY,
-        'HTTP-Referer': window.location.href,
-        'X-Title':'Maths Support Dev Panel'
-      },
-      body:JSON.stringify({
-        model:modelId,
-        messages,
-        temperature:0.7,
-        max_tokens:8000
-      })
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+OPENROUTER_API_KEY,'HTTP-Referer':window.location.origin,'X-Title':'Maths Support Dev Panel'},
+      body:JSON.stringify({model:modelId,messages:[{role:'system',content:aiSystemPrompt()},...aiMessages],temperature:0.7,max_tokens:8000})
     });
-
-    if(!response.ok){
-      const err=await response.json();
-      throw new Error(err.error?.message||'OpenRouter error '+response.status);
-    }
-    const data=await response.json();
+    if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'OpenRouter '+res.status);}
+    const data=await res.json();
     const reply=data.choices[0].message.content;
-    thinkBubble.remove();
-    aiAppendMsg('assistant', reply);
-    aiMessages.push({role:'assistant',content:reply});
-    aiExtractMemories(reply);
-    aiStatus('');
-
-    // Show token usage hint
-    if(data.usage){
-      const used=data.usage.total_tokens;
-      document.getElementById('aiStatusLine').textContent=`${modelId.split('/')[1]} · ${used.toLocaleString()} tokens used`;
-    }
-  }catch(e){
-    thinkBubble.remove();
-    aiAppendMsg('system','⚠️ Error: '+e.message);
-    aiStatus('');
-  }
-
-  aiIsThinking=false;
-  document.getElementById('aiSendBtn').disabled=false;
-  input.focus();
+    think.remove(); aiAppendMsg('assistant',reply); aiMessages.push({role:'assistant',content:reply});
+    aiExtractMemories(reply); aiStatus('');
+    if(data.usage) document.getElementById('aiStatusLine').textContent=modelId.split('/').pop()+' · '+data.usage.total_tokens.toLocaleString()+' tokens';
+  }catch(e){ think.remove(); aiAppendMsg('system','⚠️ Error: '+e.message); aiStatus(''); }
+  aiIsThinking=false; document.getElementById('aiSendBtn').disabled=false; input.focus();
 }
 
-// Input event listeners
-document.getElementById('aiChatInput').addEventListener('input',function(){
-  this.style.height=''; this.style.height=Math.min(this.scrollHeight,130)+'px';
-});
-document.getElementById('aiChatInput').addEventListener('keydown',function(e){
-  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAiMessage();}
-});
-document.addEventListener('keydown',function(e){
-  if(e.key==='Enter'&&document.activeElement?.id==='ghTokenInput') ghConnect();
-});
+document.getElementById('aiChatInput').addEventListener('input',function(){ this.style.height=''; this.style.height=Math.min(this.scrollHeight,130)+'px'; });
+document.getElementById('aiChatInput').addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAiMessage();} });
+document.addEventListener('keydown',function(e){ if(e.key==='Enter'&&document.activeElement?.id==='ghTokenInput')ghConnect(); });
+
+// ══════════════════════════════════════════════════════════════════
+// VERCEL PANEL
+// ══════════════════════════════════════════════════════════════════
+function vcGetHeaders(){ return{'Authorization':'Bearer '+vcToken,'Content-Type':'application/json'}; }
+
+async function vcConnect(){
+  const tok=(document.getElementById('vcTokenInput')?.value||'').trim();
+  const errEl=document.getElementById('vcConnectError'), statusEl=document.getElementById('vcConnectStatus');
+  if(errEl)errEl.style.display='none';
+  if(!tok){if(errEl){errEl.textContent='Please paste your Vercel token.';errEl.style.display='block';}return;}
+  if(statusEl){statusEl.textContent='⏳ Validating…';statusEl.style.display='block';}
+  try{
+    // Vercel v2/user: validates token and returns user info
+    const r=await fetch(VERCEL_API+'/v2/user',{headers:{'Authorization':'Bearer '+tok,'Content-Type':'application/json'}});
+    const body=await r.json();
+    if(!r.ok) throw new Error(body?.error?.message||body?.message||'Auth failed ('+r.status+')');
+    // Response shape: { user: { name, email, ... } } OR top-level { name, email }
+    const userObj=body.user||body;
+    if(statusEl)statusEl.textContent='✅ Valid! Saving…';
+    const upsertData={key:'vercel_token',value:tok};
+    if(currentUser?.id) upsertData.updated_by=currentUser.id;
+    const{error}=await sb.from('admin_settings').upsert(upsertData,{onConflict:'key'});
+    if(error)throw new Error('Supabase: '+error.message);
+    vcToken=tok;
+    if(statusEl)statusEl.textContent='✅ Connected!';
+    setTimeout(()=>vcShowDashboard(userObj),500);
+  }catch(e){
+    if(statusEl)statusEl.style.display='none';
+    if(errEl){errEl.textContent='❌ '+e.message;errEl.style.display='block';}
+  }
+}
+
+async function vcRestoreSavedToken(){
+  if(!currentUser)return;
+  try{
+    const{data}=await sb.from('admin_settings').select('value').eq('key','vercel_token').maybeSingle();
+    if(!data?.value)return;
+    vcToken=data.value;
+    const r=await fetch(VERCEL_API+'/v2/user',{headers:{'Authorization':'Bearer '+vcToken,'Content-Type':'application/json'}});
+    if(r.ok){ const body=await r.json(); vcShowDashboard(body.user||body); }
+    else vcToken=''; // token expired
+  }catch(e){ console.warn('vcRestore:',e); }
+}
+
+async function vcShowDashboard(userData){
+  document.getElementById('vcTokenGate').style.display='none';
+  const dash=document.getElementById('vcDashboard'); dash.style.display='flex';
+  // userData may be the full response { user:{...} } OR just the user object directly
+  const u=userData?.user||userData||{};
+  document.getElementById('vcTeamName').textContent=u.name||u.username||'Vercel';
+  document.getElementById('vcUserEmail').textContent=u.email||'';
+  await vcLoadProjects(); await vcLoadDeployments();
+  await aiRefreshDeployMini();
+}
+
+async function vcLoadProjects(){
+  try{
+    const r=await fetch(VERCEL_API+'/v9/projects?limit=100',{headers:{'Authorization':'Bearer '+vcToken}});
+    if(!r.ok)return;
+    const data=await r.json(); vcProjects=data.projects||[];
+    const sel=document.getElementById('vcProjectSelect');
+    sel.innerHTML='<option value="">All Projects</option>';
+    vcProjects.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.name; sel.appendChild(o); });
+    // Auto-select maths-support
+    const mp=vcProjects.find(p=>p.name.toLowerCase().includes('maths'));
+    if(mp)sel.value=mp.id;
+  }catch(e){}
+}
+
+async function vcLoadDeployments(){
+  const el=document.getElementById('vcDeployments');
+  el.innerHTML='<div class="vc-loading"><div class="vc-spinner"></div><span>Loading…</span></div>';
+  const pid=document.getElementById('vcProjectSelect')?.value||'';
+  let url=VERCEL_API+'/v6/deployments?limit=30'; if(pid)url+='&projectId='+pid;
+  try{
+    const r=await fetch(url,{headers:{'Authorization':'Bearer '+vcToken}});
+    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'API '+r.status);}
+    const data=await r.json(); vcDeploymentsList=data.deployments||[];
+    vcRenderDeployments(vcDeploymentsList); vcUpdateStats(vcDeploymentsList);
+  }catch(e){ el.innerHTML=`<div class="vc-empty">❌ ${e.message}</div>`; }
+}
+
+function vcRenderDeployments(deps){
+  const el=document.getElementById('vcDeployments');
+  if(!deps.length){el.innerHTML='<div class="vc-empty">No deployments found</div>';return;}
+  el.innerHTML='';
+  deps.forEach(d=>{
+    const s=(d.state||d.readyState||'').toLowerCase();
+    const card=document.createElement('div'); card.className='vc-deploy-card';
+    const url=d.url?'https://'+d.url:'#';
+    const branch=d.meta?.githubCommitRef||'';
+    const msg=(d.meta?.githubCommitMessage||'').slice(0,60);
+    card.innerHTML=`
+      <div class="vc-deploy-status ${s}"></div>
+      <div class="vc-deploy-info">
+        <div class="vc-deploy-name">${escapeHtml(d.name||'deploy')}<span class="vc-deploy-badge ${s}">${s||'unknown'}</span></div>
+        <div class="vc-deploy-meta"><span>🕐 ${vcTimeAgo(d.createdAt)}</span>${branch?`<span>🌿 ${escapeHtml(branch)}</span>`:''}<span>${escapeHtml(msg)}</span></div>
+      </div>
+      <div class="vc-deploy-actions">
+        ${s==='ready'?`<a href="${url}" target="_blank" style="text-decoration:none"><button class="vc-action-btn">🔗 View</button></a>`:''}
+        <button class="vc-action-btn" onclick="vcViewLogs('${d.uid||d.id}','${escapeHtml(d.name||'')}')">📋 Logs</button>
+        <button class="vc-action-btn primary" onclick="vcRedeploy('${d.uid||d.id}','${escapeHtml(d.name||'')}')">⚡ Redeploy</button>
+      </div>`;
+    el.appendChild(card);
+  });
+}
+
+function vcUpdateStats(deps){
+  const s=n=>deps.filter(d=>(d.state||d.readyState||'').toLowerCase()===n).length;
+  document.getElementById('vcStatTotal').textContent=deps.length;
+  document.getElementById('vcStatReady').textContent=s('ready');
+  document.getElementById('vcStatError').textContent=deps.filter(d=>['error','failed'].includes((d.state||d.readyState||'').toLowerCase())).length;
+  document.getElementById('vcStatBuilding').textContent=deps.filter(d=>['building','initializing','queued'].includes((d.state||d.readyState||'').toLowerCase())).length;
+}
+
+async function vcViewLogs(id,name){
+  document.getElementById('vcLogTitle').textContent='📋 Logs — '+name;
+  document.getElementById('vcLogBody').textContent='Loading…';
+  document.getElementById('vcLogOverlay').classList.add('active');
+  try{
+    const r=await fetch(VERCEL_API+'/v2/deployments/'+id+'/events',{headers:{'Authorization':'Bearer '+vcToken}});
+    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Error '+r.status);}
+    const events=await r.json(); const body=document.getElementById('vcLogBody'); body.innerHTML='';
+    if(!events.length){body.textContent='No log events.';return;}
+    events.forEach(ev=>{
+      const line=document.createElement('div'); line.className='vc-log-line';
+      const text=ev.text||ev.payload?.text||JSON.stringify(ev);
+      const t=ev.created?new Date(ev.created).toLocaleTimeString('en-GB'):'';
+      if(/error/i.test(text))line.classList.add('err');
+      else if(/warn/i.test(text))line.classList.add('warn');
+      else if(/ready|success/i.test(text))line.classList.add('ok');
+      line.textContent=(t?'['+t+'] ':'')+text;
+      body.appendChild(line);
+    });
+    body.scrollTop=body.scrollHeight;
+  }catch(e){ document.getElementById('vcLogBody').textContent='❌ '+e.message; }
+}
+function vcCloseLog(){ document.getElementById('vcLogOverlay').classList.remove('active'); }
+
+async function vcRedeploy(id,name){
+  if(!confirm('Redeploy "'+name+'"?'))return;
+  try{
+    const r=await fetch(VERCEL_API+'/v13/deployments?forceNew=1',{method:'POST',headers:vcGetHeaders(),body:JSON.stringify({deploymentId:id})});
+    const data=await r.json();
+    if(!r.ok)throw new Error(data.error?.message||'Failed '+r.status);
+    showToast('⚡ Redeployment triggered!'); setTimeout(vcLoadDeployments,2500);
+  }catch(e){alert('❌ '+e.message);}
+}
+
+async function vcTriggerDeploy(){
+  const pid=document.getElementById('vcProjectSelect')?.value;
+  if(!pid){alert('Select a project first.');return;}
+  const latest=vcDeploymentsList.find(d=>d.projectId===pid||vcProjects.find(p=>p.id===pid)?.name===d.name);
+  if(!latest){alert('No deployments found for this project.');return;}
+  await vcRedeploy(latest.uid||latest.id,latest.name||'Latest');
+}
+
+function vcDisconnect(){ vcToken=''; document.getElementById('vcDashboard').style.display='none'; document.getElementById('vcTokenGate').style.display='flex'; }
+
+// ── switchDevTab (updated) ────────────────────────────────────────
+function switchDevTab(tab){
+  document.querySelectorAll('.dev-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.dev-tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('devTab-'+tab).classList.add('active');
+  document.getElementById('devPanel-'+tab).classList.add('active');
+  if(tab==='github'){ ghRestoreSavedToken(); }
+  if(tab==='ai'){ aiLoadMemory(); aiRefreshFileTree(); aiRefreshDeployMini(); }
+  if(tab==='vercel'){ vcRestoreSavedToken(); }
+}
 
 // ── Keep sidebar hover listener ──
 // ── Keep sidebar hover listener ──
@@ -3318,5 +3348,16 @@ window.addEventListener('load',async()=>{
   }
 });
 </script>
+
+<!-- VERCEL LOG MODAL -->
+<div class="vc-log-overlay" id="vcLogOverlay">
+  <div class="vc-log-box">
+    <div class="vc-log-header">
+      <div class="vc-log-title" id="vcLogTitle">Deployment Logs</div>
+      <button class="vc-log-close" onclick="vcCloseLog()">✕</button>
+    </div>
+    <div class="vc-log-body" id="vcLogBody">Loading…</div>
+  </div>
+</div>
 </body>
 </html>
