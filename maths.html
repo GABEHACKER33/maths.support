@@ -1042,7 +1042,7 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
     <button class="game-button" onclick="openGame('Territorial','https://territorial-io.com/')"><img src="img/territorial.png" alt="Territorial" class="game-image"><div class="game-info"><h3>🌍 Territorial</h3><p>Multiplayer strategy game</p></div></button>
     <button class="game-button" onclick="openGame('Futboll-11','https://whatsapp.gabriel-oli-ren-micro.workers.dev/')"><img src="img/futboll.png" alt="Futboll-11" class="game-image"><div class="game-info"><h3>Futboll-11</h3><p>Futboll Games</p></div></button>
     <button class="game-button" onclick="openGame('Age Of War','https://yohohoio.gabriel-oli-ren-micro.workers.dev/age-of-war.embedgame')"><img src=" img/age-of-war.png" alt="Age Of War" class="game-image"><div class="game-info"><h3>Age Of War</h3><p>Age war game</p></div></button>
-    <button class="game-button" onclick="openGame('Granny',granny.html)"><img src=" img/granny.png" alt="Granny" class="game-image"><div class="game-info"><h3>Granny</h3><p>Granny</p></div></button>
+    <button class="game-button" onclick="openGame('Granny','granny.html')"><img src=" img/granny.png" alt="Granny" class="game-image"><div class="game-info"><h3>Granny</h3><p>Granny</p></div></button>
   </div>
 
   <!-- APPS PAGE -->
@@ -1152,7 +1152,7 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
 <div class="chat-page" id="chatPage">
   <div class="chat-topbar">
     <button class="chat-topbar-back" onclick="showSection('home')">←</button>
-    <div class="chat-topbar-title">💬 Maths Support Chat</div>ç
+    <div class="chat-topbar-title">💬 Maths Support Chat</div>
     <button class="chat-broadcast-btn" id="broadcastBtn" style="display:none" onclick="showBroadcastModal()">📢Broadcast</button>
     <div class="chat-topbar-badge" id="chatTopBadge" style="display:none">
       <span>📨</span><span id="chatTopBadgeNum">0</span> unread
@@ -2139,20 +2139,6 @@ async function sendBroadcast(){
   if(error){alert('Error: '+error.message);return;}
   closeBroadcastModal();
   showToast('📢 Broadcast sent to all users!');
-}   .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${friendId}),and(sender_id.eq.${friendId},receiver_id.eq.${currentUser.id})`)
-    .order('created_at',{ascending:true}).limit(200);
-  if(!data||!data.length){container.innerHTML='<div class="chat-empty-msgs"><span>👋</span><span>Say hello!</span></div>';return;}
-  let lastDate=null;
-  data.forEach(m=>{
-    const mDate=new Date(m.created_at).toDateString();
-    if(mDate!==lastDate){appendDateDivider(container,m.created_at);lastDate=mDate;}
-    appendBubble(m);
-    if(m.id)lastMsgId=m.id;
-  });
-  container.scrollTop=container.scrollHeight;
-  markMessagesRead(friendId);
-  updateLastMsgPreview(friendId,data[data.length-1]);
-}
 
 async function pollNewMessages(friendId){
   if(!friendId||!currentUser)return;
