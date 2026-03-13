@@ -248,6 +248,48 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 @media(max-width:768px){.apps-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:500px){.apps-grid{grid-template-columns:1fr}}
 
+/* ── CUSTOM APPS ── */
+.custom-apps-section{background:rgba(255,255,255,.97);border-radius:20px;padding:28px 32px;margin-bottom:32px;box-shadow:0 8px 30px rgba(0,0,0,.1)}
+.custom-apps-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:12px}
+.custom-apps-title{color:#667eea;font-size:1.2em;font-weight:800;display:flex;align-items:center;gap:10px;border-bottom:2px solid #f0f4ff;padding-bottom:14px;flex:1}
+.custom-apps-add-btn{background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:#fff;padding:10px 22px;border-radius:11px;font-size:.88em;font-weight:700;cursor:pointer;transition:all .25s;white-space:nowrap;font-family:inherit}
+.custom-apps-add-btn:hover{transform:translateY(-2px);box-shadow:0 5px 16px rgba(102,126,234,.4)}
+.custom-apps-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:20px}
+@media(max-width:1100px){.custom-apps-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:768px){.custom-apps-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.custom-apps-grid{grid-template-columns:1fr}}
+.custom-app-card{position:relative;background:#fff;border:2px solid #f0f0f0;border-radius:14px;overflow:hidden;cursor:pointer;transition:all .25s;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.custom-app-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.15);border-color:#667eea}
+.custom-app-icon{font-size:2.2em;line-height:1}
+.custom-app-name{font-size:.82em;font-weight:700;color:#333;text-align:center;padding:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+.custom-app-desc{font-size:.72em;color:#888;text-align:center;padding:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+.custom-app-delete{position:absolute;top:6px;right:6px;background:rgba(246,79,89,.15);border:none;color:#f64f59;width:22px;height:22px;border-radius:50%;font-size:.75em;cursor:pointer;display:none;align-items:center;justify-content:center;transition:background .2s;line-height:1;font-weight:700}
+.custom-app-card:hover .custom-app-delete{display:flex}
+.custom-app-delete:hover{background:rgba(246,79,89,.35)}
+.custom-app-empty{grid-column:1/-1;text-align:center;padding:32px 20px;color:#ccc;font-size:.9em}
+.custom-app-empty span{font-size:2em;display:block;margin-bottom:10px}
+/* Add App Modal */
+.add-app-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:10000;display:none;justify-content:center;align-items:center}
+.add-app-overlay.active{display:flex}
+.add-app-box{background:#fff;border-radius:22px;padding:36px 40px;max-width:460px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.25)}
+.add-app-box h3{color:#667eea;font-size:1.3em;font-weight:800;margin-bottom:6px}
+.add-app-box p{color:#aaa;font-size:.85em;margin-bottom:24px}
+.add-app-field{margin-bottom:16px}
+.add-app-field label{display:block;font-size:.8em;font-weight:700;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.add-app-input{width:100%;padding:12px 15px;border:2px solid #ebebeb;border-radius:11px;font-size:.95em;outline:none;transition:border-color .25s;font-family:inherit}
+.add-app-input:focus{border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.1)}
+.add-app-emoji-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.add-app-emoji-btn{width:36px;height:36px;border:2px solid #ebebeb;border-radius:9px;background:#f8f8f8;font-size:1.1em;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.add-app-emoji-btn:hover,.add-app-emoji-btn.selected{border-color:#667eea;background:#f0f4ff}
+.add-app-actions{display:flex;gap:10px;margin-top:24px}
+.add-app-cancel{flex:1;padding:13px;background:#f5f5f5;border:none;border-radius:11px;color:#888;font-size:.95em;font-weight:700;cursor:pointer;font-family:inherit}
+.add-app-cancel:hover{background:#eee}
+.add-app-save{flex:2;padding:13px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:11px;color:#fff;font-size:.95em;font-weight:700;cursor:pointer;transition:all .25s;font-family:inherit}
+.add-app-save:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(102,126,234,.4)}
+.add-app-save:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.add-app-err{font-size:.82em;margin-top:10px;text-align:center;color:#f64f59;display:none}
+.add-app-err.show{display:block}
+
 /* ── ACCOUNT PAGE ── */
 .account-page{display:none;max-width:720px;margin:0 auto}
 .account-page.active{display:block}
@@ -1094,17 +1136,63 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
     <button class="game-button" onclick="openGame('Age Of War','https://yohohoio.gabriel-oli-ren-micro.workers.dev/age-of-war.embedgame')"><img src=" img/age-of-war.png" alt="Age Of War" class="game-image"><div class="game-info"><h3>Age Of War</h3><p>Age war game</p></div></button>
     <button class="game-button" onclick="openGame('Granny','granny.html')"><img src=" img/granny.png" alt="Granny" class="game-image"><div class="game-info"><h3>Granny</h3><p>Granny</p></div></button>
     <button class="game-button" onclick="openGame('Shark.io','https://games.construct.net/64330/72970/embed.html?uid=0&o=1')"><img src=" img/shark-io.png" alt="Shark.io" class="game-image"><div class="game-info"><h3>Shark.io</h3><p>Shark.io</p></div></button>
-<button class="game-button" onclick="openGame('Openfront.io','https://openfront.gabriel-oli-ren-micro.workers.dev/')"><img src=" img/openfront-io.png" alt="openfront.io" class="game-image"><div class="game-info"><h3>Openfront.io</h3><p>Openfront.io</p></div></button>
   </div>
 
   <!-- APPS PAGE -->
   <div class="apps-page" id="appsPage">
+    <!-- Built-in apps -->
     <div class="apps-grid">
       <button class="game-button" onclick="openGame('Strong Dog','https://colute.net/')"><img src=" img/favicon.png" alt="Strong Dog" class="game-image"><div class="game-info"><h3>🐕 Strong Dog</h3><p>Game portal</p></div></button>
       <button class="game-button" onclick="openGame('Rtve Play','https://rtve.es/play/')"><img src=" img/rt-ve.png" alt="Rtve Play" class="game-image"><div class="game-info"><h3>📺 Rtve Play</h3><p>Video streaming</p></div></button>
       <button class="game-button" onclick="openGame('ROYALEDLE','https://clash.gabriel-oli-ren-micro.workers.dev/')"><img src=" img/royaledle.png" alt="ROYALEDLE" class="game-image"><div class="game-info"><h3>👑 ROYALEDLE</h3><p>Puzzle guessing game</p></div></button>
       <button class="game-button" onclick="openGame('Sound Buttons','https://myinstants.online/')"><img src=" img/my-instants.png" alt="Sound Buttons" class="game-image"><div class="game-info"><h3>🔊 Sound Buttons</h3><p>Fun sound effects</p></div></button>
       <button class="game-button" onclick="openGame('Browser LOL','https://browserlol.gabriel-oli-ren-micro.workers.dev/')"><img src=" img/injex.png" alt="Injex Browser" class="game-image"><div class="game-info"><h3>Browser LOL</h3><p>Search online Unblocked</p></div></button>
+    </div>
+
+    <!-- Custom user apps -->
+    <div class="custom-apps-section">
+      <div class="custom-apps-header">
+        <div class="custom-apps-title">🔗 My Custom Links</div>
+        <button class="custom-apps-add-btn" onclick="openAddAppModal()">＋ Add Link</button>
+      </div>
+      <div class="custom-apps-grid" id="customAppsGrid">
+        <div class="custom-app-empty" id="customAppsEmpty">
+          <span>🔗</span>
+          Sign in to save your own links and apps here
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD APP MODAL -->
+  <div class="add-app-overlay" id="addAppOverlay">
+    <div class="add-app-box">
+      <h3>➕ Add Custom Link</h3>
+      <p>Save any website or app — opens inside the site.</p>
+      <div class="add-app-field">
+        <label>Name</label>
+        <input class="add-app-input" id="addAppName" placeholder="e.g. My Favourite Game" maxlength="30">
+      </div>
+      <div class="add-app-field">
+        <label>URL</label>
+        <input class="add-app-input" id="addAppUrl" placeholder="https://example.com" type="url">
+      </div>
+      <div class="add-app-field">
+        <label>Description (optional)</label>
+        <input class="add-app-input" id="addAppDesc" placeholder="Short description" maxlength="40">
+      </div>
+      <div class="add-app-field">
+        <label>Icon (pick an emoji)</label>
+        <div class="add-app-emoji-row" id="addAppEmojiRow">
+          <!-- filled by JS -->
+        </div>
+        <input class="add-app-input" id="addAppEmojiCustom" placeholder="Or type your own emoji" maxlength="4" style="margin-top:10px">
+      </div>
+      <div class="add-app-err" id="addAppErr"></div>
+      <div class="add-app-actions">
+        <button class="add-app-cancel" onclick="closeAddAppModal()">Cancel</button>
+        <button class="add-app-save" id="addAppSaveBtn" onclick="saveCustomApp()">💾 Save</button>
+      </div>
     </div>
   </div>
 
@@ -1754,6 +1842,7 @@ async function onSignedIn(user){
   startFriendPolling();
   subscribeToChat();
   subscribeToTyping();
+  loadCustomApps();
   if(sessionStorage.getItem('questionnaire_done')!=='true')checkAndShowQuestionnaire();
 // Show broadcast button for admins
   const iAmAdmin=ADMIN_USER_IDS.includes(user.id)||currentProfile?.is_admin;
@@ -2585,6 +2674,133 @@ async function confirmReveal(){
   await sb.from('friendships').update({status:'accepted',identity_revealed:true}).eq('id',revealPendingFriendshipId);
   closeRevealModal();await loadFriends();showToast('✅ Your identity has been revealed!');
 }
+
+// ══════════════════════════════════════════════════════════════════
+// CUSTOM APPS
+// ══════════════════════════════════════════════════════════════════
+const CUSTOM_APP_EMOJIS = ['🌐','🎮','📺','🎵','📚','🔗','🛒','📰','💬','📧','🗂️','🎨','⚡','🚀','🧠','📊','🔒','🎯','🏆','🌍'];
+let customAppsSelectedEmoji = '🌐';
+
+function openAddAppModal(){
+  if(!currentUser){ showToast('Sign in to save custom links!'); return; }
+  customAppsSelectedEmoji = '🌐';
+  document.getElementById('addAppName').value = '';
+  document.getElementById('addAppUrl').value = '';
+  document.getElementById('addAppDesc').value = '';
+  document.getElementById('addAppEmojiCustom').value = '';
+  const err = document.getElementById('addAppErr');
+  err.textContent = ''; err.classList.remove('show');
+  // Render emoji picker
+  const row = document.getElementById('addAppEmojiRow');
+  row.innerHTML = CUSTOM_APP_EMOJIS.map(e =>
+    `<button type="button" class="add-app-emoji-btn${e===customAppsSelectedEmoji?' selected':''}" onclick="selectAppEmoji('${e}',this)">${e}</button>`
+  ).join('');
+  document.getElementById('addAppOverlay').classList.add('active');
+  setTimeout(()=>document.getElementById('addAppName').focus(), 100);
+}
+
+function closeAddAppModal(){
+  document.getElementById('addAppOverlay').classList.remove('active');
+}
+
+function selectAppEmoji(emoji, btn){
+  customAppsSelectedEmoji = emoji;
+  document.querySelectorAll('.add-app-emoji-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('addAppEmojiCustom').value = '';
+}
+
+async function saveCustomApp(){
+  const name = document.getElementById('addAppName').value.trim();
+  const url  = document.getElementById('addAppUrl').value.trim();
+  const desc = document.getElementById('addAppDesc').value.trim();
+  const customEmoji = document.getElementById('addAppEmojiCustom').value.trim();
+  const icon = customEmoji || customAppsSelectedEmoji || '🌐';
+  const err  = document.getElementById('addAppErr');
+  const btn  = document.getElementById('addAppSaveBtn');
+
+  err.classList.remove('show');
+  if(!name){ err.textContent='Please enter a name.'; err.classList.add('show'); return; }
+  if(!url){ err.textContent='Please enter a URL.'; err.classList.add('show'); return; }
+
+  // Normalise URL
+  let finalUrl = url;
+  if(!/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
+
+  btn.disabled = true; btn.textContent = '⏳ Saving...';
+  const { data, error } = await sb.from('custom_apps')
+    .insert({ user_id: currentUser.id, name, url: finalUrl, description: desc, icon })
+    .select().single();
+  btn.disabled = false; btn.textContent = '💾 Save';
+
+  if(error){ err.textContent = 'Error: ' + error.message; err.classList.add('show'); return; }
+  closeAddAppModal();
+  renderCustomAppCard(data);
+  document.getElementById('customAppsEmpty').style.display = 'none';
+  showToast('✅ Link saved!');
+}
+
+async function loadCustomApps(){
+  const grid = document.getElementById('customAppsGrid');
+  const empty = document.getElementById('customAppsEmpty');
+  if(!currentUser){
+    empty.textContent = ''; empty.innerHTML = '<span>🔗</span>Sign in to save your own links here';
+    empty.style.display = 'block'; return;
+  }
+  const { data, error } = await sb.from('custom_apps')
+    .select('*').eq('user_id', currentUser.id).order('created_at', { ascending: true });
+  // Remove old cards (keep empty placeholder)
+  grid.querySelectorAll('.custom-app-card').forEach(c=>c.remove());
+  if(error || !data || !data.length){
+    empty.innerHTML = '<span>🔗</span>No custom links yet — click <strong>Add Link</strong> to get started!';
+    empty.style.display = 'block'; return;
+  }
+  empty.style.display = 'none';
+  data.forEach(app => renderCustomAppCard(app));
+}
+
+function renderCustomAppCard(app){
+  const grid = document.getElementById('customAppsGrid');
+  const card = document.createElement('div');
+  card.className = 'custom-app-card';
+  card.dataset.id = app.id;
+  card.innerHTML = `
+    <button class="custom-app-delete" onclick="deleteCustomApp('${app.id}',event)" title="Remove">✕</button>
+    <div class="custom-app-icon">${escapeHtml(app.icon||'🌐')}</div>
+    <div class="custom-app-name">${escapeHtml(app.name)}</div>
+    ${app.description ? `<div class="custom-app-desc">${escapeHtml(app.description)}</div>` : ''}
+  `;
+  card.addEventListener('click', ()=>openGame(app.name, app.url));
+  grid.appendChild(card);
+}
+
+async function deleteCustomApp(id, e){
+  e.stopPropagation();
+  if(!confirm('Remove this link?')) return;
+  const { error } = await sb.from('custom_apps').delete().eq('id', id).eq('user_id', currentUser.id);
+  if(error){ showToast('❌ Could not delete'); return; }
+  const card = document.querySelector(`.custom-app-card[data-id="${id}"]`);
+  if(card) card.remove();
+  const grid = document.getElementById('customAppsGrid');
+  if(!grid.querySelector('.custom-app-card')){
+    const empty = document.getElementById('customAppsEmpty');
+    empty.innerHTML = '<span>🔗</span>No custom links yet — click <strong>Add Link</strong> to get started!';
+    empty.style.display = 'block';
+  }
+  showToast('🗑️ Link removed');
+}
+
+// Close modal on overlay click
+document.getElementById('addAppOverlay').addEventListener('click', function(e){
+  if(e.target === this) closeAddAppModal();
+});
+// Enter key in modal inputs
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') closeAddAppModal();
+  if(e.key==='Enter' && document.getElementById('addAppOverlay').classList.contains('active') && document.activeElement?.classList.contains('add-app-input')){
+    e.preventDefault(); saveCustomApp();
+  }
+});
 
 // ══════════════════════════════════════════════════════════════════
 // MAIN APP INIT (unchanged)
