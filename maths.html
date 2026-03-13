@@ -245,9 +245,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 @media(max-width:500px){.apps-grid{grid-template-columns:1fr}}
 
 /* ── CUSTOM APPS ── */
-.custom-apps-section{background:rgba(255,255,255,.97);border-radius:20px;padding:28px 32px;margin-bottom:32px;box-shadow:0 8px 30px rgba(0,0,0,.1)}
-.custom-apps-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:12px}
-.custom-apps-title{color:#667eea;font-size:1.2em;font-weight:800;display:flex;align-items:center;gap:10px;border-bottom:2px solid #f0f4ff;padding-bottom:14px;flex:1}
+.custom-apps-section{max-width:1400px;margin:0 auto;padding-bottom:20px}
+.custom-apps-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+.custom-apps-title{color:rgba(255,255,255,.85);font-size:1.1em;font-weight:800;display:flex;align-items:center;gap:8px;border-bottom:2px solid rgba(255,255,255,.12);padding-bottom:14px;flex:1}
 .custom-apps-add-btn{background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:#fff;padding:10px 22px;border-radius:11px;font-size:.88em;font-weight:700;cursor:pointer;transition:all .25s;white-space:nowrap;font-family:inherit}
 .custom-apps-add-btn:hover{transform:translateY(-2px);box-shadow:0 5px 16px rgba(102,126,234,.4)}
 .custom-apps-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:20px}
@@ -1134,17 +1134,6 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
     <button class="game-button" onclick="openGame('Shark.io','https://games.construct.net/64330/72970/embed.html?uid=0&o=1')"><img src=" img/shark-io.png" alt="Shark.io" class="game-image"><div class="game-info"><h3>Shark.io</h3><p>Shark.io</p></div></button>
   </div>
 
-  <!-- APPS PAGE -->
-  <div class="apps-page" id="appsPage">
-    <!-- Built-in apps -->
-    <div class="apps-grid">
-      <button class="game-button" onclick="openGame('Strong Dog','https://colute.net/')"><img src=" img/favicon.png" alt="Strong Dog" class="game-image"><div class="game-info"><h3>🐕 Strong Dog</h3><p>Game portal</p></div></button>
-      <button class="game-button" onclick="openGame('Rtve Play','https://rtve.es/play/')"><img src=" img/rt-ve.png" alt="Rtve Play" class="game-image"><div class="game-info"><h3>📺 Rtve Play</h3><p>Video streaming</p></div></button>
-      <button class="game-button" onclick="openGame('ROYALEDLE','https://clash.gabriel-oli-ren-micro.workers.dev/')"><img src=" img/royaledle.png" alt="ROYALEDLE" class="game-image"><div class="game-info"><h3>👑 ROYALEDLE</h3><p>Puzzle guessing game</p></div></button>
-      <button class="game-button" onclick="openGame('Sound Buttons','https://myinstants.online/')"><img src=" img/my-instants.png" alt="Sound Buttons" class="game-image"><div class="game-info"><h3>🔊 Sound Buttons</h3><p>Fun sound effects</p></div></button>
-      <button class="game-button" onclick="openGame('Browser LOL','https://browserlol.gabriel-oli-ren-micro.workers.dev/')"><img src=" img/injex.png" alt="Injex Browser" class="game-image"><div class="game-info"><h3>Browser LOL</h3><p>Search online Unblocked</p></div></button>
-    </div>
-
     <!-- Custom user apps -->
     <div class="custom-apps-section">
       <div class="custom-apps-header">
@@ -1157,6 +1146,17 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
           Sign in to save your own links and apps here
         </div>
       </div>
+    </div>
+
+  <!-- APPS PAGE -->
+  <div class="apps-page" id="appsPage">
+    <!-- Built-in apps -->
+    <div class="apps-grid">
+      <button class="game-button" onclick="openGame('Strong Dog','https://colute.net/')"><img src=" img/favicon.png" alt="Strong Dog" class="game-image"><div class="game-info"><h3>🐕 Strong Dog</h3><p>Game portal</p></div></button>
+      <button class="game-button" onclick="openGame('Rtve Play','https://rtve.es/play/')"><img src=" img/rt-ve.png" alt="Rtve Play" class="game-image"><div class="game-info"><h3>📺 Rtve Play</h3><p>Video streaming</p></div></button>
+      <button class="game-button" onclick="openGame('ROYALEDLE','https://clash.gabriel-oli-ren-micro.workers.dev/')"><img src=" img/royaledle.png" alt="ROYALEDLE" class="game-image"><div class="game-info"><h3>👑 ROYALEDLE</h3><p>Puzzle guessing game</p></div></button>
+      <button class="game-button" onclick="openGame('Sound Buttons','https://myinstants.online/')"><img src=" img/my-instants.png" alt="Sound Buttons" class="game-image"><div class="game-info"><h3>🔊 Sound Buttons</h3><p>Fun sound effects</p></div></button>
+      <button class="game-button" onclick="openGame('Browser LOL','https://browserlol.gabriel-oli-ren-micro.workers.dev/')"><img src=" img/injex.png" alt="Injex Browser" class="game-image"><div class="game-info"><h3>Browser LOL</h3><p>Search online Unblocked</p></div></button>
     </div>
   </div>
 
