@@ -3029,7 +3029,7 @@ function aiRenderTreeItems(container, items, parentPath){
             if(!r.ok)throw new Error();
             sub.innerHTML='';
             aiRenderTreeItems(sub, await r.json(), item.path);
-          }catch(){ sub.innerHTML=`<div class="ai-file-tree-loading" style="padding-left:${(depth+1)*10+8}px">❌ error</div>`; }
+          }catch(e){ sub.innerHTML=`<div class="ai-file-tree-loading" style="padding-left:${(depth+1)*10+8}px">❌ error</div>`; }
         }else{ open=false; node.classList.remove('active'); document.getElementById(subId)?.remove(); }
       };
     }else{
