@@ -175,13 +175,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 
 .main-content{margin-left:60px;padding:40px;transition:margin-left .3s}
 .top-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:40px;padding:15px 20px;background:rgba(255,255,255,.97);border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,.1);flex-wrap:wrap}
-.top-nav.minimal .search-container,.top-nav.minimal .ai-helper-btn{display:none}
+.top-nav.minimal .search-container,.top-nav.minimal .add-link-btn{display:none}
 .site-name{font-size:1.8em;font-weight:800;color:#667eea;white-space:nowrap;letter-spacing:-.5px}
 .search-container{flex:1;min-width:200px;max-width:600px}
 .search-bar{width:100%;padding:13px 20px;border:2px solid #ebebeb;border-radius:25px;font-size:1em;outline:none;transition:all .3s;font-family:inherit}
 .search-bar:focus{border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.1)}
-.ai-helper-btn{background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:#fff;padding:13px 26px;border-radius:25px;font-size:.95em;font-weight:700;cursor:pointer;transition:all .3s;white-space:nowrap;display:flex;align-items:center;gap:8px;font-family:inherit}
-.ai-helper-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(102,126,234,.4)}
+.add-link-btn{background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:#fff;padding:13px 26px;border-radius:25px;font-size:.95em;font-weight:700;cursor:pointer;transition:all .3s;white-space:nowrap;display:flex;align-items:center;gap:8px;font-family:inherit}
+.add-link-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(102,126,234,.4)}
 
 /* ── USER BADGE ── */
 .user-badge{display:none;align-items:center;gap:10px;background:#fff;border:1.5px solid rgba(102,126,234,.25);border-radius:30px;padding:6px 14px 6px 6px;cursor:pointer;transition:all .25s;box-shadow:0 2px 10px rgba(0,0,0,.07);position:relative;user-select:none}
@@ -206,11 +206,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:url('https://i.postim
 .role-badge.verified{background:linear-gradient(135deg,#00b4db,#0083b0);color:#fff}
 
 /* ── AI OVERLAY ── */
-.ai-overlay{position:fixed;inset:0;background:#fff;z-index:9999;display:none}
-.ai-overlay.active{display:block}
-.ai-close-btn{position:fixed;top:20px;right:20px;background:#ff4444;border:none;color:#fff;width:50px;height:50px;border-radius:50%;font-size:1.5em;cursor:pointer;z-index:10000;box-shadow:0 4px 8px rgba(0,0,0,.2);font-weight:bold;transition:all .3s}
-.ai-close-btn:hover{background:#cc0000;transform:scale(1.1)}
-.ai-frame{width:100%;height:100%;border:none}
+
 
 /* ── GAMES GRID ── */
 .games-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;max-width:1400px;margin:0 auto 40px;position:relative}
@@ -1085,7 +1081,7 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
     <div class="search-container">
       <input type="text" class="search-bar" id="searchBar" placeholder="Search for games...">
     </div>
-    <button class="ai-helper-btn" onclick="openAIHelper()"><span>🤖</span><span>AI Helper</span></button>
+    <button class="add-link-btn" onclick="openAddAppModal()"><span>＋</span><span>Add Link</span></button>
     <div class="user-badge" id="userBadge" onclick="toggleDropdown()">
       <div class="user-avatar-sm" id="userAvatarSm">?</div>
       <span class="user-name-sm" id="userNameSm">User</span>
@@ -1131,7 +1127,7 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
     <button class="game-button" onclick="openGame('Masked Special Forces','https://ezclasswork.com/science/maskedforces/')"><img src=" img/masked-forces.png" alt="Masked Special Forces" class="game-image"><div class="game-info"><h3>🎖️ Masked Special Forces</h3><p>Action FPS game</p></div></button>
     <button class="game-button" onclick="openGame('Geometry Dash Lite','https://arcadrome.com/embed/geometry-dash-lite/')"><img src="img/geometry-dash.png" alt="Geometry Dash" class="game-image"><div class="game-info"><h3>📐 Geometry Dash Lite</h3><p>Rhythm platformer game</p></div></button>
     <button class="game-button" onclick="openGame('5 nights at epstein','https://ig.gabriel-oli-ren-micro.workers.dev/')"><img src="img/epstein.png" alt="5 nights at epstein" class="game-image"><div class="game-info"><h3>5 nights at epstein</h3><p>escape epstein</p></div></button>
-    <button class="game-button" onclick="openGame('Openfront','https://openfront.gabriel-oli-ren-micro.workers.dev//')"><img src="img/openfront.png" alt="Openfront" class="game-image"><div class="game-info"><h3>🌍 Openfront</h3><p>Multiplayer strategy game</p></div></button>
+    <button class="game-button" onclick="openGame('Territorial','https://territorial-io.com/')"><img src="img/territorial.png" alt="Territorial" class="game-image"><div class="game-info"><h3>🌍 Territorial</h3><p>Multiplayer strategy game</p></div></button>
     <button class="game-button" onclick="openGame('Futboll-11','https://whatsapp.gabriel-oli-ren-micro.workers.dev/')"><img src="img/futboll.png" alt="Futboll-11" class="game-image"><div class="game-info"><h3>Futboll-11</h3><p>Futboll Games</p></div></button>
     <button class="game-button" onclick="openGame('Age Of War','https://yohohoio.gabriel-oli-ren-micro.workers.dev/age-of-war.embedgame')"><img src=" img/age-of-war.png" alt="Age Of War" class="game-image"><div class="game-info"><h3>Age Of War</h3><p>Age war game</p></div></button>
     <button class="game-button" onclick="openGame('Granny','granny.html')"><img src=" img/granny.png" alt="Granny" class="game-image"><div class="game-info"><h3>Granny</h3><p>Granny</p></div></button>
@@ -1614,10 +1610,6 @@ window.SDK_OPTIONS={gameId:"jp112o3o4hzgrnc7zaewjkrfk282pul8",onEvent:function(a
 </div>
 
 <!-- AI HELPER -->
-<div class="ai-overlay" id="aiOverlay">
-  <button class="ai-close-btn" onclick="closeAIHelper()">✕</button>
-  <iframe id="aiFrame" class="ai-frame" src=""></iframe>
-</div>
 
 <!-- GRANNY -->
 <div id="granny-unity-container">
@@ -2637,8 +2629,7 @@ function showSection(section){
 // ══════════════════════════════════════════════════════════════════
 // AI + SEARCH (unchanged)
 // ══════════════════════════════════════════════════════════════════
-function openAIHelper(){document.getElementById('aiFrame').src='https://www.chattide.ai/chat-gpt/';document.getElementById('aiOverlay').classList.add('active');}
-function closeAIHelper(){document.getElementById('aiFrame').src='';document.getElementById('aiOverlay').classList.remove('active');}
+
 function searchGames(){
   const term=document.getElementById('searchBar').value.toLowerCase();
   if(document.getElementById('homeBtn').classList.contains('active')){
